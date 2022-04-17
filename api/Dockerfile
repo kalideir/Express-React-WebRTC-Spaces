@@ -17,8 +17,6 @@ EXPOSE 9229
 
 COPY --chown=node:node package*.json ./
 
-USER node
-
 RUN rm -rf node_modules/
 RUN npm cache clean --force
 
@@ -32,9 +30,6 @@ ENV PATH /usr/app/node_modules/.bin:$PATH
 
 COPY --chown=node:node . .
 
-
-
-# USER node
 
 
 # if you want to use npm start instead, then use `docker run --init in production`
