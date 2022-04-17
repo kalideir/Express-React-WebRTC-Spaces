@@ -21,7 +21,8 @@ RUN rm -rf node_modules/
 RUN npm cache clean --force
 
 
-RUN npm install --unsafe-perm=true  && npm cache clean --force
+RUN rm -rf node_modules && npm install --unsafe-perm=true  && npm cache clean --force
+
 RUN npm install sharp
 
 
