@@ -17,7 +17,7 @@ ENV PORT $PORT
 
 COPY --chown=node:node package*.json ./
 
-# RUN export NODE_OPTIONS=--max_old_space_size=4096
+RUN export NODE_OPTIONS=--max_old_space_size=20000
 
 RUN rm -rf node_modules && npm install --unsafe-perm=true  && npm cache clean --force
 

@@ -5,7 +5,7 @@ var options = {
   timeout: 2000,
   host: 'localhost',
   port: process.env.PORT || 8080,
-  path: '/healthCheck', // must be the same as HEALTHCHECK in Dockerfile
+  path: '/api/healthCheck', // must be the same as HEALTHCHECK in Dockerfile
 };
 
 var request = http.request(options, res => {
