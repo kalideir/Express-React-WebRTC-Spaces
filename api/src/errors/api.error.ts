@@ -1,6 +1,16 @@
 import createError from 'http-errors';
 
 class ApiError {
+  public message: string;
+  public status: number;
+  public originalStack: string;
+
+  constructor(message, status, originalStack) {
+    this.originalStack = originalStack;
+    this.message = message;
+    this.status = status;
+  }
+
   static unauthorized(message: string) {
     return new createError.Unauthorized(message);
   }

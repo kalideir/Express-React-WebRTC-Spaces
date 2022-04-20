@@ -6,11 +6,10 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useDispatch } from 'react-redux';
 
 const schema = yup.object({
-  firstName: yup.string().min(3).required(''),
-  lastName: yup.string().min(3).required('Efternamn krävs'),
-  email: yup.string().email().required('E-post krävs'),
-  password: yup.string().min(8).max(32).required('lösenord krävs'),
-  passwordConfirmation: yup.string().oneOf([yup.ref('password'), null], 'lösenorden måste vara lika'),
+  username: yup.string().min(3, 'Must be at least 3 letters').required('Username required'),
+  email: yup.string().email().required('Email is required'),
+  password: yup.string().min(8).max(32).required('Password is required'),
+  passwordConfirmation: yup.string().oneOf([yup.ref('password'), null], "Passwords don't match"),
 });
 
 function Register() {
@@ -27,7 +26,9 @@ function Register() {
 
   const dispatch = useDispatch();
 
-  async function onSubmitHandler(data: FieldValues) {}
+  async function onSubmitHandler(data: FieldValues) {
+    console.log({ data });
+  }
 
   return (
     <div>
@@ -49,14 +50,12 @@ function Register() {
                 Username:
               </label>
               <input
-                {...register('firstName')}
+                {...register('username')}
                 type="text"
-                name="name"
-                id="name"
                 placeholder="username"
                 className="w-full border border-gray-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
               />
-              <div className="text-danger">{errors.firstName && <div>{errors.firstName.message}</div>}</div>
+              {errors.username && <div className="text-red-500 font-semibold">{errors.username.message}</div>}
             </div>
 
             <div>
@@ -64,28 +63,36 @@ function Register() {
                 Email:
               </label>
               <input
-                {...register('firstName')}
+                {...register('email')}
                 type="text"
-                name="email"
-                id="email"
                 placeholder="@email"
                 className="w-full border border-gray-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
               />
-              <div className="text-danger">{errors.firstName && <div>{errors.firstName.message}</div>}</div>
+              {errors.email && <div className="text-red-500 font-semibold">{errors.email.message}</div>}
             </div>
             <div className="mb-6">
               <label htmlFor="email" className="block text-slate-900 dark:text-slate-200 font-bold">
                 Password:
               </label>
               <input
-                {...register('firstName')}
+                {...register('password')}
                 type="password"
-                name="name"
-                id="name"
-                placeholder="username"
+                placeholder="password"
                 className="w-full border border-gray-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
               />
-              <div className="text-danger">{errors.firstName && <div>{errors.firstName.message}</div>}</div>
+              {errors.password && <div className="text-red-500 font-semibold">{errors.password.message}</div>}
+            </div>
+            <div className="mb-6">
+              <label htmlFor="email" className="block text-slate-900 dark:text-slate-200 font-bold">
+                Confirm Password:
+              </label>
+              <input
+                {...register('passwordConfirmation')}
+                type="password"
+                placeholder="password confirmation"
+                className="w-full border border-gray-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
+              />
+              {errors.passwordConfirmation && <div className="text-red-500 font-semibold">{errors.passwordConfirmation.message}</div>}
             </div>
             <button className="cursor-pointer py-4 px-4 block mt-6 bg-indigo-500 text-white font-bold w-full text-center rounded">Login</button>
           </form>

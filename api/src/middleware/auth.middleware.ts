@@ -5,6 +5,7 @@ import { ApiError } from '../errors';
 import { signAccessToken } from '../services';
 import config from 'config';
 import { t } from '../utils';
+import httpStatus from 'http-status';
 
 const handler = (req, res, next) => async (err, user, info) => {
   const error = err || info;
@@ -23,7 +24,7 @@ const handler = (req, res, next) => async (err, user, info) => {
   try {
     await req.logIn(user, { session: false });
   } catch (e) {
-    return next(e);
+    return next(new ApiError(e.message, httpStatus.INTERNAL_SERVER_ERROR, e.stack));
   }
   req.user = user;
   return next();
