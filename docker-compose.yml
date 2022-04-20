@@ -2,18 +2,18 @@ version: '3.9'
 
 services:
   client:
-    container_name: web
+    container_name: client
     stdin_open: true
     build:
       context: ./client/
+      target: dev
     ports:
       - '3000:3000'
+    
     env_file:
-      - ./client/.env.development.local
+      - ./client/.env.development.local    
     volumes:
       - ./client:/usr/app
-      - ./api/package.json:/usr/app/package.json
-      - ./api/package-lock.json:/usr/app/package-lock.json
       - /usr/app/node_modules
   redis:
     container_name: redis
@@ -43,8 +43,6 @@ services:
       - "9100:9100"
     volumes:
       - ./api/:/usr/app
-      - ./api/package.json:/usr/app/package.json
-      - ./api/package-lock.json:/usr/app/package-lock.json
       - /usr/app/node_modules
     
     restart: 'unless-stopped'
@@ -83,7 +81,7 @@ services:
     ports:
       - '80:80'
     build:
-      context: ./api/
+      context: ./nginx/
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     restart: 'unless-stopped'

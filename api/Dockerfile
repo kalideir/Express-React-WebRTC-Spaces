@@ -1,4 +1,4 @@
-FROM node:16.14-slim as base
+FROM node:16.14.2-buster as base
 
 # set our node environment, either development or production
 # defaults to production, compose overrides this to development on build and run
@@ -15,15 +15,18 @@ WORKDIR /usr/app
 EXPOSE 8000
 EXPOSE 9229
 
+USER node
+
 COPY --chown=node:node package*.json ./
 
-RUN rm -rf node_modules/
+# RUN rm -rf node_modules/
 RUN npm cache clean --force
 
+RUN npm config set unsafe-perm true
 
-RUN rm -rf node_modules && npm install --unsafe-perm=true  && npm cache clean --force
+RUN npm install --unsafe-perm
 
-RUN npm install sharp
+# RUN npm install sharp
 
 
 ENV PATH /usr/app/node_modules/.bin:$PATH

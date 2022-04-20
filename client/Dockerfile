@@ -19,7 +19,9 @@ COPY --chown=node:node package*.json ./
 
 RUN export NODE_OPTIONS=--max_old_space_size=20000
 
-RUN rm -rf node_modules && npm install --unsafe-perm=true  && npm cache clean --force
+# RUN rm -rf node_modules/
+
+RUN npm install --unsafe-perm=true && npm cache clean --force
 
 
 COPY --chown=node:node . .
@@ -33,9 +35,15 @@ ENV NODE_ENV = development
 ENTRYPOINT [ "npm", "run", "start" ]
 
 
+# prod setup
+FROM base as prod
+
+ENV NODE_ENV = production
+
+RUN npm run build
+# ENTRYPOINT [ "npm", "run", "start" ]
 
 # nginx 
-FROM nginx
+# FROM nginx
 
-COPY ../nginx/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /usr/app/build /usr/share/nginx/html
+# COPY --from=build /usr/app/build /usr/share/nginx/html
