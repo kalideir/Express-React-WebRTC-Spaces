@@ -70,7 +70,7 @@ const swaggerOptions: swaggerJsdoc.Options = {
     },
     security: [cookieName],
   },
-  apis: ['./src/routes/**/*.ts', './src/models/**/*.ts', './src/schema/**/*.ts'],
+  apis: ['./src/swagger/**/*.ts'],
 };
 
 export default swaggerOptions;

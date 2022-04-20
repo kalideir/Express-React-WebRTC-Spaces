@@ -47,7 +47,6 @@ const errorTransport = new winstonDaily({
  */
 const logger = winston.createLogger({
   format: winston.format.combine(
-    winston.format.timestamp(),
     // winston.format.colorize(),
     winston.format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',

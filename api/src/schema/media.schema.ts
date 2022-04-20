@@ -17,27 +17,6 @@ const params = {
   }),
 };
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    CreateMediaInput:
- *      type: object
- *      required:
- *        - type
- *        - file
- *        - contentType
- *      properties:
- *        type:
- *          type: string
- *        contentType:
- *          type: string
- *        file:
- *          type: string
- *          format: binary
- *    CreateMediaResponse:
- *      type: object
- */
 export const createMediaSchema = object({
   ...payload,
 });

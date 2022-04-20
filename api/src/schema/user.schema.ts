@@ -22,66 +22,12 @@ const userPayload = {
   }),
 };
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    GetUserResponse:
- *      type: object
- *      properties:
- *        email:
- *          type: string
- *        firstName:
- *          type: string
- *        lastName:
- *          type: string
- *        createdAt:
- *          type: string
- *        updatedAt:
- *          type: string
- *        phoneNumber:
- *          type: string
- *        address:
- *          type: string
- *        birthdate:
- *          type: string
- *        profilePicture:
- *          type: string
- *        role:
- *          type: string
- */
 export const getUserSchema = object({
   params: object({
     id: string(),
   }),
 });
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    UpdateUserInput:
- *      type: object
- *    UpdateUserResponse:
- *        type: object
- *        properties:
- *          email:
- *            type: string
- *          firstName:
- *            type: string
- *          lastName:
- *            type: string
- *          createdAt:
- *            type: string
- *          updatedAt:
- *            type: string
- *          phoneNumber:
- *            type: string
- *          profilePicture:
- *            type: string
- *          id:
- *            type: string
- */
 export const updateUserSchema = object({
   ...userPayload,
 });
@@ -103,64 +49,10 @@ const query = {
   }),
 };
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    ListUsersResponse:
- *      type: object
- *      properties:
- *        email:
- *          type: string
- *        firstName:
- *          type: string
- *        lastName:
- *          type: string
- *        createdAt:
- *          type: string
- *        updatedAt:
- *          type: string
- *        phoneNumber:
- *          type: string
- *        address:
- *          type: string
- *        birthdate:
- *          type: string
- *        profilePicture:
- *          type: string
- *        role:
- *          type: string
- */
 export const listUsersSchema = object({
   ...query,
 });
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    UpdateUserInput:
- *      type: object
- *    UpdateUserResponse:
- *        type: object
- *        properties:
- *          email:
- *            type: string
- *          firstName:
- *            type: string
- *          lastName:
- *            type: string
- *          createdAt:
- *            type: string
- *          updatedAt:
- *            type: string
- *          phoneNumber:
- *            type: string
- *          profilePicture:
- *            type: string
- *          id:
- *            type: string
- */
 export const updateOtherUserSchema = object({
   ...userPayload,
   params: object({ id: string({ required_error: t('id_required') }) }),

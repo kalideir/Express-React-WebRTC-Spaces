@@ -5,6 +5,9 @@ const fields = {
   email: string({
     required_error: t('email_required'),
   }).email(t('email_invalid')),
+  username: string({
+    required_error: t('username_required'),
+  }).min(1, t('username_field_length')),
   password: string({
     required_error: t('password_required'),
   }).min(6, t('password_field_length')),
@@ -13,71 +16,14 @@ const fields = {
   }),
 };
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    RegisterUserInput:
- *      type: object
- *      required:
- *        - email
- *        - password
- *      properties:
- *        email:
- *          type: string
- *          default: user@email.com
- *        password:
- *          type: string
- *          default: password
- *    RegisterUserResponse:
- *      type: object
- *      properties:
- *        email:
- *          type: string
- *        _id:
- *          type: string
- *        createdAt:
- *          type: string
- *        updatedAt:
- *          type: string
- */
 export const registerUserSchema = object({
   body: object({
     email: fields.email,
+    username: fields.username,
     password: fields.password,
   }),
 });
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    LoginInput:
- *      type: object
- *      required:
- *        - email
- *        - password
- *      properties:
- *        email:
- *          type: string
- *          default: user@email.com
- *        password:
- *          type: string
- *          default: password
- *    LoginResponse:
- *        type: object
- *        properties:
- *          accessToken:
- *            type: string
- *          refreshToken:
- *            type: string
- *          _id:
- *            type: string
- *          createdAt:
- *            type: string
- *          updatedAt:
- *            type: string
- */
 export const loginSchema = object({
   body: object({
     email: fields.email,
@@ -85,120 +31,24 @@ export const loginSchema = object({
   }),
 });
 
-/**
- * @swagger
- * components:
- *  schemas:
- *      VerifyUserResponse:
- *        type: object
- *        properties:
- *          email:
- *            type: string
- *          fullName:
- *            type: string
- *          _id:
- *            type: string
- *          createdAt:
- *            type: string
- *          updatedAt:
- *            type: string
- */
 export const verifyUserSchema = object({
   query: object({
     verificationCode: string(),
   }),
 });
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    ResendVerificationCodeInput:
- *      type: object
- *      required:
- *        - email
- *      properties:
- *        email:
- *          type: string
- *    ResendVerificationCodeResponse:
- *        type: object
- *        properties:
- *          email:
- *            type: string
- *          fullName:
- *            type: string
- *          _id:
- *            type: string
- *          createdAt:
- *            type: string
- *          updatedAt:
- *            type: string
- */
 export const resendVerificationCodeSchema = object({
   body: object({
     email: fields.email,
   }),
 });
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    ForgotPasswordInput:
- *      type: object
- *      required:
- *        - email
- *      properties:
- *        email:
- *          type: string
- *    ForgotPasswordResponse:
- *        type: object
- *        properties:
- *          email:
- *            type: string
- *          fullName:
- *            type: string
- *          _id:
- *            type: string
- *          createdAt:
- *            type: string
- *          updatedAt:
- *            type: string
- */
 export const forgotPasswordSchema = object({
   body: object({
     email: fields.email,
   }),
 });
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    ResetPasswordInput:
- *      type: object
- *      required:
- *        - password
- *        - passwordConfirmation
- *      properties:
- *        password:
- *          type: string
- *        passwordConfirmation:
- *          type: string
- *    ResetPasswordResponse:
- *        type: object
- *        properties:
- *          email:
- *            type: string
- *          fullName:
- *            type: string
- *          _id:
- *            type: string
- *          createdAt:
- *            type: string
- *          updatedAt:
- *            type: string
- */
 export const resetPasswordSchema = object({
   query: object({
     passwordResetCode: string(),
@@ -212,34 +62,6 @@ export const resetPasswordSchema = object({
   }),
 });
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    NewPasswordInput:
- *      type: object
- *      required:
- *        - password
- *        - passwordConfirmation
- *      properties:
- *        password:
- *          type: string
- *        passwordConfirmation:
- *          type: string
- *    NewPasswordResponse:
- *        type: object
- *        properties:
- *          email:
- *            type: string
- *          fullName:
- *            type: string
- *          _id:
- *            type: string
- *          createdAt:
- *            type: string
- *          updatedAt:
- *            type: string
- */
 export const newPasswordSchema = object({
   body: object({
     password: fields.password,
@@ -250,23 +72,6 @@ export const newPasswordSchema = object({
   }),
 });
 
-/**
- * @swagger
- * components:
- *  schemas:
- *    NewTokenInput:
- *      type: object
- *      required:
- *        - refreshToken
- *      properties:
- *        refreshToken:
- *          type: string
- *    NewTokenResponse:
- *        type: object
- *        properties:
- *          token:
- *            type: string
- */
 export const tokenSchema = object({
   body: object({
     refreshToken: string({ required_error: t('refresh_token_required') }),

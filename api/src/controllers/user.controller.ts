@@ -19,9 +19,16 @@ export type ListUsersQueryType = Partial<{
   [name: string]: unknown;
 }>;
 
-export async function get(req: Request<GetUsersInput['params']>, res: Response) {
-  const { id } = req.params;
+export async function load(req: Request<GetUsersInput['params']>, res: Response, next: NextFunction, id: string) {
   let user = await findUserById(id);
+  user = await user.populate('profilePicture');
+  const result = user.toJSON();
+  res.locals.user = result;
+  next();
+}
+
+export async function get(req: Request<GetUsersInput['params']>, res: Response) {
+  let user = res.locals.user;
   user = await user.populate('profilePicture');
   const result = user.toJSON();
   return res.json({ ...result });
