@@ -11,7 +11,7 @@ const initialState: SpaceData = {
 };
 
 const spaceSlice = createSlice({
-  name: 'spaceSlice',
+  name: 'space',
   initialState,
   reducers: {
     togglePermissionModal: state => {

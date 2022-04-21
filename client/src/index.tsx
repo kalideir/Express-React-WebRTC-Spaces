@@ -3,16 +3,23 @@ import ReactDOM from 'react-dom';
 import './styles/global.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { SnackbarProvider } from 'notistack';
+import { ApiProvider } from '@reduxjs/toolkit/query/react';
+import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import store from './store/store';
 
-import { Provider } from 'react-redux';
+import { ApiService } from './services';
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <App />
+        <ApiProvider api={ApiService}>
+          <SnackbarProvider maxSnack={3}>
+            <App />
+          </SnackbarProvider>
+        </ApiProvider>
       </BrowserRouter>
     </Provider>
   </React.StrictMode>,

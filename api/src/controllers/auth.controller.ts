@@ -44,7 +44,7 @@ export async function login(req: Request<LoginInput>, res: Response, next: NextF
   let user = await findUserByEmail(email);
 
   if (!user) {
-    return next(ApiError.unauthorized(t('user_not_found')));
+    return next(ApiError.unauthorized(t('account_not_found')));
   }
 
   const isValid = await user.comparePassword(password);
@@ -88,7 +88,7 @@ export async function verifyUser(req: Request<VerifyUserInput>, res: Response, n
   const user = await findUser({ verificationCode });
 
   if (!user) {
-    return next(ApiError.unauthorized(t('user_not_found')));
+    return next(ApiError.unauthorized(t('account_not_found')));
   }
 
   if (user.verified) {
@@ -117,7 +117,7 @@ export async function resendVerificationCode(req: Request<ResendVerificationCode
   const user = await findUserByEmail(email);
 
   if (!user) {
-    return next(ApiError.unauthorized(t('user_not_found')));
+    return next(ApiError.unauthorized(t('account_not_found')));
   }
 
   if (user.verified) {
@@ -141,7 +141,7 @@ export async function forgotPassword(req: Request<ForgotPasswordInput>, res: Res
   const user = await findUserByEmail(email);
 
   if (!user) {
-    return next(ApiError.unauthorized(t('user_not_found')));
+    return next(ApiError.unauthorized(t('account_not_found_found')));
   }
 
   if (!user.verified) {

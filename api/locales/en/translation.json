@@ -1,5 +1,5 @@
 {
-    "account_create_success": "Account is created",
+    "account_create_success": "Account is created successfully. Please verify your Email.",
     "account_already_exists": "Account already exists",
     "account_not_found": "Account not found",
     "login_invalid": "Login is invalid",

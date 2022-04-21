@@ -15,11 +15,11 @@ ARG PORT=3000
 
 ENV PORT $PORT
 
-COPY --chown=node:node package*.json ./
+COPY --chown=node:node package.json ./
 
 RUN export NODE_OPTIONS=--max_old_space_size=20000
 
-# RUN rm -rf node_modules/
+RUN rm -rf node_modules/
 
 RUN npm install --unsafe-perm=true && npm cache clean --force
 
