@@ -35,9 +35,13 @@ function ResendVerificationLink() {
   async function onSubmitHandler(data: FieldValues) {
     try {
       const res = await resendVerificationLink(data as ResendVerificationLinkData).unwrap();
-      enqueueSnackbar(res.message);
+      enqueueSnackbar(res.message, {
+        variant: 'success',
+      });
     } catch (err: any | SerializedError) {
-      enqueueSnackbar(err?.data?.message || 'Error');
+      enqueueSnackbar(err?.data?.message || 'Error', {
+        variant: 'error',
+      });
     }
   }
 
@@ -46,7 +50,7 @@ function ResendVerificationLink() {
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 mb-32 mt-16 dark:bg-slate-800 mx-auto max-w-xl rounded-lg pb-32 ">
         <div className="max-w-md w-full space-y-8ß">
           <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 dark:text-slate-200">Reset Password</h2>
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 dark:text-slate-200">Verification Link</h2>
             <p className="mt-2 text-center text-sm text-slate-400">
               Or
               <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">

@@ -32,7 +32,7 @@ export const loginSchema = object({
 });
 
 export const verifyUserSchema = object({
-  query: object({
+  body: object({
     verificationCode: string(),
   }),
 });
@@ -80,7 +80,7 @@ export const tokenSchema = object({
 
 export type RegisterUserInput = TypeOf<typeof registerUserSchema>['body'];
 
-export type VerifyUserInput = TypeOf<typeof verifyUserSchema>['query'];
+export type VerifyUserInput = TypeOf<typeof verifyUserSchema>['body'];
 
 export type ResendVerificationCodeInput = TypeOf<typeof resendVerificationCodeSchema>['body'];
 

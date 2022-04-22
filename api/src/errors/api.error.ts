@@ -3,10 +3,10 @@ import createError from 'http-errors';
 class ApiError {
   public message: string;
   public status: number;
-  public originalStack: string;
+  public originalStack?: string;
 
-  constructor(message, status, originalStack) {
-    this.originalStack = originalStack;
+  constructor(message, status, stack = null) {
+    this.originalStack = stack;
     this.message = message;
     this.status = status;
   }

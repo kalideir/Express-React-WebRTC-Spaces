@@ -3,6 +3,7 @@ export default {
   metricsPort: process.env.METRICS_PORT || 9100,
   dbURI: process.env.DB_URI || 'mongodb://localhost:27017',
   redisUrl: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
+  clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
   logDir: '../logs',
   email: {
     user: process.env.EMAIL_USER,

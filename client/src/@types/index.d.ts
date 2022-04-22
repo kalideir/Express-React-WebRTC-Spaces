@@ -11,6 +11,9 @@ export type RegisterData = AuthData & { username: string };
 
 export type RegisterResponse = { message: string };
 
+export type VerifyUserData = {
+  verificationCode: string;
+};
 export interface IUser {
   email: string;
   profilePicture: string;
@@ -22,13 +25,6 @@ export interface IUser {
   active: boolean;
   verified: boolean;
   createdAt: string;
-}
-
-export interface SerializedError {
-  name?: string;
-  message?: string;
-  stack?: string;
-  code?: string;
 }
 
 export type LoginResponse = {

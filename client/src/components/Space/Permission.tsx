@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useSelector } from 'react-redux';
 import { State, StoreState } from '../../store/rootReducer';
-import { SpaceData, togglePermissionModal } from '../../store/spaceSlice';
+import { togglePermissionModal } from '../../store/spaceSlice';
 import { BsFillMicFill } from 'react-icons/bs';
 import { MIC_ACCESS_GRANTED } from '../../constants';
 import { useDispatch } from 'react-redux';

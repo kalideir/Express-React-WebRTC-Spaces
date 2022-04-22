@@ -35,7 +35,9 @@ function ForgotPassword() {
   async function onSubmitHandler(data: FieldValues) {
     try {
       const res = await sendPasswordLink(data as ForgotPasswordData).unwrap();
-      enqueueSnackbar(res.message);
+      enqueueSnackbar(res.message, {
+        variant: 'success',
+      });
     } catch (err: any | SerializedError) {
       enqueueSnackbar(err?.data?.message || 'Error');
     }

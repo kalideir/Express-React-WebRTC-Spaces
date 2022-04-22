@@ -40,10 +40,14 @@ function Register() {
   async function onSubmitHandler(data: FieldValues) {
     try {
       const res = await registerUser(data as RegisterData).unwrap();
-      enqueueSnackbar(res.message);
+      enqueueSnackbar(res.message, {
+        variant: 'success',
+      });
       reset({});
     } catch (err: any | SerializedError) {
-      enqueueSnackbar(err?.data?.message || 'Error');
+      enqueueSnackbar(err?.data?.message || 'Error', {
+        variant: 'error',
+      });
     }
   }
 

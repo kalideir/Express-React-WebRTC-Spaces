@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import config from 'config';
-import { ApiError } from '../errors';
+import { ApiError, CustomError } from '../errors';
 import { UserModel } from '../models';
 import {
   RegisterUserInput,
@@ -22,19 +22,23 @@ import {
   signRefreshToken,
 } from '../services';
 import { EnhancedRequest } from '../types';
-import { logger, t } from '../utils';
+import { logger, registerEmailData, t } from '../utils';
+import httpStatus from 'http-status';
+import { sendMailProducer } from '../workers';
 
 const cookieName = config.get<string>('cookieName');
 
 export async function register(req: Request<RegisterUserInput>, res: Response, next: NextFunction) {
   const input = req.body;
-  const exists = await findUserByEmail(input.email);
+  const exists = false; //await findUserByEmail(input.email);
   if (exists) {
     return next(ApiError.conflict(t('account_already_exists')));
   }
   const user = await UserModel.create(input);
   const verificationCode = await generateVerificationCode(user.email);
   user.verificationCode = verificationCode;
+
+  sendMailProducer(registerEmailData(user.email, verificationCode));
   await user.save();
   res.json({ message: t('account_create_success') });
 }
@@ -54,7 +58,7 @@ export async function login(req: Request<LoginInput>, res: Response, next: NextF
   }
 
   if (!user.verified) {
-    return next(ApiError.unauthorized(t('account_not_verified')));
+    return next(new CustomError(t('account_not_verified'), httpStatus.UNAUTHORIZED, { error: 'VERIFICAITON_REQUIRED' }));
   }
 
   if (!user.active) {
@@ -75,20 +79,20 @@ export async function login(req: Request<LoginInput>, res: Response, next: NextF
   });
 
   return res.send({
+    // accessToken,
     refreshToken,
-    accessToken,
     user: user.toJSON(),
     message: t('login_success'),
   });
 }
 
 export async function verifyUser(req: Request<VerifyUserInput>, res: Response, next: NextFunction) {
-  const { verificationCode } = req.query;
+  const { verificationCode } = req.body;
 
   const user = await findUser({ verificationCode });
 
   if (!user) {
-    return next(ApiError.unauthorized(t('account_not_found')));
+    return next(new CustomError(t('token_expired_or_invalid'), httpStatus.UNAUTHORIZED, { error: 'VERIFICAITON_ERROR', success: false }));
   }
 
   if (user.verified) {
@@ -101,10 +105,17 @@ export async function verifyUser(req: Request<VerifyUserInput>, res: Response, n
 
   const accessToken = signAccessToken({ sub: user.id });
 
+  res.cookie(cookieName, accessToken, {
+    httpOnly: true,
+    sameSite: 'strict',
+    path: '/',
+    secure: process.env.NODE_ENV !== 'development',
+  });
+
   const refreshToken = await signRefreshToken({ sub: user._id });
 
   return res.send({
-    accessToken,
+    // accessToken,
     refreshToken,
     user: user.toJSON(),
     message: t('verification_success'),

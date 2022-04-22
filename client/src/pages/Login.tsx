@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FieldValues, useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
@@ -19,7 +19,7 @@ const schema = yup.object({
 function Login() {
   const [loginUser, { error, status, data, isLoading }] = useLoginMutation();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
+  const [verificationRequired, setVerificationRequired] = useState(false);
   const {
     register,
     handleSubmit,
@@ -29,17 +29,26 @@ function Login() {
     resolver: yupResolver(schema),
   });
 
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
   async function onSubmitHandler(data: FieldValues) {
     try {
       const res = await loginUser(data as LoginData).unwrap();
-      setAuth({ user: res.user });
-      enqueueSnackbar(res.message);
+      dispatch(setAuth({ user: res.user }));
+      enqueueSnackbar(res.message, {
+        variant: 'success',
+      });
+      reset({});
     } catch (err: any | SerializedError) {
-      enqueueSnackbar(err?.data?.message || 'Error');
+      const source = err.data.source;
+      if (source === 'VERIFICAITON_REQUIRED') {
+        setVerificationRequired(true);
+      }
+      enqueueSnackbar(err?.data?.message || 'Error', {
+        variant: 'error',
+      });
     }
   }
 
@@ -81,10 +90,9 @@ function Login() {
                 className="w-full border border-gray-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
               />
               {errors.password && <div className="text-red-500 font-semibold">{errors.password.message}</div>}
-
               <Link
                 to="/forgot-password"
-                className="text-sm font-thin text-indigo-800 dark:text-slate-50 hover:underline mt-2 inline-block hover:text-slate-900 hover:dark:text-slate-100"
+                className="text-sm text-indigo-300 dark:text-indigo-300 hover:underline mt-2 inline-block hover:text-slate-900 hover:dark:text-slate-100"
               >
                 Forget Password
               </Link>
@@ -111,6 +119,14 @@ function Login() {
                 'Login'
               )}
             </button>
+            {verificationRequired && (
+              <Link
+                to="/resend-verification"
+                className="text-sm text-indigo-300 dark:text-indigo-300 hover:underline inline-block hover:text-slate-900 hover:dark:text-slate-100"
+              >
+                Your account requires verification
+              </Link>
+            )}
           </form>
         </div>
       </div>

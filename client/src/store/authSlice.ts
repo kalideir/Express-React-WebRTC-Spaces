@@ -1,19 +1,22 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { IUser, RegisterData } from '../@types';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { IUser } from '../@types';
+import { RootState } from './store';
 
-type InitialStateType = {
+export type AuthSliceData = {
   email: string;
   isAuthenticated: boolean;
-  user: Partial<IUser>;
+  user: null | Partial<IUser>;
 };
 
-const initialState: Partial<InitialStateType> = {};
+const initialState: Partial<AuthSliceData> = {
+  user: null,
+};
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: 'authSlice',
   initialState,
   reducers: {
-    setAuth: (state, { payload: { user } }: PayloadAction<{ user: IUser }>) => {
+    setAuth: (state, { payload: { user } }: PayloadAction<{ user: null | IUser }>) => {
       state.user = user;
       state.isAuthenticated = true;
     },
@@ -26,3 +29,5 @@ const authSlice = createSlice({
 export const { setAuth } = authSlice.actions;
 
 export default authSlice.reducer;
+
+export const selectCurrentUser = (state: RootState) => state.auth?.user;

@@ -1,4 +1,13 @@
-import { ForgotPasswordData, LoginData, LoginResponse, MessageResponse, RegisterData, RegisterResponse, ResendVerificationLinkData } from '../@types';
+import {
+  ForgotPasswordData,
+  LoginData,
+  LoginResponse,
+  MessageResponse,
+  RegisterData,
+  RegisterResponse,
+  ResendVerificationLinkData,
+  VerifyUserData,
+} from '../@types';
 import ApiService, { RequestMethods } from './api.service';
 
 const authApi = ApiService.injectEndpoints({
@@ -17,7 +26,7 @@ const authApi = ApiService.injectEndpoints({
         body,
       }),
     }),
-    verify: build.mutation<LoginResponse, LoginData>({
+    verify: build.mutation<LoginResponse, VerifyUserData>({
       query: body => ({
         url: `/auth/verifyUser`,
         method: RequestMethods.POST,

@@ -1,1 +1,1 @@
-export { default as sendEmailProducer } from './sendemail.producer';
+export { default as sendMailProducer } from './sendmail.producer';

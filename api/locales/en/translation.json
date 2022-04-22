@@ -30,5 +30,6 @@
     "media_type_required": "A video or image is required",
     "id_required": "*id* is required",
     "username_required": "Username field is required",
-    "username_field_length": "Username must be at least one letter long"
+    "username_field_length": "Username must be at least one letter long",
+    "token_expired_or_invalid": "Token has expired or is invalid"
   }

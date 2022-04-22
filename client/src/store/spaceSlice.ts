@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export type SpaceData = {
+export type SpaceSliceData = {
   permissionFulfilled: boolean;
   permissionModalVisible: boolean;
 };
 
-const initialState: SpaceData = {
+const initialState: SpaceSliceData = {
   permissionFulfilled: false,
   permissionModalVisible: false,
 };

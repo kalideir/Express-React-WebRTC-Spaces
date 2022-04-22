@@ -6,7 +6,7 @@ const LoginRoutes = [
   { path: '/forgot-password', element: <ForgotPassword /> },
   { path: '/resend-verification', element: <ResendVerificationLink /> },
   { path: '/new-password', element: <NewPassword /> },
-  { path: '/verify-account', element: <VerifyAccount /> },
+  { path: '/verify-account/:token', element: <VerifyAccount /> },
 ];
 
 export default LoginRoutes;

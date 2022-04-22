@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       match: /^\S+@\S+\.\S+$/,
       required: true,
-      unique: true,
+      unique: false,
       trim: true,
       lowercase: true,
     },

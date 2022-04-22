@@ -3,8 +3,7 @@ import { Role, UserDocument, UserModel } from '../models';
 import { DeleteUserInput, GetUsersInput, ListUsersInput, UpdateUserInput } from '../schema';
 import { findUserById, updateUser } from '../services';
 
-import { logger, sendEmail, t } from '../utils';
-import { sendEmailProducer } from '../workers';
+import { logger, t } from '../utils';
 
 import { ApiError } from '../errors';
 

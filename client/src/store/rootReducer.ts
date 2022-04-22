@@ -1,20 +1,19 @@
 import { CombinedState, combineReducers } from '@reduxjs/toolkit';
 import { ApiService } from '../services';
-import spaceReducer, { SpaceData } from './spaceSlice';
-import authReducer from './authSlice';
+import spaceReducer, { SpaceSliceData } from './spaceSlice';
+import authReducer, { AuthSliceData } from './authSlice';
 
 const rootReducer = combineReducers({
-  [ApiService.reducerPath]: ApiService.reducer,
   space: spaceReducer,
   auth: authReducer,
+  [ApiService.reducerPath]: ApiService.reducer,
 });
-
-export type RootState = ReturnType<typeof rootReducer>;
 
 export type State = CombinedState<{ [key: string]: unknown }>;
 
 export type StoreState = State & {
-  space: SpaceData;
+  space: SpaceSliceData;
+  auth: AuthSliceData;
 };
 
 export default rootReducer;

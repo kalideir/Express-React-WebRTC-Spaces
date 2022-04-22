@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AnyAction, configureStore, Dispatch, Middleware, MiddlewareArray } from '@reduxjs/toolkit';
+import { AnyAction, configureStore, Dispatch, Middleware } from '@reduxjs/toolkit';
 import { createLogger } from 'redux-logger';
 import { ApiService } from '../services';
 import rootReducer from './rootReducer';
+import logger from 'redux-logger';
 
 const middleware: Middleware<any, any, Dispatch<AnyAction>>[] = [];
 
@@ -13,8 +14,11 @@ if (process.env.NODE_ENV === 'development') {
 
 const store = configureStore({
   reducer: rootReducer,
-  middleware: new MiddlewareArray().prepend(middleware).prepend(ApiService.middleware),
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(middleware).concat(ApiService.middleware).concat(logger),
   devTools: process.env.NODE_ENV === 'development',
 });
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 
 export default store;

@@ -4,4 +4,9 @@ import config from 'config';
 
 const redisUrl = config.get<string>('redisUrl');
 
-export const sendMailQueue = new Queue('email', redisUrl);
+console.log(redisUrl);
+export const sendMailQueue = new Queue('email', redisUrl, {
+  defaultJobOptions: {
+    removeOnComplete: true,
+  },
+});

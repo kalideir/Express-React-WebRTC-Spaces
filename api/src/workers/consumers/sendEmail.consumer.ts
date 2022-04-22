@@ -1,7 +1,7 @@
-import { Job } from 'bull';
-import { SendMailOptions } from 'nodemailer';
+import { DoneCallback, Job } from 'bull';
 import { logger, sendEmail } from '../../utils';
 import { sendMailQueue } from '../bull';
+import { SendEmailJobData } from '../../types';
 
 export type SendEmailContext = {
   description: string;
@@ -12,21 +12,17 @@ export type SendEmailContext = {
   message: string;
 };
 
-export type SendEmailJobData = {
-  emailOptions: SendMailOptions;
-  context: SendEmailContext;
-};
-
-sendMailQueue.process(async (job: Job<SendEmailJobData>) => {
-  logger.debug(job.data);
-  return await consumer(job.data);
+sendMailQueue.process(async (job: Job<SendEmailJobData>, done: DoneCallback) => {
+  logger.debug('Job data ' + job.data);
+  await consumer(job.data);
+  done();
 });
 
 export default function consumer(jobData: SendEmailJobData) {
   return new Promise((resolve, reject) => {
-    const { emailOptions, context } = jobData;
+    const { emailOptions, context, template } = jobData;
     try {
-      sendEmail(emailOptions, context);
+      sendEmail(emailOptions, context, template);
       resolve(true);
     } catch (e) {
       logger.error(e);
