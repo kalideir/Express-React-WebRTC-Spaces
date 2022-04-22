@@ -1,48 +1,53 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FieldValues, useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useDispatch } from 'react-redux';
-import { useVerifyLinkMutation } from '../services/auth.service';
 import { SerializedError } from '@reduxjs/toolkit';
-import { setAuth } from '../store/authSlice';
-import { ResendVerificationLinkData, LoginData } from '../@types';
+import { ResendVerificationData, LoginData } from '../@types';
+import { useAppDispatch } from '../hooks';
+import { resendVerificationLink } from '../store/authSlice';
 
 const schema = yup.object({
   email: yup.string().email().required('Email is required'),
 });
 
 function ResendVerificationLink() {
-  const [resendVerificationLink, { error, status, data, isLoading }] = useVerifyLinkMutation();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<ResendVerificationLinkData>({
+  } = useForm<ResendVerificationData>({
     resolver: yupResolver(schema),
   });
 
-  const history = useNavigate();
+  const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   async function onSubmitHandler(data: FieldValues) {
+    setIsLoading(true);
     try {
-      const res = await resendVerificationLink(data as ResendVerificationLinkData).unwrap();
+      const res = await dispatch(resendVerificationLink(data as LoginData)).unwrap();
       enqueueSnackbar(res.message, {
         variant: 'success',
       });
+      reset({});
     } catch (err: any | SerializedError) {
-      enqueueSnackbar(err?.data?.message || 'Error', {
+      const message = err?.message || 'Error';
+      enqueueSnackbar(message, {
         variant: 'error',
       });
     }
+    setIsLoading(false);
   }
 
   return (

@@ -5,11 +5,10 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useDispatch } from 'react-redux';
-import { useLoginMutation } from '../services/auth.service';
 import { SerializedError } from '@reduxjs/toolkit';
-import { setAuth } from '../store/authSlice';
-import { LoginData } from '../@types';
+import { LoginData, LoginResponse } from '../@types';
+import { loginUser } from '../store/authSlice';
+import { useAppDispatch } from '../hooks';
 
 const schema = yup.object({
   email: yup.string().email().required('Email is required'),
@@ -17,8 +16,8 @@ const schema = yup.object({
 });
 
 function Login() {
-  const [loginUser, { error, status, data, isLoading }] = useLoginMutation();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
   const [verificationRequired, setVerificationRequired] = useState(false);
   const {
     register,
@@ -31,25 +30,27 @@ function Login() {
 
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   async function onSubmitHandler(data: FieldValues) {
+    setIsLoading(true);
     try {
-      const res = await loginUser(data as LoginData).unwrap();
-      dispatch(setAuth({ user: res.user }));
+      const res = await dispatch(loginUser(data as LoginData)).unwrap();
       enqueueSnackbar(res.message, {
         variant: 'success',
       });
       reset({});
     } catch (err: any | SerializedError) {
-      const source = err.data.source;
+      const message = err?.message || 'Error';
+      const source = err.extra?.error;
       if (source === 'VERIFICAITON_REQUIRED') {
         setVerificationRequired(true);
       }
-      enqueueSnackbar(err?.data?.message || 'Error', {
+      enqueueSnackbar(message, {
         variant: 'error',
       });
     }
+    setIsLoading(false);
   }
 
   return (

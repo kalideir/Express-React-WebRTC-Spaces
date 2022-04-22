@@ -15,6 +15,10 @@ class ApiError {
     return new createError.Unauthorized(message);
   }
 
+  static notFound(message: string) {
+    return new createError.NotFound(message);
+  }
+
   static badRequest(message: string) {
     return new createError.BadRequest(message);
   }

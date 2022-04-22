@@ -13,13 +13,13 @@ const handler = (req, res, next) => async (err, user, info) => {
     return next(ApiError.internalServerError(error.message || t('something_went_wrong')));
   }
   if (!user) {
-    return next(ApiError.unauthorized(error.message || t('unauthorized')));
+    return next(ApiError.forbidden(error.message || t('unauthorized')));
   }
   if (!user.active) {
-    return next(ApiError.unauthorized(t('unauthorized')));
+    return next(ApiError.forbidden(t('unauthorized')));
   }
   if (!user.verified) {
-    return next(ApiError.unauthorized(t('account_not_verified')));
+    return next(ApiError.forbidden(t('account_not_verified')));
   }
   try {
     await req.logIn(user, { session: false });

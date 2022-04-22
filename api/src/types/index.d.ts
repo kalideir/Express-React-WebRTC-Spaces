@@ -18,7 +18,7 @@ export type EmailData = {
   context: SendMailContext;
 };
 
-export type EmailTemplate = 'register' | 'email';
+export type EmailTemplate = 'register' | 'email' | 'account-verification';
 
 export type S3Body = string | Buffer | Uint8Array | Blob | Readable;
 

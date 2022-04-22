@@ -18,7 +18,7 @@
     "delete_success": "Successfully deleted",
     "password_required": "password is required",
     "password_confirmation_required": "Password confirmation is required",
-    "password_size_length": "Password must be at least 6 charachters",
+    "password_field_length": "Password must be at least 6 charachters",
     "email_required": "Email is required",
     "passwords_dont_match": "Passwords dont't match",
     "refresh_token_required": "Refresh token is required to generate new access token",

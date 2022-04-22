@@ -12,7 +12,7 @@ const error = (error: HttpError, req: Request, res: Response, next: NextFunction
     return res.status(error.status).json({ message: error.message });
   }
   if (error instanceof CustomError) {
-    return res.status(error.status).json({ message: error.message, source: error.extra.error });
+    return res.status(error.status).json({ message: error.message, extra: error.extra });
   }
 
   return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: t('something_went_wrong') });

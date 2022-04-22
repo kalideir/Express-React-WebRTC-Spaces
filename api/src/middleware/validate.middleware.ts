@@ -13,7 +13,7 @@ const validate = (schema: AnyZodObject) => (req: Request, res: Response, next: N
     next();
   } catch (e) {
     logger.debug(e);
-    return res.status(httpStatus.BAD_REQUEST).send(e.errors.map(e => ({ message: e.message, path: e.validation })));
+    return res.status(httpStatus.BAD_REQUEST).send({ errors: e.errors.map(e => ({ path: e.path[1], message: e.message })) });
   }
 };
 

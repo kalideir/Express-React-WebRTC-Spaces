@@ -1,10 +1,10 @@
-import { Login, NewPassword, Register, VerifyAccount } from '../pages';
+import { Login, ResetPassword, Register, VerifyAccount } from '../pages';
 
 const UserRoutes = [
   { path: '/login', element: <Login /> },
   { path: '/register', element: <Register /> },
 
-  { path: '/new-password', element: <NewPassword /> },
+  { path: '/reset-password', element: <ResetPassword /> },
   { path: '/verify-account', element: <VerifyAccount /> },
 ];
 

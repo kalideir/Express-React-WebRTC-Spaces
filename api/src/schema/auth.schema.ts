@@ -50,10 +50,8 @@ export const forgotPasswordSchema = object({
 });
 
 export const resetPasswordSchema = object({
-  query: object({
-    passwordResetCode: string(),
-  }),
   body: object({
+    passwordResetCode: string(),
     password: fields.password,
     passwordConfirmation: fields.passwordConfirmation,
   }).refine(data => data.password === data.passwordConfirmation, {

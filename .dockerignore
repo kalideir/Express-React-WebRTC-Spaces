@@ -5,6 +5,7 @@
 # code formatter
 */.eslintrc.json
 */.eslintignore
+**/.eslintcache
 .editorconfig
 .huskyrc
 .lintstagedrc.json

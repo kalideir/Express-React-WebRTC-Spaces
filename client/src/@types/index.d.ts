@@ -12,7 +12,7 @@ export type RegisterData = AuthData & { username: string };
 export type RegisterResponse = { message: string };
 
 export type VerifyUserData = {
-  verificationCode: string;
+  verificationCode: null | string;
 };
 export interface IUser {
   email: string;
@@ -35,7 +35,13 @@ export type LoginResponse = {
 
 export type ForgotPasswordData = Pick<LoginData, 'email'>;
 
-export type ResendVerificationLinkData = Pick<LoginData, 'email'>;
+export type ResetPasswordData = {
+  password: string;
+  passwordConfirmation: stirng;
+  passwordResetCode: string;
+};
+
+export type ResendVerificationData = Pick<LoginData, 'email'>;
 
 export type MessageResponse = { message: string };
 

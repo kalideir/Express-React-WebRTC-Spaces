@@ -22,7 +22,7 @@ import {
   signRefreshToken,
 } from '../services';
 import { EnhancedRequest } from '../types';
-import { logger, registerEmailData, t } from '../utils';
+import { forgotPasswordData, logger, registerEmailData, resendVerificationData, t } from '../utils';
 import httpStatus from 'http-status';
 import { sendMailProducer } from '../workers';
 
@@ -38,8 +38,10 @@ export async function register(req: Request<RegisterUserInput>, res: Response, n
   const verificationCode = await generateVerificationCode(user.email);
   user.verificationCode = verificationCode;
 
-  sendMailProducer(registerEmailData(user.email, verificationCode));
   await user.save();
+
+  sendMailProducer(registerEmailData(user.email, verificationCode));
+
   res.json({ message: t('account_create_success') });
 }
 
@@ -48,7 +50,7 @@ export async function login(req: Request<LoginInput>, res: Response, next: NextF
   let user = await findUserByEmail(email);
 
   if (!user) {
-    return next(ApiError.unauthorized(t('account_not_found')));
+    return next(ApiError.notFound(t('account_not_found')));
   }
 
   const isValid = await user.comparePassword(password);
@@ -62,7 +64,7 @@ export async function login(req: Request<LoginInput>, res: Response, next: NextF
   }
 
   if (!user.active) {
-    return next(ApiError.unauthorized(t('login_invalid')));
+    return next(ApiError.forbidden(t('login_invalid')));
   }
 
   const accessToken = signAccessToken({ sub: user._id });
@@ -141,6 +143,8 @@ export async function resendVerificationCode(req: Request<ResendVerificationCode
 
   await user.save();
 
+  sendMailProducer(resendVerificationData(user.email, verificationCode));
+
   logger.debug(`Verification code was resent to ${email}`);
 
   return res.send({ message: t('verification_code_was_sent') });
@@ -165,15 +169,15 @@ export async function forgotPassword(req: Request<ForgotPasswordInput>, res: Res
 
   await user.save();
 
+  sendMailProducer(forgotPasswordData(user.email, passwordResetCode));
+
   logger.debug(`Reset password link was sent to ${email}`);
 
   return res.send({ message: t('reset_password_link_sent') });
 }
 
 export async function resetPassword(req: Request<ResetPasswordInput>, res: Response, next: NextFunction) {
-  const { passwordResetCode } = req.query as { passwordResetCode: string };
-
-  const { password } = req.body;
+  const { password, passwordResetCode } = req.body;
 
   const user = await findUser({ passwordResetCode });
 

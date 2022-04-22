@@ -1,21 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FieldValues, useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { SerializedError } from '@reduxjs/toolkit';
-import { ForgotPasswordData } from '../@types';
-import { forgotPassword } from '../store/authSlice';
+import type { SerializedError } from '@reduxjs/toolkit';
+import { ResetPasswordData } from '../@types';
 import { useAppDispatch } from '../hooks';
+import { resetPassword } from '../store/authSlice';
 
 const schema = yup.object({
-  email: yup.string().email().required('Email is required'),
+  password: yup.string().min(8).max(32).required('Password is required'),
+  passwordConfirmation: yup
+    .string()
+    .oneOf([yup.ref('password'), null], "Passwords don't match")
+    .default('password'),
 });
 
-function ForgotPassword() {
+function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
+  const { token: passwordResetCode } = useParams() as { token: string };
+
+  const navigate = useNavigate();
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -24,21 +31,22 @@ function ForgotPassword() {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<ForgotPasswordData>({
+  } = useForm({
     resolver: yupResolver(schema),
   });
-
-  const navigate = useNavigate();
-
   const dispatch = useAppDispatch();
 
   async function onSubmitHandler(data: FieldValues) {
     setIsLoading(true);
     try {
-      const res = await dispatch(forgotPassword(data as ForgotPasswordData)).unwrap();
+      const res = await dispatch(resetPassword({ ...data, passwordResetCode } as ResetPasswordData)).unwrap();
       enqueueSnackbar(res.message, {
         variant: 'success',
       });
+      enqueueSnackbar('Please login with your new password', {
+        variant: 'success',
+      });
+      setTimeout(() => navigate('/login'), 1000);
       reset({});
     } catch (err: any | SerializedError) {
       const message = err?.message || 'Error';
@@ -48,33 +56,37 @@ function ForgotPassword() {
     }
     setIsLoading(false);
   }
-
   return (
     <div>
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 mb-32 mt-16 dark:bg-slate-800 mx-auto max-w-xl rounded-lg pb-32 ">
         <div className="max-w-md w-full space-y-8ß">
           <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 dark:text-slate-200">Reset Password</h2>
-            <p className="mt-2 text-center text-sm text-slate-400">
-              Or
-              <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                {' '}
-                login{' '}
-              </Link>
-            </p>
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 dark:text-slate-200">New Password</h2>
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmitHandler)}>
-            <div>
+            <div className="mb-6">
               <label htmlFor="email" className="block text-slate-900 dark:text-slate-200 font-bold">
-                Email:
+                Password:
               </label>
               <input
-                {...register('email')}
-                type="text"
-                placeholder="@email"
+                {...register('password')}
+                type="password"
+                placeholder="password"
                 className="w-full border border-gray-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
               />
-              {errors.email && <div className="text-red-500 font-semibold">{errors.email.message}</div>}
+              {errors.password && <div className="text-red-500 font-semibold">{errors.password.message}</div>}
+            </div>
+            <div className="mb-6">
+              <label htmlFor="email" className="block text-slate-900 dark:text-slate-200 font-bold">
+                Confirm Password:
+              </label>
+              <input
+                {...register('passwordConfirmation')}
+                type="password"
+                placeholder="password confirmation"
+                className="w-full border border-gray-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
+              />
+              {errors.passwordConfirmation && <div className="text-red-500 font-semibold">{errors.passwordConfirmation.message}</div>}
             </div>
             <button className="cursor-pointer py-4 px-4 block mt-6 bg-indigo-500 text-white font-bold w-full text-center rounded">
               {isLoading ? (
@@ -95,7 +107,7 @@ function ForgotPassword() {
                   />
                 </svg>
               ) : (
-                'Send Email'
+                'Save Password'
               )}
             </button>
           </form>
@@ -105,4 +117,4 @@ function ForgotPassword() {
   );
 }
 
-export default ForgotPassword;
+export default ResetPassword;

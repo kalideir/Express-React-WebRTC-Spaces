@@ -3,40 +3,34 @@
 import { SerializedError } from '@reduxjs/toolkit';
 import { useSnackbar } from 'notistack';
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { VerifyUserData } from '../@types';
-import { useTypedSelector } from '../hooks';
-import { useAuth } from '../hooks/useAuth';
-import { useRegisterMutation, useVerifyMutation } from '../services/auth.service';
-import { selectCurrentUser, setAuth } from '../store/authSlice';
+import type { VerifyUserData } from '../@types';
+import { useAppDispatch } from '../hooks';
+import { verifyUser } from '../store/authSlice';
 
 function VerifyAccount() {
-  const { token: verificationCode } = useParams();
-  const [verifyUser] = useVerifyMutation();
+  const { token: verificationCode } = useParams() as { token: string };
+
   const { enqueueSnackbar } = useSnackbar();
 
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   async function onSubmitHandler() {
-    let to = '/';
     try {
-      const res = await verifyUser({ verificationCode } as VerifyUserData).unwrap();
+      const res = await dispatch(verifyUser({ verificationCode })).unwrap();
       enqueueSnackbar(res.message, {
         variant: 'success',
       });
-      to = '/';
-      dispatch(setAuth({ user: res.user }));
-      setTimeout(() => navigate(to), 100);
+      setTimeout(() => navigate('/'), 100);
     } catch (err: any | SerializedError) {
-      dispatch(setAuth({ user: null }));
-      const source = err.data.source;
-      if (source === 'VERIFICAITON_ERROR') {
-        setTimeout(() => navigate(to), 1000);
+      const message = err?.message || 'Error';
+      const extra = err?.extra;
+      if (extra.error === 'VERIFICAITON_ERROR') {
+        setTimeout(() => navigate(''), 1000);
       }
-      enqueueSnackbar(err?.data?.message || 'Error', {
+      enqueueSnackbar(message, {
         variant: 'error',
       });
     }
