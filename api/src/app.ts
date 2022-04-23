@@ -54,14 +54,13 @@ app.use(compress());
 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-app.use(cors());
-
 app.use(helmet());
 
 app.use(
   cors({
-    origin: ['*'],
+    origin: true,
     optionsSuccessStatus: 200,
+    credentials: true,
   }),
 );
 

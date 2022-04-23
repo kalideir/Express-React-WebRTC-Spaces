@@ -72,12 +72,12 @@ export async function login(req: Request<LoginInput>, res: Response, next: NextF
   const refreshToken = await signRefreshToken({ sub: user._id });
 
   user = await user.populate('profilePicture');
-
+  res.setHeader('X-Cookie', accessToken);
   res.cookie(cookieName, accessToken, {
     httpOnly: true,
-    sameSite: 'strict',
+    sameSite: 'none',
     path: '/',
-    secure: process.env.NODE_ENV !== 'development',
+    secure: true, //process.env.NODE_ENV !== 'development',
   });
 
   return res.send({

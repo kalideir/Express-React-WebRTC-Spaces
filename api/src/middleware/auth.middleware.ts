@@ -9,6 +9,7 @@ import httpStatus from 'http-status';
 
 const handler = (req, res, next) => async (err, user, info) => {
   const error = err || info;
+  console.log(error, info, user);
   if (err) {
     return next(ApiError.internalServerError(error.message || t('something_went_wrong')));
   }

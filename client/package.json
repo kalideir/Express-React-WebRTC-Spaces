@@ -2,6 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost3000",
   "dependencies": {
     "@apollo/client": "^3.5.10",
     "@hookform/resolvers": "^2.8.8",

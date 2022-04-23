@@ -46,3 +46,5 @@ export type ResendVerificationData = Pick<LoginData, 'email'>;
 export type MessageResponse = { message: string };
 
 export type LoginData = AuthData;
+
+export type AutoLoginResponse = Pick<LoginResponse, 'user'>;

@@ -1,12 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { SnackbarProvider } from 'notistack';
-import React from 'react';
-import { useRoutes } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useAppDispatch } from './hooks';
 import Wrapper from './layout/Wrapper';
-import { LoginRoutes, PublicRoutes, UserRoutes } from './routes';
+import { Routes } from './routes';
+import { autoLogin } from './store/authSlice';
 
 function App() {
-  const routes = useRoutes([...PublicRoutes, ...LoginRoutes, ...UserRoutes]);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(autoLogin());
+  }, [dispatch]);
+
   return (
     <SnackbarProvider
       maxSnack={3}
@@ -16,7 +21,9 @@ function App() {
       }}
     >
       <div className="h-screen bg-slate-900">
-        <Wrapper>{routes}</Wrapper>
+        <Wrapper>
+          <Routes />
+        </Wrapper>
       </div>
     </SnackbarProvider>
   );

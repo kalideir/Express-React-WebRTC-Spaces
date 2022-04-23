@@ -11,11 +11,13 @@ export function setRefreshToken(token: string) {
 }
 
 const apiService = axios.create({
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
 });
+// apiService.defaults.withCredentials = true;
 
 apiService.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConfig => {
   config.params = config.params || {};
@@ -36,6 +38,7 @@ apiService.interceptors.response.use(
   async function (error: AxiosError) {
     const originalRequest = error.config;
     const refreshToken = getRefreshToken();
+
     let retry = false;
     if (refreshToken && error?.response?.status === 401 && !retry) {
       retry = true;

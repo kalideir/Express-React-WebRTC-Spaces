@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk, createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
-import { AxiosError } from 'axios';
+import type { AxiosError } from 'axios';
 import type {
+  AutoLoginResponse,
   ForgotPasswordData,
   IUser,
   LoginData,
   LoginResponse,
   RegisterData,
-  RegisterResponse,
   ResendVerificationData,
   ResetPasswordData,
   VerifyUserData,
 } from '../@types';
 import { apiService } from '../services';
+import { setRefreshToken } from '../services/api.service';
 import { RootState } from './store';
 
 type Error = {
@@ -44,8 +45,9 @@ const initialState: Partial<AuthSliceData> = {
 
 export const loginUser = createAsyncThunk('auth/loginUser', async (data: LoginData, { rejectWithValue }) => {
   try {
-    const res = await apiService.post('/auth/login', data);
-    return res.data;
+    const res = await apiService.post('/auth/login', data, { withCredentials: true });
+    setRefreshToken(res.data?.refreshToken);
+    return res?.data;
   } catch (error: any | AxiosError) {
     const errors = error.response?.data?.errors;
     const extra = error.response?.data?.extra;
@@ -109,6 +111,17 @@ export const resetPassword = createAsyncThunk('auth/resetPassword', async (data:
   }
 });
 
+export const autoLogin = createAsyncThunk('auth/autoLogin', async (_, { rejectWithValue }) => {
+  try {
+    const res = await apiService.get('/auth/me');
+    return res.data;
+  } catch (error: any | AxiosError) {
+    const errors = error.response?.data?.errors;
+    const message = error?.response.data.message || 'Error';
+    return rejectWithValue({ errors, message });
+  }
+});
+
 const authSlice: Slice = createSlice({
   name: 'auth',
   initialState,
@@ -126,10 +139,16 @@ const authSlice: Slice = createSlice({
     [loginUser.fulfilled.type]: (state, action: PayloadAction<LoginResponse>) => {
       const { payload } = action;
       state.user = payload.user;
+      state.isAuthenticated = true;
     },
     [loginUser.rejected.type]: (state, action: PayloadAction<ErrorPayload>) => {
       const { payload } = action;
-      if (payload.errors) state.loginErrors = payload;
+      if (payload?.errors) state.loginErrors = payload;
+    },
+    [autoLogin.fulfilled.type]: (state, action: PayloadAction<AutoLoginResponse>) => {
+      const { payload } = action;
+      state.user = payload.user;
+      state.isAuthenticated = true;
     },
   },
 });
@@ -139,3 +158,4 @@ export const { setAuth } = authSlice.actions;
 export default authSlice.reducer;
 
 export const selectCurrentUser = (state: RootState) => state.auth.user;
+export const selectIsAuthenticated = (state: RootState) => state.auth.isAuthenticated;
