@@ -2,6 +2,7 @@ import { signJwt } from '../utils/jwt';
 import { findUserById } from '.';
 import { verifyJwt } from '../utils';
 import config from 'config';
+import { UserDocument } from '../models';
 
 export type AccessTokenJWTPayload = {
   sub: string;
@@ -61,16 +62,17 @@ export function generateVerificationCode(email: string) {
   return verificationCode;
 }
 
-export async function reIssueAccessToken({ refreshToken }: { refreshToken: string }) {
+export async function reIssueAccessToken({ refreshToken }: { refreshToken: string }): Promise<{ accessToken: string; user: UserDocument } | false> {
   const decoded = verifyJwt(refreshToken) as RefreshTokenJWTPayload;
 
   if (!decoded || !decoded.sub) return false;
 
   const user = await findUserById(decoded.sub);
+  console.log({ decoded, refreshToken });
 
   if (!user) return false;
 
   const accessToken = signAccessToken({ sub: user.id });
 
-  return accessToken;
+  return { user, accessToken };
 }

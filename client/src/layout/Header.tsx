@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BsPlusSquareFill } from 'react-icons/bs';
+import { useSelector } from 'react-redux';
+import { selectIsAuthenticated } from '../store/authSlice';
 
 function Header() {
   const [top, setTop] = useState(true);
-
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   // detect whether user has scrolled the page down by 10px
   useEffect(() => {
     const scrollHandler = () => {
@@ -25,32 +27,41 @@ function Header() {
           </div>
 
           <div className="inline-flex items-center">
-            <nav className="hidden md:flex md:flex-grow">
+            {!isAuthenticated && (
+              <nav className="hidden md:flex md:flex-grow">
+                <ul className="flex flex-grow justify-end flex-wrap items-center">
+                  <li>
+                    <Link className="block font-medium text-gray-300 hover:text-gray-200 py-2" to="/register">
+                      Register
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="font-medium text-gray-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/login">
+                      Login
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
+            )}
+
+            {isAuthenticated && (
               <ul className="flex flex-grow justify-end flex-wrap items-center">
                 <li>
-                  <Link className="block font-medium text-gray-300 hover:text-gray-200 py-2" to="/register">
-                    Register
+                  <Link className="font-medium text-gray-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/login">
+                    Profile
                   </Link>
                 </li>
                 <li>
-                  <Link className="font-medium text-gray-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/login">
-                    Login
+                  <Link
+                    className="btn-sm text-white bg-indigo-600 py-2 px-3 rounded flex items-center justify-start  hover:bg-indigo-700 ml-3 sm:ml-6 lg:ml-10"
+                    to="/new-space"
+                  >
+                    <BsPlusSquareFill className="mr-2" />
+                    <span>Create Space</span>
                   </Link>
                 </li>
               </ul>
-            </nav>
-
-            <ul className="flex flex-grow justify-end flex-wrap items-center">
-              <li>
-                <a
-                  className="btn-sm text-white bg-indigo-600 py-2 px-3 rounded flex items-center justify-start  hover:bg-indigo-700 ml-3 sm:ml-6 lg:ml-10"
-                  href="https://cruip.com/unlimited-access/"
-                >
-                  <BsPlusSquareFill className="mr-2" />
-                  <span>Create Space</span>
-                </a>
-              </li>
-            </ul>
+            )}
 
             <div className="flex md:hidden ml-3 sm:ml-6">
               <button className="hamburger" aria-controls="mobile-nav">

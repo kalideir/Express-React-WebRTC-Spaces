@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AnyAction, configureStore, Dispatch, Middleware } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
 
 import authReducer from './authSlice';
+import profileReducer from './profileSlice';
+import spaceReducer from './spaceSlice';
 
 const middleware: Middleware<any, any, Dispatch<AnyAction>>[] = [];
 
@@ -13,6 +14,8 @@ if (process.env.NODE_ENV === 'development') {
 const store = configureStore({
   reducer: {
     auth: authReducer,
+    profile: profileReducer,
+    spaces: spaceReducer,
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(logger),
   devTools: process.env.NODE_ENV === 'development',

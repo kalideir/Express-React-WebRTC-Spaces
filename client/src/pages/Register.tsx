@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FieldValues, useForm } from 'react-hook-form';
@@ -23,7 +22,6 @@ const schema = yup.object({
 function Register() {
   const [isLoading, setIsLoading] = useState(false);
 
-  // const [registerUser, { error, status, data, isLoading }] = useRegisterMutation();
   const { enqueueSnackbar } = useSnackbar();
 
   const {

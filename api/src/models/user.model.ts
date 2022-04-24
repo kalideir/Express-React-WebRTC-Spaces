@@ -4,6 +4,7 @@ import config from 'config';
 
 export interface UserInput {
   email: string;
+  username: string;
   firstName: string;
   lastName: string;
   password: string;
@@ -37,6 +38,13 @@ const userSchema = new mongoose.Schema(
       match: /^\S+@\S+\.\S+$/,
       required: true,
       unique: false,
+      trim: true,
+      lowercase: true,
+    },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
       trim: true,
       lowercase: true,
     },

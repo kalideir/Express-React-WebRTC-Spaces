@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import config from 'config';
 import { ApiError, CustomError } from '../errors';
-import { UserModel } from '../models';
+import { UserDocument, UserModel } from '../models';
 import {
   RegisterUserInput,
   ForgotPasswordInput,
@@ -72,11 +72,12 @@ export async function login(req: Request<LoginInput>, res: Response, next: NextF
   const refreshToken = await signRefreshToken({ sub: user._id });
 
   user = await user.populate('profilePicture');
-  res.setHeader('X-Cookie', accessToken);
+
   res.cookie(cookieName, accessToken, {
     httpOnly: true,
     sameSite: 'none',
     path: '/',
+    domain: 'localhost/',
     secure: true, //process.env.NODE_ENV !== 'development',
   });
 
@@ -212,21 +213,30 @@ export async function me(req: EnhancedRequest, res: Response) {
   return res.send({ user: user.toJSON() });
 }
 
-export async function token(req: Request<unknown, unknown, NewTokenInput>, res: Response, next: NextFunction) {
+export async function token(req: Request<NewTokenInput>, res: Response, next: NextFunction) {
   const { refreshToken } = req.body;
 
-  const newAccessToken = await reIssueAccessToken({ refreshToken });
+  const result = await reIssueAccessToken({ refreshToken });
 
-  if (newAccessToken) {
-    res.cookie(cookieName, newAccessToken, {
+  if (result === false) {
+    return next(ApiError.unauthorized(t('not_allowed')));
+  }
+  const { accessToken, user } = result;
+
+  if (accessToken) {
+    res.cookie(cookieName, accessToken, {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: 'none',
       path: '/',
-      secure: process.env.NODE_ENV !== 'development',
+      secure: true, //process.env.NODE_ENV !== 'development',
+    });
+    return res.send({
+      // accessToken,
+      refreshToken,
+      user: user.toJSON(),
+      message: t('login_success'),
     });
   }
-
-  return next(ApiError.forbidden(t('not_allowed')));
 }
 
 export async function googleOauth(req: EnhancedRequest, res: Response) {

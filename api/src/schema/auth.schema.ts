@@ -76,7 +76,7 @@ export const tokenSchema = object({
   }),
 });
 
-export type RegisterUserInput = TypeOf<typeof registerUserSchema>['body'];
+export type RegisterUserInput = Required<TypeOf<typeof registerUserSchema>['body']>;
 
 export type VerifyUserInput = TypeOf<typeof verifyUserSchema>['body'];
 

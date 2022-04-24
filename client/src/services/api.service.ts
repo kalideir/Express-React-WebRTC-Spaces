@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios';
 import { REFRESH_TOKEN_NAME } from '../constants';
-import { newCookie } from './auth.service';
+import { newCookie } from '../store/authSlice';
 
 export function getRefreshToken(): string {
   return localStorage.getItem(REFRESH_TOKEN_NAME) || '';
@@ -17,7 +17,6 @@ const apiService = axios.create({
     Accept: 'application/json',
   },
 });
-// apiService.defaults.withCredentials = true;
 
 apiService.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConfig => {
   config.params = config.params || {};
@@ -38,11 +37,8 @@ apiService.interceptors.response.use(
   async function (error: AxiosError) {
     const originalRequest = error.config;
     const refreshToken = getRefreshToken();
-
-    let retry = false;
-    if (refreshToken && error?.response?.status === 401 && !retry) {
-      retry = true;
-      return newCookie({ refreshToken })
+    if (refreshToken && error?.response?.status === 401) {
+      return newCookie(refreshToken)
         .then(() => {
           return apiService(originalRequest);
         })

@@ -11,8 +11,8 @@ export default function AppRoutes() {
         <Route path="/register" element={<NoAuthRoute element={Register} />} />
         <Route path="/forgot-password" element={<NoAuthRoute element={ForgotPassword} />} />
         <Route path="/resend-verification" element={<NoAuthRoute element={ResendVerificationLink} />} />
-        <Route path="/reset-password" element={<NoAuthRoute element={ResetPassword} />} />
-        <Route path="/verify-account" element={<NoAuthRoute element={VerifyAccount} />} />
+        <Route path="/reset-password/:token" element={<NoAuthRoute element={ResetPassword} />} />
+        <Route path="/verify-account/:token" element={<NoAuthRoute element={VerifyAccount} />} />
 
         {/* <Route path="/" element={<RequireAuthRoute exact element={} />}>
           <Route path="/register" element={} />

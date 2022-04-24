@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { SerializedError } from '@reduxjs/toolkit';
 import { useSnackbar } from 'notistack';
 import React, { useEffect } from 'react';

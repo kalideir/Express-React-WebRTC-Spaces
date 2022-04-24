@@ -22,6 +22,7 @@ export interface IUser {
   firstName: string;
   lastName: string;
   phoneNumber: number;
+  address: string;
   active: boolean;
   verified: boolean;
   createdAt: string;
@@ -48,3 +49,20 @@ export type MessageResponse = { message: string };
 export type LoginData = AuthData;
 
 export type AutoLoginResponse = Pick<LoginResponse, 'user'>;
+
+export type Error = {
+  path: string;
+  message: string;
+};
+
+export type ErrorPayload = {
+  errors?: Error[];
+  message?: string;
+  extra: unknown;
+};
+
+export interface ISpace {
+  name: string;
+  participants: string[];
+  url: string;
+}

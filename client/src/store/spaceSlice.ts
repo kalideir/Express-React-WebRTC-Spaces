@@ -1,13 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ISpace } from '../@types';
 
 export type SpaceSliceData = {
   permissionFulfilled: boolean;
   permissionModalVisible: boolean;
+  spaces: ISpace[];
 };
 
 const initialState: SpaceSliceData = {
   permissionFulfilled: false,
   permissionModalVisible: false,
+  spaces: [],
 };
 
 const spaceSlice = createSlice({

@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk, createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 import type { AxiosError } from 'axios';
 import type {
   AutoLoginResponse,
+  ErrorPayload,
   ForgotPasswordData,
   IUser,
   LoginData,
@@ -13,19 +13,8 @@ import type {
   VerifyUserData,
 } from '../@types';
 import { apiService } from '../services';
-import { setRefreshToken } from '../services/api.service';
+import { getRefreshToken, setRefreshToken } from '../services/api.service';
 import { RootState } from './store';
-
-type Error = {
-  path: string;
-  message: string;
-};
-
-type ErrorPayload = {
-  errors?: Error[];
-  message?: string;
-  extra: unknown;
-};
 
 export type AuthSliceData = {
   email: null | string;
@@ -35,7 +24,7 @@ export type AuthSliceData = {
   loginErrors: unknown;
 };
 
-const initialState: Partial<AuthSliceData> = {
+const initialState: AuthSliceData = {
   user: null,
   isAuthenticated: false,
   email: null,
@@ -43,9 +32,18 @@ const initialState: Partial<AuthSliceData> = {
   loginErrors: {},
 };
 
+export async function newCookie(refreshToken: string) {
+  try {
+    const res = await apiService.post('/auth/token', { refreshToken });
+    return res.data;
+  } catch (error: any | AxiosError) {
+    return error;
+  }
+}
+
 export const loginUser = createAsyncThunk('auth/loginUser', async (data: LoginData, { rejectWithValue }) => {
   try {
-    const res = await apiService.post('/auth/login', data, { withCredentials: true });
+    const res = await apiService.post('/auth/login', data);
     setRefreshToken(res.data?.refreshToken);
     return res?.data;
   } catch (error: any | AxiosError) {
@@ -122,7 +120,7 @@ export const autoLogin = createAsyncThunk('auth/autoLogin', async (_, { rejectWi
   }
 });
 
-const authSlice: Slice = createSlice({
+const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
@@ -149,6 +147,11 @@ const authSlice: Slice = createSlice({
       const { payload } = action;
       state.user = payload.user;
       state.isAuthenticated = true;
+    },
+    [verifyUser.fulfilled.type]: (state, action: PayloadAction<LoginResponse>) => {
+      const { payload } = action;
+      state.isAuthenticated = true;
+      state.user = payload.user;
     },
   },
 });
