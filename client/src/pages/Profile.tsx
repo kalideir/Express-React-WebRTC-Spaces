@@ -8,75 +8,90 @@ import { useSnackbar } from 'notistack';
 import { MdUpload } from 'react-icons/md';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import type { IUser } from '../@types';
+import type { IUser, UpdateProfileData } from '../@types';
 import type { SerializedError } from '@reduxjs/toolkit';
 import { useAppDispatch } from '../hooks';
 import { useNavigate } from 'react-router-dom';
-import { upload } from '../store/profileSlice';
+import { updateProfile, upload } from '../store/profileSlice';
 
 const schema = yup.object({
   username: yup.string().min(3, 'Must be at least 3 letters').required('Username required'),
   firstName: yup.string().min(3, 'Must be at least 3 letters').required('First name required'),
   lastName: yup.string().min(3, 'Must be at least 3 letters').required('Last name required'),
-  phoneNumber: yup.number().min(7).typeError('Required').required('Phone number is required'),
+  phoneNumber: yup.number().min(7).typeError('Phone number required').required('Phone number is required'),
   email: yup.string().email().required('Email is required').email(),
 });
 
 function Profile() {
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<Partial<File> | null>(null);
   const [uploadedfile, setUploadedfile] = useState({});
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const currentUser = useSelector(selectCurrentUser) as IUser;
+  const [isEditing, setIsEditing] = useState(false);
+
+  const avatar = currentUser.profilePicture || `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${currentUser.username}`;
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
     reset,
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      ...currentUser,
+    },
   });
 
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const currentUser = useSelector(selectCurrentUser) as IUser;
-  const avatar = currentUser.profilePicture || `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${currentUser.username}`;
-  const [isEditing, setIsEditing] = useState(false);
-
   async function onSubmitHandler(data: FieldValues) {
-    // setIsLoading(true);
-    // try {
-    //   const res = await dispatch(registerUser(data as RegisterData)).unwrap();
-    //   enqueueSnackbar(res.message, {
-    //     variant: 'success',
-    //   });
-    //   reset({});
-    // } catch (err: any | SerializedError) {
-    //   const message = err?.message || 'Error';
-    //   enqueueSnackbar(message, {
-    //     variant: 'error',
-    //   });
-    // }
-    // setIsLoading(false);
-  }
-
-  async function uploadAvatar() {
-    if (file!.size > 5 * 1024 * 1024) {
-      setFile({ name: 'File size has to be less than 5MB.' });
-      return;
-    }
-
+    setIsLoading(true);
+    const id = data._id;
+    delete data._id;
+    delete data.verified;
+    delete data.role;
     try {
-      const data = new FormData();
-      data.append('file', file);
-      data.append('type', 'IMAGE');
-      data.append('contentType', 'Resume');
-      const res = await dispatch(upload(data)).unwrap();
-      setUploadedfile(res.data);
+      const res = await dispatch(updateProfile({ data, id })).unwrap();
+      enqueueSnackbar(res.message, {
+        variant: 'success',
+      });
+      reset({});
     } catch (err: any | SerializedError) {
-      const message = err?.message || 'Error uploading avatar.';
+      const message = err?.message || 'Error';
+      if (err.errors) {
+        err.errors.forEach((error: { path: keyof typeof schema.fields; message: string }) => {
+          setError(error.path, { message: error.message });
+        });
+      }
       enqueueSnackbar(message, {
         variant: 'error',
       });
+    }
+    setIsLoading(false);
+  }
+
+  async function uploadAvatar() {
+    if (file instanceof File) {
+      if (file.size > 5 * 1024 * 1024) {
+        setFile({ name: 'File size has to be less than 5MB.' });
+        return;
+      }
+
+      try {
+        const data = new FormData();
+        data.append('file', file);
+        data.append('type', 'IMAGE');
+        const res = await dispatch(upload(data)).unwrap();
+        setUploadedfile(res.data);
+      } catch (err: any | SerializedError) {
+        const message = err?.message || 'Error uploading avatar.';
+        enqueueSnackbar(message, {
+          variant: 'error',
+        });
+      }
     }
   }
 
@@ -86,14 +101,15 @@ function Profile() {
         <div className="max-w-2xl mx-auto bg-gray-100 dark:bg-slate-800 rounded-xl shadow-md overflow-hidden md:max-w-3xl">
           <div className="md:flex">
             <div className="w-full p-2 py-10">
-              <div className="flex-col items-center justify-center"></div>
-              <label className="cursor-pointer mt-6 flex-col" htmlFor="select-avatar">
-                <div className="relative w-24 self-center mx-auto">
-                  <img src={avatar} className="rounded-full mx-auto w-full h-full" />
-                  {isEditing && <MdUpload className="self-center text-center mx-auto text-slate-900 dark:text-slate-200 mt-3" size={20} />}
-                </div>
-                <input type="file" className="hidden" id="select-avatar" />
-              </label>
+              <div className="flex-col items-center  w-24 mx-auto justify-center">
+                <label className="cursor-pointer mt-6 flex-col" htmlFor="select-avatar">
+                  <div className="relative w-24 self-center mx-auto">
+                    <img src={avatar} className="rounded-full mx-auto w-full h-full" />
+                    {isEditing && <MdUpload className="self-center text-center mx-auto text-slate-900 dark:text-slate-200 mt-3" size={20} />}
+                  </div>
+                  <input type="file" className="hidden" id="select-avatar" />
+                </label>
+              </div>
               {!isEditing && (
                 <>
                   <div className="flex flex-col text-center mt-3 mb-4">
@@ -162,7 +178,7 @@ function Profile() {
                       <div className="relative z-0 mb-6 w-full group">
                         <input
                           type="text"
-                          {...register('username')}
+                          {...register('firstName')}
                           id="floating_first_name"
                           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                           placeholder=" "
@@ -173,14 +189,14 @@ function Profile() {
                         >
                           First name
                         </label>
-                        {errors.username && <div className="text-red-500 font-semibold">{errors.username.message}</div>}
+                        {errors.firstName && <div className="text-red-500 font-semibold">{errors.firstName.message}</div>}
                       </div>
                     </div>
                     <div className="w-1/2">
                       <div className="relative z-0 mb-6 w-full group">
                         <input
                           type="text"
-                          {...register('username')}
+                          {...register('lastName')}
                           id="floating_last_name"
                           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                           placeholder=" "
@@ -191,7 +207,7 @@ function Profile() {
                         >
                           Last name
                         </label>
-                        {errors.username && <div className="text-red-500 font-semibold">{errors.username.message}</div>}
+                        {errors.lastName && <div className="text-red-500 font-semibold">{errors.lastName.message}</div>}
                       </div>
                     </div>
                   </div>
@@ -200,8 +216,7 @@ function Profile() {
                       <div className="relative z-0 mb-6 w-full group">
                         <input
                           type="tel"
-                          pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                          {...register('username')}
+                          {...register('phoneNumber')}
                           id="floating_phone"
                           className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                           placeholder=" "
@@ -212,19 +227,40 @@ function Profile() {
                         >
                           Phone number
                         </label>
-                        {errors.username && <div className="text-red-500 font-semibold">{errors.username.message}</div>}
+                        {errors.phoneNumber && <div className="text-red-500 font-semibold">{errors.phoneNumber.message}</div>}
                       </div>
                     </div>
                   </div>
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="h-12 w-1/3  mx-auto bg-blue-700 text-white text-md rounded hover:shadow hover:bg-blue-800"
-                  >
-                    Save
-                  </button>{' '}
-                  <button onClick={() => setIsEditing(false)} className="h-12 w-1/5  mx-auto bg-slate-500 text-white text-md rounded hover:shadow-xl">
-                    Cancel
-                  </button>{' '}
+                  <div className="flex items-center justify-start w-3/5">
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="h-12 w-3/5 flex items-center justify-center mx-auto bg-blue-700 text-white text-md rounded hover:shadow hover:bg-blue-800"
+                    >
+                      {isLoading ? (
+                        <svg
+                          role="status"
+                          className="inline mr-3 w-4 h-4 text-white animate-spin"
+                          viewBox="0 0 100 101"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                            fill="#E5E7EB"
+                          />
+                          <path
+                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      ) : (
+                        'Save'
+                      )}
+                    </button>{' '}
+                    <button onClick={() => setIsEditing(false)} className="h-12 w-1/3 bg-slate-500 text-white text-md rounded hover:shadow-xl mx-2">
+                      Cancel
+                    </button>{' '}
+                  </div>
                 </form>
               )}
             </div>

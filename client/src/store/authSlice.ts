@@ -14,6 +14,7 @@ import type {
 } from '../@types';
 import { apiService } from '../services';
 import { getRefreshToken, setRefreshToken } from '../services/api.service';
+import { updateProfile } from './profileSlice';
 import { RootState } from './store';
 
 export type AuthSliceData = {
@@ -151,6 +152,10 @@ const authSlice = createSlice({
     [verifyUser.fulfilled.type]: (state, action: PayloadAction<LoginResponse>) => {
       const { payload } = action;
       state.isAuthenticated = true;
+      state.user = payload.user;
+    },
+    [updateProfile.fulfilled.type]: (state, action: PayloadAction<{ user: IUser }>) => {
+      const { payload } = action;
       state.user = payload.user;
     },
   },

@@ -6,7 +6,7 @@ import { use } from '../utils';
 
 const router = Router();
 
-router.param('id', use(controller.load));
+router.param('id', controller.load);
 
 router
   .route('/:id')

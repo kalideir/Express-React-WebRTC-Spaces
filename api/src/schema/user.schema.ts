@@ -1,4 +1,4 @@
-import { object, string, TypeOf } from 'zod';
+import { number, object, string, TypeOf } from 'zod';
 import { t } from '../utils';
 
 const userPayload = {
@@ -12,7 +12,7 @@ const userPayload = {
     address: string({
       required_error: 'Address is required',
     }).optional(),
-    phoneNumber: string({
+    phoneNumber: number({
       required_error: 'Phone number is required',
     }).optional(),
     profilePictureId: string({}).nullable().optional(),

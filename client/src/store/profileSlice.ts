@@ -13,17 +13,20 @@ const initialState: Partial<ProfileSliceData> = {
   spaces: [],
 };
 
-export const updateProfile = createAsyncThunk('profile/updateProfile', async (data: Partial<IUser>, { rejectWithValue }) => {
-  try {
-    const res = await apiService.patch('/user/', data);
-    return res?.data;
-  } catch (error: any | AxiosError) {
-    const errors = error.response?.data?.errors;
-    const extra = error.response?.data?.extra;
-    const message = error?.response.data.message || 'Login error';
-    return rejectWithValue({ errors, message, extra });
-  }
-});
+export const updateProfile = createAsyncThunk(
+  'profile/updateProfile',
+  async ({ data, id }: { data: Partial<IUser>; id: string }, { rejectWithValue }) => {
+    try {
+      const res = await apiService.patch(`/user/${id}`, data);
+      return res?.data;
+    } catch (error: any | AxiosError) {
+      const errors = error.response?.data?.errors;
+      const extra = error.response?.data?.extra;
+      const message = error?.response.data.message || 'Login error';
+      return rejectWithValue({ errors, message, extra });
+    }
+  },
+);
 
 export const upload = createAsyncThunk('profile/upload', async (formData: FormData, { rejectWithValue }) => {
   try {

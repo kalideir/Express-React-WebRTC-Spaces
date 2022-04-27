@@ -66,3 +66,5 @@ export interface ISpace {
   participants: string[];
   url: string;
 }
+
+export type UpdateProfileData = Partial<IUser>;
