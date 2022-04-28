@@ -4,6 +4,7 @@ export * from './morgan';
 export * from './jwt';
 export * from './emails';
 export { default as dbConnect } from './db';
+export { default as multer } from './multer';
 export { default as use } from './use';
 export { default as sendEmail } from './mailer';
 export { default as t } from './translate';

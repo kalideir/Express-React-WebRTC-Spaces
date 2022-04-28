@@ -12,7 +12,6 @@ const s3 = new AWS.S3({
 });
 
 export function uploadFileToAWSS3(fileName: string, fileType: string, fileContent: S3Body): Promise<S3.ManagedUpload.SendData | Error> {
-  console.log(fileContent, 'xfileContent');
   return new Promise<S3.ManagedUpload.SendData>((resolve, reject) => {
     const params = {
       Bucket: awsS3BucketName,
