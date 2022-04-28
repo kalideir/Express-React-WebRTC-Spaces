@@ -6,10 +6,10 @@ export enum MediaTypes {
 
 export interface MediaDocument extends mongoose.Document {
   type: MediaTypes;
-  originalUrl: string;
   thumbnaillUrl: string;
   mediumUrl: string;
   largelUrl: string;
+  smallUrl: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,16 +20,16 @@ const mediaSchema = new mongoose.Schema(
       type: String,
       enum: MediaTypes,
     },
-    originalUrl: {
-      type: String,
-    },
     thumbnailUrl: {
       type: String,
     },
-    mediumUrl: {
+    largeUrl: {
       type: String,
     },
-    largeUrl: {
+    smallUrl: {
+      type: String,
+    },
+    mediumUrl: {
       type: String,
     },
   },

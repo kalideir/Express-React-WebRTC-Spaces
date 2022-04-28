@@ -7,8 +7,8 @@ import { deleteFileFromAWSS3, uploadFileToAWSS3 } from '../services';
 import { logger, t } from '../utils';
 import fs from 'fs';
 import { S3 } from 'aws-sdk';
-import { resize, sizes } from '../utils/media';
-import { ImageSize, MediaTypesKey } from '../types';
+import { resize, sizes, sizesUrls } from '../utils/media';
+import type { ImageSize, MediaTypesKey, S3UploadResult } from '../types';
 import { nanoid } from 'nanoid';
 import path from 'path';
 
@@ -27,28 +27,19 @@ export async function create(req: Request<CreateMediaInput>, res: Response) {
   const filename = `${nanoid(10)}_${Date.now()}_${req.file.originalname.split(' ').join('_')}`;
   const fileType = req.file.mimetype;
   const uploadType = req.body.type as MediaTypesKey;
-  let image: unknown | S3.ManagedUpload.SendData;
-
+  const { name, ext } = path.parse(filename);
   const desiredSizes = sizes[uploadType];
   const buffers = await Promise.all(desiredSizes.map((size: ImageSize) => resize(size, req.file.path)));
-  const { name, ext } = path.parse(filename);
 
   const results = await Promise.all(
-    buffers.map((buffer, index) => uploadFileToAWSS3(`${name}_${desiredSizes[index].width}x${desiredSizes[index].height}.${ext}`, fileType, buffer)),
+    buffers.map((buffer, index) =>
+      uploadFileToAWSS3(`${name}_${desiredSizes[index].width}x${desiredSizes[index].height}.${ext}`, fileType, buffer, desiredSizes[index].name),
+    ),
   );
-  console.log(results);
-  // payload = { ...payload, originalUrl: image.Location };
-  // const savedMedia = await MediaModel.create(payload);
-  // logger.info(savedMedia.toJSON());
-  // logger.info(image);
-
-  // res.status(httpStatus.CREATED).json({ message: 'Media skapades framgångsrikt.', media: { ...savedMedia.toJSON() } });
-  // res.send({});
-  // const savedMedia = await MediaModel.create(payload);
-  // logger.info(savedMedia.toJSON());
-  // logger.info(image);
+  const payload = { type: uploadType, ...sizesUrls(results) };
+  const savedMedia = await MediaModel.create(payload);
   fs.unlinkSync(req.file.path);
-  res.status(httpStatus.CREATED).json({ message: t('file_upload_success'), media: {} });
+  res.status(httpStatus.CREATED).json({ message: t('file_upload_success'), media: savedMedia.toJSON() });
 }
 
 export async function update(req: Request, res: Response) {

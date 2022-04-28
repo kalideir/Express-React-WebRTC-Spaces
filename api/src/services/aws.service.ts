@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk';
 import config from 'config';
 import { S3 } from 'aws-sdk';
-import { S3Body } from '../types';
+import { S3Body, S3UploadResult, SizeName } from '../types';
 const awsAccessId = config.get<string>('awsAccessId');
 const awsSecretKey = config.get<string>('awsSecretKey');
 const awsS3BucketName = config.get<string>('awsS3BucketName');
@@ -11,8 +11,8 @@ const s3 = new AWS.S3({
   secretAccessKey: awsSecretKey,
 });
 
-export function uploadFileToAWSS3(fileName: string, fileType: string, fileContent: S3Body): Promise<S3.ManagedUpload.SendData | Error> {
-  return new Promise<S3.ManagedUpload.SendData>((resolve, reject) => {
+export function uploadFileToAWSS3(fileName: string, fileType: string, fileContent: S3Body, sizeName: SizeName) {
+  return new Promise<S3UploadResult>((resolve, reject) => {
     const params = {
       Bucket: awsS3BucketName,
       Key: fileName,
@@ -25,7 +25,7 @@ export function uploadFileToAWSS3(fileName: string, fileType: string, fileConten
       if (err) {
         reject(err);
       } else {
-        resolve(data);
+        resolve({ ...data, sizeName });
       }
     });
   });
