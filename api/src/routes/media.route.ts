@@ -15,7 +15,7 @@ const multer = Multer({
 
 router.param('id', controller.load);
 
-router.route('/').post(authorizeUser, validate(createMediaSchema), multer.single('image'), use(controller.upload));
+router.route('/').post(authorizeUser, multer.single('image'), validate(createMediaSchema), use(controller.create));
 
 router
   .route('/:id')

@@ -1,7 +1,11 @@
 import mongoose from 'mongoose';
 
+export enum MediaTypes {
+  PROFILE_PICTURE = 'PROFILE_PICTURE',
+}
+
 export interface MediaDocument extends mongoose.Document {
-  type: string;
+  type: MediaTypes;
   originalUrl: string;
   thumbnaillUrl: string;
   mediumUrl: string;
@@ -14,6 +18,7 @@ const mediaSchema = new mongoose.Schema(
   {
     type: {
       type: String,
+      enum: MediaTypes,
     },
     originalUrl: {
       type: String,

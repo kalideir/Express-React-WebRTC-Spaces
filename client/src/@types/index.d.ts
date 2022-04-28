@@ -15,6 +15,8 @@ export type VerifyUserData = {
   verificationCode: null | string;
 };
 export interface IUser {
+  id: string;
+  _id: string;
   email: string;
   profilePicture: string;
   username: string;
@@ -68,3 +70,14 @@ export interface ISpace {
 }
 
 export type UpdateProfileData = Partial<IUser>;
+
+export type MediaResponse = Partial<{
+  type: string;
+  originalUrl: string;
+  thumbnaillUrl: string;
+  mediumUrl: string;
+  largelUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+  id: string;
+}>;

@@ -8,11 +8,11 @@ import { useSnackbar } from 'notistack';
 import { MdUpload } from 'react-icons/md';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import type { IUser, UpdateProfileData } from '../@types';
+import type { IUser, MediaResponse } from '../@types';
 import type { SerializedError } from '@reduxjs/toolkit';
 import { useAppDispatch } from '../hooks';
 import { useNavigate } from 'react-router-dom';
-import { updateProfile, upload } from '../store/profileSlice';
+import { selectUploadProgress, updateProfile, upload } from '../store/profileSlice';
 
 const schema = yup.object({
   username: yup.string().min(3, 'Must be at least 3 letters').required('Username required'),
@@ -22,17 +22,23 @@ const schema = yup.object({
   email: yup.string().email().required('Email is required').email(),
 });
 
+export enum MediaTypes {
+  PROFILE_PICTURE = 'PROFILE_PICTURE',
+}
+
 function Profile() {
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const [file, setFile] = useState<Partial<File> | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [uploadedfile, setUploadedfile] = useState({});
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const currentUser = useSelector(selectCurrentUser) as IUser;
+  const uploadProgress = useSelector(selectUploadProgress) as number;
   const [isEditing, setIsEditing] = useState(false);
-
-  const avatar = currentUser.profilePicture || `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${currentUser.username}`;
+  const id = currentUser.id;
+  const avatar = file
+    ? URL.createObjectURL(file)
+    : currentUser.profilePicture || `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${currentUser.username}`;
 
   const {
     register,
@@ -49,43 +55,59 @@ function Profile() {
 
   async function onSubmitHandler(data: FieldValues) {
     setIsLoading(true);
-    const id = data._id;
     delete data._id;
     delete data.verified;
     delete data.role;
-    try {
-      const res = await dispatch(updateProfile({ data, id })).unwrap();
-      enqueueSnackbar(res.message, {
-        variant: 'success',
-      });
-      reset({});
-    } catch (err: any | SerializedError) {
-      const message = err?.message || 'Error';
-      if (err.errors) {
-        err.errors.forEach((error: { path: keyof typeof schema.fields; message: string }) => {
-          setError(error.path, { message: error.message });
-        });
-      }
-      enqueueSnackbar(message, {
-        variant: 'error',
-      });
+    let media: null | MediaResponse;
+    if (file) {
+      media = await uploadAvatar();
+      console.log({ media });
     }
+    // try {
+    //   if (file) {
+    //     const media = await uploadAvatar();
+    //   }
+    //   const res = await dispatch(updateProfile({ data, id })).unwrap();
+    //   enqueueSnackbar(res.message, {
+    //     variant: 'success',
+    //   });
+    //   reset({});
+    // } catch (err: any | SerializedError) {
+    //   const message = err?.message || 'Error';
+    //   if (err.errors) {
+    //     err.errors.forEach((error: { path: keyof typeof schema.fields; message: string }) => {
+    //       setError(error.path, { message: error.message });
+    //     });
+    //   }
+    //   enqueueSnackbar(message, {
+    //     variant: 'error',
+    //   });
+    // }
     setIsLoading(false);
   }
 
-  async function uploadAvatar() {
-    if (file instanceof File) {
-      if (file.size > 5 * 1024 * 1024) {
-        setFile({ name: 'File size has to be less than 5MB.' });
-        return;
-      }
+  function selectFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      enqueueSnackbar('File size has to be less than 5MB', {
+        variant: 'error',
+      });
+      return;
+    }
+    setFile(file);
+  }
 
+  async function uploadAvatar(): Promise<MediaResponse | null> {
+    if (file instanceof File) {
       try {
         const data = new FormData();
-        data.append('file', file);
-        data.append('type', 'IMAGE');
-        const res = await dispatch(upload(data)).unwrap();
-        setUploadedfile(res.data);
+        data.append('image', file);
+        data.append('type', MediaTypes.PROFILE_PICTURE);
+        const media = await dispatch(upload(data)).unwrap();
+        return media;
       } catch (err: any | SerializedError) {
         const message = err?.message || 'Error uploading avatar.';
         enqueueSnackbar(message, {
@@ -93,6 +115,7 @@ function Profile() {
         });
       }
     }
+    return null;
   }
 
   return (
@@ -101,21 +124,33 @@ function Profile() {
         <div className="max-w-2xl mx-auto bg-gray-100 dark:bg-slate-800 rounded-xl shadow-md overflow-hidden md:max-w-3xl">
           <div className="md:flex">
             <div className="w-full p-2 py-10">
-              <div className="flex-col items-center  w-24 mx-auto justify-center">
-                <label className="cursor-pointer mt-6 flex-col" htmlFor="select-avatar">
-                  <div className="relative w-24 self-center mx-auto">
+              <div className="flex-col items-center mb-16 w-24 mx-auto justify-center">
+                <label className="cursor-pointer mt-6 flex-col" htmlFor={isEditing ? 'select-avatar' : ''}>
+                  <div className="relative w-24 h-24 self-center mx-auto">
                     <img src={avatar} className="rounded-full mx-auto w-full h-full" />
                     {isEditing && <MdUpload className="self-center text-center mx-auto text-slate-900 dark:text-slate-200 mt-3" size={20} />}
                   </div>
-                  <input type="file" className="hidden" id="select-avatar" />
+                  <input type="file" onChange={selectFile} className="hidden" id="select-avatar" />
                 </label>
               </div>
+              {isLoading && (
+                <div className="w-2/5 mx-auto">
+                  <div className="w-full bg-gray-200 rounded-full dark:bg-slate-900 mt-5">
+                    <div
+                      style={{ width: uploadProgress || '0' }}
+                      className="bg-indigo-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
+                    >
+                      5%
+                    </div>
+                  </div>
+                </div>
+              )}
               {!isEditing && (
                 <>
                   <div className="flex flex-col text-center mt-3 mb-4">
                     {' '}
-                    <span className="text-2xl font-medium">{currentUser.fullName}</span>{' '}
-                    <span className="text-md text-slate-50">@{currentUser.username}</span> <br />
+                    <span className="text-2xl font-medium text-slate-900 dark:text-slate-100">{currentUser.fullName}</span>{' '}
+                    <span className="text-md text-slate-800 dark:text-slate-200">@{currentUser.username}</span> <br />
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       Joined in {formatDistanceToNow(Date.parse(currentUser.createdAt))}
                     </span>
