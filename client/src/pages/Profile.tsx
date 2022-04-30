@@ -13,8 +13,9 @@ import type { SerializedError } from '@reduxjs/toolkit';
 import { useAppDispatch } from '../hooks';
 import { useNavigate } from 'react-router-dom';
 import { updateProfile } from '../store/profileSlice';
-import { getUploadUrl, selectUploadProgress, upload } from '../store/uploadslice';
+import { createMedia, getUploadUrl, selectUploadProgress, upload } from '../store/uploadslice';
 import { getExtension } from '../utils';
+import { MediaTypes } from '../constants';
 
 const schema = yup.object({
   username: yup.string().min(3, 'Must be at least 3 letters').required('Username required'),
@@ -23,10 +24,6 @@ const schema = yup.object({
   phoneNumber: yup.number().min(7).typeError('Phone number required').required('Phone number is required'),
   email: yup.string().email().required('Email is required').email(),
 });
-
-export enum MediaTypes {
-  PROFILE_PICTURE = 'PROFILE_PICTURE',
-}
 
 function Profile() {
   const [isLoading, setIsLoading] = useState(false);
@@ -63,8 +60,10 @@ function Profile() {
     let media: null | MediaResponse;
     try {
       if (file) {
-        const imageUrl = await uploadAvatar();
-        setUploadedfile(imageUrl as string);
+        const originalUrl = (await uploadAvatar()) as string;
+        media = (await dispatch(createMedia({ originalUrl, type: MediaTypes.PROFILE_PICTURE }))) as MediaResponse;
+        Object.assign('profilePictureId', media?.id || null);
+        console.log(media);
       }
       const res = await dispatch(updateProfile({ data, id })).unwrap();
       enqueueSnackbar(res.message, {
@@ -131,7 +130,6 @@ function Profile() {
                   <input type="file" onChange={selectFile} className="hidden" id="select-avatar" />
                 </label>
               </div>
-              {uploadedfile && <img src={uploadedfile} />}
               {isLoading && (
                 <div className="w-2/5 mx-auto">
                   <div className="w-full bg-gray-200 rounded-full dark:bg-slate-900 mt-5">

@@ -1,7 +1,7 @@
 import { createAction, createAsyncThunk, createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 import type { AxiosError } from 'axios';
 import axios from 'axios';
-import { ISpace, IUser } from '../@types';
+import { ISpace, IUser, MediaData } from '../@types';
 import { apiService } from '../services';
 import { RootState } from './store';
 
@@ -68,6 +68,17 @@ export const upload = createAsyncThunk(
     }
   },
 );
+
+export const createMedia = createAsyncThunk('upload/createMedia', async (data: MediaData, { rejectWithValue }) => {
+  try {
+    const res = await apiService.post(`/media`, data);
+    return res?.data;
+  } catch (error: any | AxiosError) {
+    const errors = error.response?.data?.errors;
+    const message = error?.response.data.message || 'Create media error';
+    return rejectWithValue({ errors, message });
+  }
+});
 
 const uploadSlice = createSlice({
   name: 'upload',

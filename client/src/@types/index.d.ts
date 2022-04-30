@@ -1,3 +1,5 @@
+import { MediaTypes } from '../constants';
+
 export type NewTokenData = {
   refreshToken: string;
 };
@@ -18,6 +20,7 @@ export interface IUser {
   id: string;
   _id: string;
   email: string;
+  profilePictureId: string;
   profilePicture: string;
   username: string;
   fullName: string;
@@ -71,13 +74,19 @@ export interface ISpace {
 
 export type UpdateProfileData = Partial<IUser>;
 
-export type MediaResponse = Partial<{
-  type: string;
+export type MediaTypesKey = keyof typeof MediaTypes;
+
+export type MediaData = Partial<{
+  type: MediaTypesKey;
   originalUrl: string;
-  thumbnaillUrl: string;
+  largeUrl: string;
   mediumUrl: string;
-  largelUrl: string;
+  smallUrl: string;
+}>;
+
+export type MediaResponse = Partial<{
   createdAt: Date;
   updatedAt: Date;
   id: string;
-}>;
+}> &
+  MediaData;
