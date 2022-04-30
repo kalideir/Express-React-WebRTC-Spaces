@@ -14,6 +14,7 @@ export default {
   },
   saltWorkFactor: 100,
   jwtSecret: process.env.JWT_SECRET || 'secret',
+  awsRegion: process.env.AWS_S3_REGION,
   awsAccessId: process.env.AWS_ACCESS_ID || '',
   awsSecretKey: process.env.AWS_SECRET_KEY || '',
   awsS3BucketName: process.env.AWS_S3_BUCKET_NAME || '',
@@ -24,4 +25,6 @@ export default {
 
   cookieName: process.env.COOKIE_NAME || 'authCookie',
   cookieKey1: process.env.COOKIE_KEY_ID || 'cookie-key-1',
+
+  webConcurrency: process.env.WEB_CONCURRENCY || 4,
 };

@@ -1,26 +1,12 @@
-import { DoneCallback, Job } from 'bull';
 import { logger, sendEmail } from '../../utils';
-import { sendMailQueue } from '../bull';
 import { SendEmailJobData } from '../../types';
+import { Job } from 'bull';
 
-export type SendEmailContext = {
-  description: string;
-  actionUrl: string;
-  btnText: string;
-  action: string;
-  subject: string;
-  message: string;
-};
-
-sendMailQueue.process(async (job: Job<SendEmailJobData>, done: DoneCallback) => {
-  logger.debug('Job data ' + job.data);
-  await consumer(job.data);
-  done();
-});
-
-export default function consumer(jobData: SendEmailJobData) {
+export default function consumer(job: Job<SendEmailJobData>) {
   return new Promise((resolve, reject) => {
-    const { emailOptions, context, template } = jobData;
+    const data = job.data;
+    logger.debug('Email job data ' + data);
+    const { emailOptions, context, template } = data;
     try {
       sendEmail(emailOptions, context, template);
       resolve(true);

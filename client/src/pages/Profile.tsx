@@ -12,7 +12,9 @@ import type { IUser, MediaResponse } from '../@types';
 import type { SerializedError } from '@reduxjs/toolkit';
 import { useAppDispatch } from '../hooks';
 import { useNavigate } from 'react-router-dom';
-import { selectUploadProgress, updateProfile, upload } from '../store/profileSlice';
+import { updateProfile } from '../store/profileSlice';
+import { getUploadUrl, selectUploadProgress, upload } from '../store/uploadslice';
+import { getExtension } from '../utils';
 
 const schema = yup.object({
   username: yup.string().min(3, 'Must be at least 3 letters').required('Username required'),
@@ -30,7 +32,7 @@ function Profile() {
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [file, setFile] = useState<File | null>(null);
-  const [uploadedfile, setUploadedfile] = useState({});
+  const [uploadedfile, setUploadedfile] = useState('');
   const dispatch = useAppDispatch();
   const currentUser = useSelector(selectCurrentUser) as IUser;
   const uploadProgress = useSelector(selectUploadProgress) as number;
@@ -59,30 +61,27 @@ function Profile() {
     delete data.verified;
     delete data.role;
     let media: null | MediaResponse;
-    if (file) {
-      media = await uploadAvatar();
-      console.log({ media });
+    try {
+      if (file) {
+        const imageUrl = await uploadAvatar();
+        setUploadedfile(imageUrl as string);
+      }
+      const res = await dispatch(updateProfile({ data, id })).unwrap();
+      enqueueSnackbar(res.message, {
+        variant: 'success',
+      });
+      reset({});
+    } catch (err: any | SerializedError) {
+      const message = err?.message || 'Error';
+      if (err.errors) {
+        err.errors.forEach((error: { path: keyof typeof schema.fields; message: string }) => {
+          setError(error.path, { message: error.message });
+        });
+      }
+      enqueueSnackbar(message, {
+        variant: 'error',
+      });
     }
-    // try {
-    //   if (file) {
-    //     const media = await uploadAvatar();
-    //   }
-    //   const res = await dispatch(updateProfile({ data, id })).unwrap();
-    //   enqueueSnackbar(res.message, {
-    //     variant: 'success',
-    //   });
-    //   reset({});
-    // } catch (err: any | SerializedError) {
-    //   const message = err?.message || 'Error';
-    //   if (err.errors) {
-    //     err.errors.forEach((error: { path: keyof typeof schema.fields; message: string }) => {
-    //       setError(error.path, { message: error.message });
-    //     });
-    //   }
-    //   enqueueSnackbar(message, {
-    //     variant: 'error',
-    //   });
-    // }
     setIsLoading(false);
   }
 
@@ -100,14 +99,13 @@ function Profile() {
     setFile(file);
   }
 
-  async function uploadAvatar(): Promise<MediaResponse | null> {
+  async function uploadAvatar(): Promise<string | null> {
     if (file instanceof File) {
       try {
-        const data = new FormData();
-        data.append('image', file);
-        data.append('type', MediaTypes.PROFILE_PICTURE);
-        const media = await dispatch(upload(data)).unwrap();
-        return media;
+        const fileType = file.type;
+        const uploadUrl = (await dispatch(getUploadUrl({ fileType, extension: getExtension(file.name) as string })).unwrap()) as string;
+        await dispatch(upload({ url: uploadUrl, file, fileType })).unwrap();
+        return uploadUrl.split('?')[0];
       } catch (err: any | SerializedError) {
         const message = err?.message || 'Error uploading avatar.';
         enqueueSnackbar(message, {
@@ -133,6 +131,7 @@ function Profile() {
                   <input type="file" onChange={selectFile} className="hidden" id="select-avatar" />
                 </label>
               </div>
+              {uploadedfile && <img src={uploadedfile} />}
               {isLoading && (
                 <div className="w-2/5 mx-auto">
                   <div className="w-full bg-gray-200 rounded-full dark:bg-slate-900 mt-5">

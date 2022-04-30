@@ -1,11 +1,21 @@
 import { object, string, TypeOf } from 'zod';
+import { MediaTypes } from '../models';
 import { t } from '../utils';
+
+const oneOf = (keys: string[]) => val => {
+  for (const k of keys) {
+    if (val[k] !== undefined) return true;
+  }
+  return false;
+};
 
 const payload = {
   body: object({
-    type: string({
-      required_error: t('media_type_required'),
-    }),
+    type: string({ required_error: t('media_type_required') }).refine(oneOf([MediaTypes.PROFILE_PICTURE]), t('media_type_invalid')),
+    originalUrl: string().optional(),
+    largeUrl: string().optional(),
+    mediumUrl: string().optional(),
+    smallUrl: string().optional(),
   }),
 };
 

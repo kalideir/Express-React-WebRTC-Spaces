@@ -28,6 +28,7 @@
     "email_invalid": "Must be a valid e-mail address",
     "email_in_use": "Email in use",
     "media_type_required": "A video or image is required",
+    "media_type_invalid": "Invalid media type",
     "id_required": "*id* is required",
     "username_required": "Username field is required",
     "username_field_length": "Username must be at least one letter long",

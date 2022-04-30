@@ -25,7 +25,7 @@ export type S3Body = string | Buffer | Uint8Array | Blob | Readable;
 
 export type SendEmailJobData = {
   emailOptions: SendMailOptions;
-  context: SendEmailContext;
+  context: SendMailContext;
   template: EmailTemplate;
 };
 

@@ -22,9 +22,9 @@ import {
   signRefreshToken,
 } from '../services';
 import { EnhancedRequest } from '../types';
-import { forgotPasswordData, logger, registerEmailData, resendVerificationData, t } from '../utils';
+import { forgotPasswordData, logger, registerEmailData, resendVerificationData, sendEmail, t } from '../utils';
 import httpStatus from 'http-status';
-import { sendMailProducer } from '../workers';
+import { sendMailProducer } from '../workers/producers';
 
 const cookieName = config.get<string>('cookieName');
 
@@ -40,6 +40,8 @@ export async function register(req: Request<RegisterUserInput>, res: Response, n
 
   await user.save();
 
+  // const { emailOptions, context, template } = registerEmailData(user.email, verificationCode);
+  // sendEmail(emailOptions, context, template);
   sendMailProducer(registerEmailData(user.email, verificationCode));
 
   res.json({ message: t('account_create_success') });

@@ -32,6 +32,10 @@ const mediaSchema = new mongoose.Schema(
     mediumUrl: {
       type: String,
     },
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
   {
     collection: 'Media',
@@ -46,6 +50,13 @@ mediaSchema.post('save', async doc => {
   if (doc.createdAt === doc.updatedAt) {
     // await jobService.mediaCreated(doc);
   }
+});
+
+mediaSchema.virtual('owner', {
+  ref: 'User',
+  localField: 'ownerId',
+  foreignField: '_id',
+  justOne: true,
 });
 
 const MediaModel = mongoose.model<MediaDocument>('Media', mediaSchema);

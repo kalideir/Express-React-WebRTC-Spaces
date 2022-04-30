@@ -4,6 +4,7 @@ import logger from 'redux-logger';
 import authReducer from './authSlice';
 import profileReducer from './profileSlice';
 import spaceReducer from './spaceSlice';
+import uploadReducer from './uploadslice';
 
 const middleware: Middleware<any, any, Dispatch<AnyAction>>[] = [];
 
@@ -16,6 +17,7 @@ const store = configureStore({
     auth: authReducer,
     profile: profileReducer,
     spaces: spaceReducer,
+    upload: uploadReducer,
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(logger),
   devTools: process.env.NODE_ENV === 'development',

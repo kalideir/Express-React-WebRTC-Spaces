@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { multer } from '../utils';
 import * as controller from '../controllers/media.controller';
 import { authorizeUser, validate } from '../middleware';
 import { createMediaSchema, deleteMediaSchema, getMediaSchema, updateMediaSchema } from '../schema';
@@ -9,7 +8,9 @@ const router = Router();
 
 router.param('id', controller.load);
 
-router.route('/').post(authorizeUser, multer.single('image'), validate(createMediaSchema), use(controller.create));
+router.route('/').post(authorizeUser, validate(createMediaSchema), use(controller.create));
+
+router.post('/new/s3UploadUrl', authorizeUser, use(controller.s3UploadUrl));
 
 router
   .route('/:id')
