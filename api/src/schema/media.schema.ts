@@ -3,9 +3,7 @@ import { MediaTypes } from '../models';
 import { t } from '../utils';
 
 const oneOf = (keys: string[]) => val => {
-  for (const k of keys) {
-    if (val[k] !== undefined) return true;
-  }
+  if (keys.includes(val)) return true;
   return false;
 };
 

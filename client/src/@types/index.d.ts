@@ -16,12 +16,14 @@ export type RegisterResponse = { message: string };
 export type VerifyUserData = {
   verificationCode: null | string;
 };
+
+export type ProfilePicture = MediaResponse;
 export interface IUser {
   id: string;
   _id: string;
   email: string;
   profilePictureId: string;
-  profilePicture: string;
+  profilePicture: ProfilePicture;
   username: string;
   fullName: string;
   firstName: string;

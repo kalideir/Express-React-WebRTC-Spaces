@@ -37,7 +37,7 @@ function Profile() {
   const id = currentUser.id;
   const avatar = file
     ? URL.createObjectURL(file)
-    : currentUser.profilePicture || `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${currentUser.username}`;
+    : currentUser.profilePicture?.originalUrl || `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${currentUser.username}`;
 
   const {
     register,
@@ -61,9 +61,8 @@ function Profile() {
     try {
       if (file) {
         const originalUrl = (await uploadAvatar()) as string;
-        media = (await dispatch(createMedia({ originalUrl, type: MediaTypes.PROFILE_PICTURE }))) as MediaResponse;
-        Object.assign('profilePictureId', media?.id || null);
-        console.log(media);
+        media = (await dispatch(createMedia({ originalUrl, type: MediaTypes.PROFILE_PICTURE })).unwrap()) as MediaResponse;
+        Object.assign(data, { profilePictureId: media?.id || null });
       }
       const res = await dispatch(updateProfile({ data, id })).unwrap();
       enqueueSnackbar(res.message, {

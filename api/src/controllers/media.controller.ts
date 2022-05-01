@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
-import { MediaModel } from '../models';
+import { MediaModel, UserDocument } from '../models';
 import { CreateMediaInput, DeleteMediaInput, LoadMediaInput } from '../schema';
 import { deleteFileFromAWSS3, generateUploadURL } from '../services';
 import { t } from '../utils';
@@ -29,8 +29,8 @@ export async function create(req: Request<CreateMediaInput>, res: Response) {
   //     uploadFileToAWSS3(`${name}_${desiredSizes[index].width}x${desiredSizes[index].height}.${ext}`, fileType, buffer, desiredSizes[index].name),
   //   ),
   // );
-
-  const media = await MediaModel.create(req.body);
+  const ownerId = (req.user as UserDocument).id;
+  const media = await MediaModel.create({ ...req.body, ownerId });
   res.status(httpStatus.CREATED).json({ message: t('file_upload_success'), media: media.toJSON() });
 }
 

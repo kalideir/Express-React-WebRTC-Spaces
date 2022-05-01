@@ -72,7 +72,7 @@ export const upload = createAsyncThunk(
 export const createMedia = createAsyncThunk('upload/createMedia', async (data: MediaData, { rejectWithValue }) => {
   try {
     const res = await apiService.post(`/media`, data);
-    return res?.data;
+    return res?.data.media;
   } catch (error: any | AxiosError) {
     const errors = error.response?.data?.errors;
     const message = error?.response.data.message || 'Create media error';
