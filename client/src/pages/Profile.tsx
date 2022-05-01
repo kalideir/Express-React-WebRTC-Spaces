@@ -37,7 +37,9 @@ function Profile() {
   const id = currentUser.id;
   const avatar = file
     ? URL.createObjectURL(file)
-    : currentUser.profilePicture?.originalUrl || `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${currentUser.username}`;
+    : currentUser.profilePicture?.smallUrl ||
+      currentUser.profilePicture?.originalUrl ||
+      `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${currentUser.username}`;
 
   const {
     register,

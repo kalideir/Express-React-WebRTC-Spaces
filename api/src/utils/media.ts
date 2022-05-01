@@ -73,7 +73,7 @@ export const resizeMedia = async (job: Job<ResizeMediaData>) => {
     job.progress(80);
 
     // save new media sizes
-    const payload = { ...media, ...sizeFields };
+    const payload = { ...media.toJSON(), ...sizeFields };
     await media.update(payload);
 
     job.progress(100);
