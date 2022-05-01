@@ -11,9 +11,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import type { IUser, MediaResponse } from '../@types';
 import type { SerializedError } from '@reduxjs/toolkit';
 import { useAppDispatch } from '../hooks';
-import { useNavigate } from 'react-router-dom';
 import { updateProfile } from '../store/profileSlice';
-import { createMedia, getUploadUrl, selectUploadProgress, upload } from '../store/uploadslice';
+import { createMedia, getUploadUrl, selectIsUploading, selectUploadProgress, upload } from '../store/uploadslice';
 import { getExtension } from '../utils';
 import { MediaTypes } from '../constants';
 
@@ -29,11 +28,12 @@ function Profile() {
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [file, setFile] = useState<File | null>(null);
-  const [uploadedfile, setUploadedfile] = useState('');
   const dispatch = useAppDispatch();
   const currentUser = useSelector(selectCurrentUser) as IUser;
+  const isUploading = useSelector(selectIsUploading) as boolean;
   const uploadProgress = useSelector(selectUploadProgress) as number;
   const [isEditing, setIsEditing] = useState(false);
+  const contentType = file?.type as string;
   const id = currentUser.id;
   const avatar = file
     ? URL.createObjectURL(file)
@@ -61,14 +61,14 @@ function Profile() {
     try {
       if (file) {
         const originalUrl = (await uploadAvatar()) as string;
-        media = (await dispatch(createMedia({ originalUrl, type: MediaTypes.PROFILE_PICTURE })).unwrap()) as MediaResponse;
+        media = (await dispatch(createMedia({ originalUrl, type: MediaTypes.PROFILE_PICTURE, contentType })).unwrap()) as MediaResponse;
         Object.assign(data, { profilePictureId: media?.id || null });
       }
       const res = await dispatch(updateProfile({ data, id })).unwrap();
+      setIsEditing(false);
       enqueueSnackbar(res.message, {
         variant: 'success',
       });
-      reset({});
     } catch (err: any | SerializedError) {
       const message = err?.message || 'Error';
       if (err.errors) {
@@ -100,9 +100,8 @@ function Profile() {
   async function uploadAvatar(): Promise<string | null> {
     if (file instanceof File) {
       try {
-        const fileType = file.type;
-        const uploadUrl = (await dispatch(getUploadUrl({ fileType, extension: getExtension(file.name) as string })).unwrap()) as string;
-        await dispatch(upload({ url: uploadUrl, file, fileType })).unwrap();
+        const uploadUrl = (await dispatch(getUploadUrl({ contentType })).unwrap()) as string;
+        await dispatch(upload({ url: uploadUrl, file, contentType })).unwrap();
         return uploadUrl.split('?')[0];
       } catch (err: any | SerializedError) {
         const message = err?.message || 'Error uploading avatar.';
@@ -129,14 +128,14 @@ function Profile() {
                   <input type="file" onChange={selectFile} className="hidden" id="select-avatar" />
                 </label>
               </div>
-              {isLoading && (
+              {isUploading && (
                 <div className="w-2/5 mx-auto">
                   <div className="w-full bg-gray-200 rounded-full dark:bg-slate-900 mt-5">
                     <div
-                      style={{ width: uploadProgress || '0' }}
+                      style={{ width: `${uploadProgress || 0}%` }}
                       className="bg-indigo-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
                     >
-                      5%
+                      {uploadProgress}%
                     </div>
                   </div>
                 </div>

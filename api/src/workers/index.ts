@@ -1,6 +1,6 @@
 import Queue from 'bull';
 import config from 'config';
-import { sendEmailConsumer } from './consumers';
+import { resizeMediaConsumer, sendEmailConsumer } from './consumers';
 
 const redisUrl = config.get<string>('redisUrl');
 
@@ -21,3 +21,5 @@ export const resizeMediaQueue = new Queue('media', redisUrl, {
 });
 
 sendMailQueue.process(maxJobsPerWorker, sendEmailConsumer);
+
+resizeMediaQueue.process(maxJobsPerWorker, resizeMediaConsumer);

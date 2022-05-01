@@ -80,6 +80,7 @@ export type MediaTypesKey = keyof typeof MediaTypes;
 
 export type MediaData = Partial<{
   type: MediaTypesKey;
+  contentType: string;
   originalUrl: string;
   largeUrl: string;
   mediumUrl: string;

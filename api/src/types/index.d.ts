@@ -34,15 +34,38 @@ export type MediaTypesKey = keyof typeof MediaTypes;
 export type ImageSize = {
   width: number;
   height: number;
-  name: SizeName;
 };
 
-export type SizesTypes = {
-  [type: string]: ImageSize[];
+export type SizeType = {
+  [size: SizeName]: {
+    width: number;
+    height: number;
+  };
+};
+
+export type SizeTypes = {
+  [type: string]: SizeType;
 };
 
 export type SizeName = 'thumbnaillUrl' | 'mediumUrl' | 'largelUrl' | 'smallUrl';
 
-export type S3UploadResult = S3.ManagedUpload.SendData & { sizeName: SizeName };
+export type S3UploadResult = S3.ManagedUpload.SendData;
 
 export type SizesUrls = { [sizeName: SizeName]: string };
+
+export type MediaData = Partial<{
+  type: MediaTypesKey;
+  originalUrl: string;
+  largeUrl: string;
+  mediumUrl: string;
+  smallUrl: string;
+  contentType: string;
+}>;
+
+export type MediaItem = Partial<{
+  createdAt: Date;
+  updatedAt: Date;
+}> &
+  MediaData;
+
+export type ResizeMediaData = MediaData & { id: string };

@@ -17,26 +17,26 @@ const s3 = new AWS.S3({
   // apiVersion: '2006-03-01',
 });
 
-export async function generateUploadURL(fileType: string, extension: string) {
+export async function generateUploadURL(contentType: string) {
   const imageName = nanoid(16);
 
   const params = {
     Bucket: awsS3BucketName,
-    Key: `${imageName}.${extension}`,
+    Key: imageName,
     Expires: 60 * 60,
-    // ContentType: fileType,
+    ContentType: contentType,
   };
 
   const uploadURL = await s3.getSignedUrlPromise('putObject', params);
   return uploadURL;
 }
 
-export function uploadFileToAWSS3(fileName: string, fileType: string, fileContent: S3Body, sizeName: SizeName) {
+export function uploadFileToAWSS3(fileName: string, contentType: string, fileContent: S3Body) {
   return new Promise<S3UploadResult>((resolve, reject) => {
     const params = {
       Bucket: awsS3BucketName,
       Key: fileName,
-      ContentType: fileType,
+      ContentType: contentType,
       Body: fileContent,
       ACL: 'public-read',
     };
@@ -45,7 +45,7 @@ export function uploadFileToAWSS3(fileName: string, fileType: string, fileConten
       if (err) {
         reject(err);
       } else {
-        resolve({ ...data, sizeName });
+        resolve(data);
       }
     });
   });

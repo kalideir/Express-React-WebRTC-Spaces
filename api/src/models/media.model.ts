@@ -1,25 +1,21 @@
 import mongoose from 'mongoose';
+import { MediaItem } from '../types';
+import { resizeMediaProducer } from '../workers/producers';
 
 export enum MediaTypes {
   PROFILE_PICTURE = 'PROFILE_PICTURE',
 }
-
-export interface MediaDocument extends mongoose.Document {
-  type: MediaTypes;
-  originalUrl: string;
-  thumbnaillUrl: string;
-  mediumUrl: string;
-  largelUrl: string;
-  smallUrl: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+export interface MediaDocument extends MediaItem, mongoose.Document {}
 
 const mediaSchema = new mongoose.Schema(
   {
     type: {
       type: String,
       enum: MediaTypes,
+    },
+    contentType: {
+      // ~mimetype
+      type: String,
     },
     originalUrl: {
       type: String,
@@ -52,7 +48,7 @@ const mediaSchema = new mongoose.Schema(
 
 mediaSchema.post('save', async doc => {
   if (doc.createdAt === doc.updatedAt) {
-    // await jobService.mediaCreated(doc);
+    await resizeMediaProducer(doc);
   }
 });
 
