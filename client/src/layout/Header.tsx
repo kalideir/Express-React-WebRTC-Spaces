@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom';
 import { BsPlusSquareFill } from 'react-icons/bs';
 import { useSelector } from 'react-redux';
 import { selectIsAuthenticated } from '../store/authSlice';
+import { useAppDispatch } from '../hooks';
+import { selectNewSpaceVisible, toggleNewSpaceModal } from '../store/uiSlice';
 
 function Header() {
   const [top, setTop] = useState(true);
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const dispatch = useAppDispatch();
   // detect whether user has scrolled the page down by 10px
   useEffect(() => {
     const scrollHandler = () => {
@@ -16,9 +19,11 @@ function Header() {
     return () => window.removeEventListener('scroll', scrollHandler);
   }, [top]);
 
+  const toggleSpaceModal = () => dispatch(toggleNewSpaceModal());
+
   return (
     <header className="relative px-3 py-sm:px-5 py-5 md:py-7">
-      <div className="w-7/12 mx-auto">
+      <div className="w-9/12 mx-auto">
         <div className="flex justify-between items-center h-10">
           <div>
             <Link className="block text-slate-900 font-extrabold tracking-wider text-3xl dark:text-slate-200" to="/">
@@ -47,18 +52,23 @@ function Header() {
             {isAuthenticated && (
               <ul className="flex flex-grow justify-end flex-wrap items-center">
                 <li>
-                  <Link className="font-medium text-gray-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/login">
+                  <Link className="font-medium text-gray-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/profile">
                     Profile
                   </Link>
                 </li>
                 <li>
-                  <Link
+                  <Link className="font-medium text-gray-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/spaces">
+                    My Spaces
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    onClick={toggleSpaceModal}
                     className="btn-sm text-white bg-indigo-600 py-2 px-3 rounded flex items-center justify-start  hover:bg-indigo-700 ml-3 sm:ml-6 lg:ml-10"
-                    to="/new-space"
                   >
                     <BsPlusSquareFill className="mr-2" />
                     <span>Create Space</span>
-                  </Link>
+                  </button>
                 </li>
               </ul>
             )}

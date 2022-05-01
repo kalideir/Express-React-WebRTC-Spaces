@@ -1,1 +1,1 @@
-export {};
+export { default as NewSpace } from './NewSpace';
