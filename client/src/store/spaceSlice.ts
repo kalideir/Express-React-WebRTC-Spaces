@@ -1,5 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
 import { ISpace } from '../@types';
+import { apiService } from '../services';
 
 export type SpaceSliceData = {
   permissionFulfilled: boolean;
@@ -12,6 +14,18 @@ const initialState: SpaceSliceData = {
   permissionModalVisible: false,
   spaces: [],
 };
+
+export const createSpace = createAsyncThunk('space/createSpace', async (data, { rejectWithValue }) => {
+  try {
+    const res = await apiService.post('/space/', data);
+    return res?.data;
+  } catch (error: any | AxiosError) {
+    const errors = error.response?.data?.errors;
+    const extra = error.response?.data?.extra;
+    const message = error?.response.data.message || 'Create error';
+    return rejectWithValue({ errors, message, extra });
+  }
+});
 
 const spaceSlice = createSlice({
   name: 'space',

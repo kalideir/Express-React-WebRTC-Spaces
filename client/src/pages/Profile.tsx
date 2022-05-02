@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../store/authSlice';
 import { formatDistanceToNow } from 'date-fns';
@@ -13,7 +13,6 @@ import type { SerializedError } from '@reduxjs/toolkit';
 import { useAppDispatch } from '../hooks';
 import { updateProfile } from '../store/profileSlice';
 import { createMedia, getUploadUrl, selectIsUploading, selectUploadProgress, upload } from '../store/uploadslice';
-import { getExtension } from '../utils';
 import { MediaTypes } from '../constants';
 
 const schema = yup.object({
@@ -35,11 +34,14 @@ function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const contentType = file?.type as string;
   const id = currentUser.id;
-  const avatar = file
-    ? URL.createObjectURL(file)
-    : currentUser.profilePicture?.smallUrl ||
-      currentUser.profilePicture?.originalUrl ||
-      `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${currentUser.username}`;
+
+  const avatar = useMemo(() => {
+    return file
+      ? URL.createObjectURL(file)
+      : currentUser.profilePicture?.smallUrl ||
+          currentUser.profilePicture?.originalUrl ||
+          `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${currentUser.username}`;
+  }, [currentUser.profilePicture, currentUser.username, file]);
 
   const {
     register,

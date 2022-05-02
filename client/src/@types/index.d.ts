@@ -72,6 +72,7 @@ export interface ISpace {
   name: string;
   participants: string[];
   url: string;
+  isPublic: boolean;
 }
 
 export type UpdateProfileData = Partial<IUser>;
@@ -93,3 +94,7 @@ export type MediaResponse = Partial<{
   id: string;
 }> &
   MediaData;
+
+export type NewSpaceData = Omit<ISpace, 'participants'>;
+
+export type NewSpaceResponse = ISpace;

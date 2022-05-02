@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
 
 export type UiSliceData = {
@@ -13,8 +13,8 @@ const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    toggleNewSpaceModal: state => {
-      state.newSpaceModalVisible = !state.newSpaceModalVisible;
+    toggleNewSpaceModal: (state, action: PayloadAction<boolean>) => {
+      state.newSpaceModalVisible = action.payload;
     },
   },
   extraReducers: {},

@@ -1,11 +1,14 @@
-import { ForgotPassword, ResendVerificationLink, Login, ResetPassword, Register, VerifyAccount, Profile, Home } from '../pages';
-import { Route, Routes } from 'react-router-dom';
+import { ForgotPassword, ResendVerificationLink, Login, ResetPassword, Register, VerifyAccount, Profile, Home, Space, NewSpace } from '../pages';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { NoAuthRoute, RequireAuthRoute } from './wrappers';
 
 export default function AppRoutes() {
+  const location = useLocation();
+  const state = location.state as { backgroundLocation?: Location };
+
   return (
     <>
-      <Routes>
+      <Routes location={state?.backgroundLocation || location}>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<NoAuthRoute element={Login} />} />
         <Route path="/register" element={<NoAuthRoute element={Register} />} />
@@ -19,8 +22,15 @@ export default function AppRoutes() {
         </Route> */}
 
         <Route path="/profile" element={<RequireAuthRoute element={Profile} />} />
-        {/* <Route path="/" element={<RequireAuthRoute element={} />} /> */}
+        <Route path="/space" element={<RequireAuthRoute element={Space} />} />
+
+        <Route path="/new-space" element={<RequireAuthRoute element={NewSpace} />} />
       </Routes>
+      {state?.backgroundLocation && (
+        <Routes>
+          <Route path="/new-space" element={<RequireAuthRoute element={NewSpace} />} />
+        </Routes>
+      )}
     </>
   );
 }

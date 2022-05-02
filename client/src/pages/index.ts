@@ -8,3 +8,4 @@ export { default as VerifyAccount } from './VerifyAccount';
 export { default as Space } from './Space';
 export { default as Spaces } from './Spaces';
 export { default as Profile } from './Profile';
+export { default as NewSpace } from './NewSpace';

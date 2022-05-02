@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { SnackbarProvider } from 'notistack';
 import React, { useEffect } from 'react';
-import { NewSpace } from './components/Spaces';
 import { useAppDispatch } from './hooks';
 import Wrapper from './layout/Wrapper';
 import { Routes } from './routes';
@@ -24,7 +23,6 @@ function App() {
       <div className="h-screen bg-slate-900">
         <Wrapper>
           <Routes />
-          <NewSpace />
         </Wrapper>
       </div>
     </SnackbarProvider>
