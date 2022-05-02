@@ -26,6 +26,7 @@ router
   .delete(authorizeUser, validate(deleteSpaceSchema), controller.remove);
 
 router.route('/:id/participants/').post(authorizeUser, validate(createParticipantSchema), use(controller.createParticipant));
+router.route('/list/mySpaces').get(authorizeUser, use(controller.mySpaces));
 
 router
   .route('/:id/participants/:pid')

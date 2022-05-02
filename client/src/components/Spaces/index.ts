@@ -1,1 +1,1 @@
-export {};
+export { default as SpaceCard } from './SpaceCard';

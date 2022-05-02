@@ -56,7 +56,7 @@ function Header() {
                   </Link>
                 </li>
                 <li>
-                  <Link className="font-medium text-gray-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/spaces">
+                  <Link className="font-medium text-gray-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/my-spaces">
                     My Spaces
                   </Link>
                 </li>

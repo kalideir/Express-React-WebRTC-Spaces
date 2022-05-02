@@ -11,6 +11,7 @@ import type { SerializedError } from '@reduxjs/toolkit';
 import { createSpace } from '../store/spaceSlice';
 import { BsLink } from 'react-icons/bs';
 import { SpaceData } from '../@types';
+import { slugify } from '../utils';
 
 const schema = yup.object({
   title: yup.string().min(10, 'Must be at least 10 letters').required('Field is required'),
@@ -38,13 +39,11 @@ function NewSpace() {
     setIsLoading(true);
     try {
       const res = await dispatch(createSpace(data as SpaceData)).unwrap();
-      enqueueSnackbar(res.message, {
+      const { message, space } = res;
+      enqueueSnackbar(message, {
         variant: 'success',
       });
-      enqueueSnackbar('Please login with your new password', {
-        variant: 'success',
-      });
-      setTimeout(() => navigate('/spaces/' + res.data.space.id), 1000);
+      setTimeout(() => navigate(`/space/${space.key}/${slugify(space.title)}`), 1000);
       reset({});
     } catch (err: any | SerializedError) {
       const message = err?.message || 'Error';

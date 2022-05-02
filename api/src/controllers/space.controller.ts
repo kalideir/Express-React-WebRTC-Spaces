@@ -20,13 +20,20 @@ export async function load(req: Request<LoadSpaceInput>, res: Response, next: Ne
   return next();
 }
 
+export async function mySpaces(req: Request, res: Response) {
+  const user = req.user as UserDocument;
+  const spaces = await SpaceModel.find({ ownerId: user.id });
+  return res.json({ spaces });
+}
+
 export async function get(req, res) {
   res.json(res.locals.space);
 }
 
 export async function create(req: Request<CreateSpaceInput>, res: Response) {
   const ownerId = (req.user as UserDocument).id;
-  const space = await SpaceModel.create({ ...req.body, ownerId });
+  const key = nanoid(20);
+  const space = await SpaceModel.create({ ...req.body, ownerId, key });
   res.status(httpStatus.CREATED).json({ message: t('create_space_success'), space: space.toJSON() });
 }
 
@@ -45,8 +52,7 @@ export async function remove(req: Request, res: Response) {
 
 export async function createParticipant(req: Request<CreateParticipantInput>, res: Response) {
   const space = res.locals.space;
-  const input = { ...req.body, key: nanoid(16) };
-  console.log(input, 'xx');
+  const input = { ...req.body };
   const participant = await ParticipantModel.create(input);
   await space.participants.push(participant.id);
   return res.json({ participants: [], message: '' });

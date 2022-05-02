@@ -1,1 +1,1 @@
-export * from './strings';
+export { default as slugify } from './slugify';

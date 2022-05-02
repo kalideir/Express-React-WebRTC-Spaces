@@ -1,13 +1,15 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { AxiosError } from 'axios';
-import { Error, ErrorPayload, ISpace, SpaceData } from '../@types';
+import { Error, ErrorPayload, ISpace, SpaceData, SpaceItem } from '../@types';
 import { apiService } from '../services';
+import { RootState } from './store';
 
 export type SpaceSliceData = {
   permissionFulfilled: boolean;
   permissionModalVisible: boolean;
-  spaces: ISpace[];
+  spaces: SpaceItem[];
   createSpaceErrors: unknown;
+  mySpaces: SpaceItem[];
 };
 
 const initialState: SpaceSliceData = {
@@ -15,6 +17,7 @@ const initialState: SpaceSliceData = {
   permissionModalVisible: false,
   spaces: [],
   createSpaceErrors: [],
+  mySpaces: [],
 };
 
 export const createSpace = createAsyncThunk('space/createSpace', async (data: SpaceData, { rejectWithValue }) => {
@@ -26,6 +29,16 @@ export const createSpace = createAsyncThunk('space/createSpace', async (data: Sp
     const extra = error.response?.data?.extra;
     const message = error?.response.data.message || 'Create error';
     return rejectWithValue({ errors, message, extra });
+  }
+});
+
+export const getMySpaces = createAsyncThunk('space/getMySpaces', async (_, { rejectWithValue }) => {
+  try {
+    const res = await apiService.get('/space/list/mySpaces');
+    return res?.data;
+  } catch (error: any | AxiosError) {
+    const message = error?.response.data.message || 'Error';
+    return rejectWithValue({ message });
   }
 });
 
@@ -45,9 +58,15 @@ const spaceSlice = createSlice({
       const { payload } = action;
       if (payload.errors) state.createSpaceErrors = payload;
     },
+    [getMySpaces.fulfilled.type]: (state, action: PayloadAction<SpaceItem[]>) => {
+      const { payload } = action;
+      state.mySpaces = payload;
+    },
   },
 });
 
 export const { togglePermissionModal, setPermission } = spaceSlice.actions;
 
 export default spaceSlice.reducer;
+
+export const selectMySpaces = (state: RootState) => state.spaces.mySpaces;

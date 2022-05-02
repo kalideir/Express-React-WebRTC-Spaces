@@ -1,4 +1,16 @@
-import { ForgotPassword, ResendVerificationLink, Login, ResetPassword, Register, VerifyAccount, Profile, Home, Space, NewSpace } from '../pages';
+import {
+  ForgotPassword,
+  ResendVerificationLink,
+  Login,
+  ResetPassword,
+  Register,
+  VerifyAccount,
+  Profile,
+  Home,
+  Space,
+  NewSpace,
+  MySpaces,
+} from '../pages';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { NoAuthRoute, RequireAuthRoute } from './wrappers';
 
@@ -19,6 +31,7 @@ export default function AppRoutes() {
 
         <Route path="/profile" element={<RequireAuthRoute element={Profile} />} />
         <Route path="/space" element={<RequireAuthRoute element={Space} />} />
+        <Route path="/my-spaces" element={<RequireAuthRoute element={MySpaces} />} />
 
         <Route path="/new-space" element={<RequireAuthRoute element={NewSpace} />} />
       </Routes>
