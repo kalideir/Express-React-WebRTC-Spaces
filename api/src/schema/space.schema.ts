@@ -1,4 +1,4 @@
-import { boolean, number, object, string, TypeOf } from 'zod';
+import { boolean, object, string, TypeOf } from 'zod';
 import { t } from '../utils';
 
 const payload = {
@@ -10,23 +10,20 @@ const payload = {
   }),
 };
 
-export const getSpaceSchema = object({
-  params: object({
-    id: string(),
-  }),
+const params = object({
+  id: string(),
+});
+
+export const createSpaceSchema = object({
+  ...payload,
 });
 
 export const updateSpaceSchema = object({
   ...payload,
+  params,
 });
 
-const params = {
-  params: object({
-    id: string({
-      required_error: t('id_required'),
-    }),
-  }),
-};
+export const getSpaceSchema = params;
 
 const query = {
   query: object({
@@ -41,9 +38,11 @@ export const listSpacesSchema = object({
 });
 
 export const deleteSpaceSchema = object({
-  ...params,
+  params,
 });
 
+export type CreateSpaceInput = Partial<TypeOf<typeof createSpaceSchema>>;
+export type LoadSpaceInput = Partial<TypeOf<typeof getSpaceSchema>>;
 export type UpdateSpaceInput = Partial<TypeOf<typeof updateSpaceSchema>>;
 export type ListSpacesInput = TypeOf<typeof listSpacesSchema>;
 export type GetSpacesInput = TypeOf<typeof getSpaceSchema>;

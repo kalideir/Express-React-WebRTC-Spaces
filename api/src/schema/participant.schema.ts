@@ -12,45 +12,47 @@ const payload = {
     userId: string({
       required_error: t('participant_id_required'),
     }).optional(),
-    type: string({ required_error: t('participant_type_required') }).refine(oneOf(Object.keys(ParticipantTypes)), t('participant_type_invalid')),
+    type: string({ required_error: t('participant_type_required') }).refine(oneOf(Object.keys(ParticipantTypes)), t('participant_type_invalpid')),
   }),
 };
 
-export const getParticipantSchema = object({
-  params: object({
-    id: string(),
-  }),
-});
-
-export const updateParticipantSchema = object({
-  ...payload,
-});
-
 const params = {
   params: object({
-    id: string({
+    pid: string({
       required_error: t('id_required'),
     }),
   }),
 };
 
-const query = {
-  query: object({
-    page: string({}).optional(),
-    limit: string({}).optional(),
-    search: string({}).optional(),
-  }),
-};
+export const createParticipantSchema = object({
+  ...payload,
+});
+
+export const getParticipantSchema = object({
+  ...params,
+});
+
+export const updateParticipantSchema = object({
+  ...payload,
+  ...params,
+});
+
+const query = object({
+  page: string({}).optional(),
+  limit: string({}).optional(),
+  search: string({}).optional(),
+});
 
 export const listParticipantsSchema = object({
-  ...query,
+  query,
 });
 
 export const deleteParticipantSchema = object({
   ...params,
 });
 
-export type UpdateParticipantInput = Partial<TypeOf<typeof updateParticipantSchema>>;
+export type CreateParticipantInput = TypeOf<typeof createParticipantSchema>['body'];
+export type UpdateParticipantInput = TypeOf<typeof updateParticipantSchema>;
 export type ListParticipantsInput = TypeOf<typeof listParticipantsSchema>;
 export type GetParticipantsInput = TypeOf<typeof getParticipantSchema>;
-export type DeleteParticipantInput = TypeOf<typeof deleteParticipantSchema>;
+export type DeleteParticipantInput = TypeOf<typeof deleteParticipantSchema>['params'];

@@ -16,6 +16,7 @@ export interface ParticipantDocument extends ParticipantInput, mongoose.Document
 const spaceSchema = new mongoose.Schema(
   {
     type: {
+      type: String,
       enum: ParticipantTypes,
       default: ParticipantTypes.GUEST,
     },

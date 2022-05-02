@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import authRoutes from './auth.route';
 import userRoutes from './user.route';
 import mediaRoutes from './media.route';
+import spaceRoutes from './space.route';
 import swaggerRoutes from './swagger.route';
 const router = express.Router();
 
@@ -16,6 +17,7 @@ router.get('/healthCheck', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/user', userRoutes);
 router.use('/media', mediaRoutes);
+router.use('/space', spaceRoutes);
 router.use('/swagger', swaggerRoutes);
 
 export default router;

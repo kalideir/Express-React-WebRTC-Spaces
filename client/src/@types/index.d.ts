@@ -98,3 +98,24 @@ export type MediaResponse = Partial<{
 export type NewSpaceData = Omit<ISpace, 'participants'>;
 
 export type NewSpaceResponse = ISpace;
+
+export enum SpaceStatus {
+  CREATED = 'CREATED',
+  STARTED = 'STARTED',
+  ENDED = 'ENDED',
+  HIDDEN = 'HIDDEN',
+}
+
+export type SpaceData = {
+  title: string;
+  isPublic: boolean;
+};
+
+export type SpaceItem = {
+  title: string;
+  isPublic: boolean;
+  url: string;
+  participants: string[];
+  participantIds: string[];
+  status: keyof typeof SpaceStatus;
+};

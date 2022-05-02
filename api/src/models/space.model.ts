@@ -1,12 +1,11 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
-import config from 'config';
 
 export interface SpaceInput {
   title: string;
-  url: string;
+  key: string;
   isPublic: boolean;
   status: keyof typeof SpaceStatus;
+  participantIds: string[];
 }
 
 export enum SpaceStatus {
@@ -25,16 +24,18 @@ const spaceSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    url: {
-      type: URL,
-      lowercase: true,
+    key: {
+      type: String,
+      required: true,
+      unique: true,
     },
     isPublic: {
       type: Boolean,
       default: false,
     },
     status: {
-      type: SpaceStatus,
+      type: String,
+      enum: SpaceStatus,
       default: SpaceStatus.CREATED,
     },
     ownerId: {
