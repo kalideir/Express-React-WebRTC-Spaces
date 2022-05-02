@@ -1,24 +1,21 @@
 import { number, object, string, TypeOf } from 'zod';
 import { t } from '../utils';
 
-const userPayload = {
+const payload = {
   body: object({
     firstName: string({
-      required_error: 'First name is required',
+      required_error: t('first_name_required'),
     }).optional(),
     lastName: string({
-      required_error: 'Last name is required',
+      required_error: t('last_name_required'),
     }).optional(),
     address: string({
-      required_error: 'Address is required',
+      required_error: t('address_required'),
     }).optional(),
     phoneNumber: number({
-      required_error: 'Phone number is required',
+      required_error: t('phone_number_required'),
     }).optional(),
     profilePictureId: string({}).nullable().optional(),
-    endDate: string({
-      required_error: 'End date is required',
-    }).optional(),
   }),
 };
 
@@ -29,7 +26,7 @@ export const getUserSchema = object({
 });
 
 export const updateUserSchema = object({
-  ...userPayload,
+  ...payload,
 });
 
 const params = {
@@ -54,7 +51,7 @@ export const listUsersSchema = object({
 });
 
 export const updateOtherUserSchema = object({
-  ...userPayload,
+  ...payload,
   params: object({ id: string({ required_error: t('id_required') }) }),
 });
 

@@ -35,7 +35,6 @@ function NewSpace() {
   const navigate = useNavigate();
 
   async function onSubmitHandler(data: FieldValues) {
-    console.log(data);
     setIsLoading(true);
     try {
       const res = await dispatch(createSpace()).unwrap();
@@ -59,14 +58,12 @@ function NewSpace() {
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        displaySpaceModal(false);
+        navigate(-1);
       }
     };
     window.addEventListener('keydown', close);
     return () => window.removeEventListener('keydown', close);
-  }, [displaySpaceModal]);
-
-  // if (!modalVisible) return null;
+  }, [displaySpaceModal, navigate]);
 
   return (
     <div

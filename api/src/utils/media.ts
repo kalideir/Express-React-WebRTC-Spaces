@@ -1,9 +1,9 @@
 import { Job } from 'bull';
 import sharp from 'sharp';
 import { downloadFile, logger } from '.';
-import { MediaModel, MediaTypes } from '../models';
+import { MediaModel } from '../models';
 import { uploadFileToAWSS3 } from '../services';
-import type { ImageSize, ResizeMediaData, S3UploadResult, SizeTypes } from '../types';
+import type { ImageSize, ResizeMediaData, S3UploadResult } from '../types';
 
 export const Sizes = {
   largeUrl: { width: 1500, height: 1500 },

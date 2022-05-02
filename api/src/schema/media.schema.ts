@@ -9,7 +9,7 @@ const oneOf = (keys: string[]) => val => {
 
 const payload = {
   body: object({
-    type: string({ required_error: t('media_type_required') }).refine(oneOf([MediaTypes.PROFILE_PICTURE]), t('media_type_invalid')),
+    type: string({ required_error: t('media_type_required') }).refine(oneOf(Object.keys(MediaTypes)), t('media_type_invalid')),
     contentType: string({ required_error: t('media_content_type_required') }),
     originalUrl: string().optional(),
     largeUrl: string().optional(),

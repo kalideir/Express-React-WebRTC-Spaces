@@ -33,5 +33,13 @@
     "id_required": "*id* is required",
     "username_required": "Username field is required",
     "username_field_length": "Username must be at least one letter long",
-    "token_expired_or_invalid": "Token has expired or is invalid"
+    "token_expired_or_invalid": "Token has expired or is invalid",
+    "first_name_required": "First name is required",
+    "last_name_required": "Last name is required",
+    "address_required": "Address is required",
+    "phone_number_required": "Phone number is required",
+    "space_title_required": "Space title is required",
+    "participant_id_required": "Participant id is required",
+    "participant_type_required": "Participant type is required",
+    "participant_type_invalid": "Participant type is missing"
   }
