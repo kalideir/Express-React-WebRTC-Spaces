@@ -136,7 +136,7 @@ function Register() {
                   />
                 </svg>
               ) : (
-                'Login'
+                'Create Account'
               )}
             </button>
             <button

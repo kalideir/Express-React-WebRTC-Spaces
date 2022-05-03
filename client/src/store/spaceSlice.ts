@@ -47,7 +47,7 @@ export const getMySpaces = createAsyncThunk('space/getMySpaces', async (_, { rej
 export const getActiveSpace = createAsyncThunk('space/getSpace', async (key: string, { rejectWithValue }) => {
   try {
     const res = await apiService.get('/space/' + key);
-    return res?.data?.spaces;
+    return res?.data;
   } catch (error: any | AxiosError) {
     const message = error?.response.data.message || 'Error';
     return rejectWithValue({ message });

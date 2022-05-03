@@ -697,7 +697,7 @@ const PARTICIPANTS = [
 
 function Participants() {
   return (
-    <div className="grid grid-cols-5 auto-rows-fr text-center self-center w-10/12 gap-4 mx-auto">
+    <div className="grid grid-cols-5 auto-rows-fr text-center self-center gap-4 mx-5">
       {PARTICIPANTS.map(participant => (
         <div
           key={participant.id}

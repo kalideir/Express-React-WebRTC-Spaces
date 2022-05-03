@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { UsersFooter } from '.';
 import { SpaceItem } from '../../@types';
-import { DropDown } from '../../layout';
+import { Divider, DropDown } from '../../layout';
 import { slugify } from '../../utils';
 
 interface IProps {
@@ -31,11 +31,12 @@ function SpaceCard(props: IProps) {
         <span className="text-sm text-slate-500 dark:text-slate-400">Visual Designer</span>
         {!!props.item.participantIds.length && <UsersFooter users={[]} />}
       </div>
-      <div className="flex items-center p-6 space-x-2 rounded-b border-dashed border-t border-slate-200 dark:border-slate-600">
+      <Divider />
+      <div className="flex items-center p-6 space-x-2 rounded-b">
         <Link
           to={`/space/${props.item.key}/${slugify(props.item.title)}`}
           data-modal-toggle="defaultModal"
-          className="text-white  w-full  bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          className="text-white  w-full  bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
         >
           View
         </Link>

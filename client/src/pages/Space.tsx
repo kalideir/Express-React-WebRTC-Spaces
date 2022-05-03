@@ -1,14 +1,17 @@
-import { Participants, Permission, SpaceHeader, SpeakerView } from '../components/Space';
+import { Participants, Permission, SpaceActions, SpaceHeader } from '../components/Space';
 import { useDispatch } from 'react-redux';
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { getActiveSpace, togglePermissionModal } from '../store/spaceSlice';
-import { MIC_ACCESS_GRANTED } from '../constants';
+import { getActiveSpace, selectActiveSpace, togglePermissionModal } from '../store/spaceSlice';
+import { MIC_ACCESS_GRANTED, SpaceStatus } from '../constants';
 import { useParams } from 'react-router-dom';
 import { Nav } from '../layout';
+import { useTypedSelector } from '../hooks';
+
 function Space() {
   const dispatch = useDispatch();
   const { key, slug } = useParams();
   const [isLoading, setIsLoading] = useState(false);
+  const activeSpace = useTypedSelector(selectActiveSpace);
 
   useEffect(() => {
     setIsLoading(true);
@@ -32,9 +35,14 @@ function Space() {
         />
       </div>
       <div className="mx-auto rounded-xl bg-slate-100  dark:bg-slate-800 pb-10 w-full mt-3 pt-2">
-        <SpeakerView />
         <SpaceHeader />
-        <Participants />
+        {activeSpace?.status !== SpaceStatus.CREATED && (
+          <>
+            <SpaceActions />
+            <Participants />
+          </>
+        )}
+
         <Permission />
       </div>
     </div>

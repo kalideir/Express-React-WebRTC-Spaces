@@ -44,7 +44,7 @@ function VerifyAccount() {
     <div className="py-64 flex items-center justify-center">
       <div className="flex items-center justify-center h-32 w-64 bg-indigo-100 dark:bg-slate-800 rounded-lg -mt-16">
         <svg
-          className="inline mr-2 w-10 h-10 animate-spin text-purple-600 fill-slate-900"
+          className="inline mr-2 w-10 h-10 animate-spin text-indigo-600 fill-slate-900"
           role="status"
           viewBox="0 0 100 101"
           fill="none"

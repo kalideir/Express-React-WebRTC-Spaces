@@ -1,4 +1,4 @@
-import { MediaTypes } from '../constants';
+import { MediaTypes, SpaceStatus } from '../constants';
 
 export type NewTokenData = {
   refreshToken: string;
@@ -98,13 +98,6 @@ export type MediaResponse = Partial<{
 export type NewSpaceData = Omit<ISpace, 'participants'>;
 
 export type NewSpaceResponse = ISpace;
-
-export enum SpaceStatus {
-  CREATED = 'CREATED',
-  STARTED = 'STARTED',
-  ENDED = 'ENDED',
-  HIDDEN = 'HIDDEN',
-}
 
 export type SpaceData = {
   title: string;

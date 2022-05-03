@@ -23,7 +23,9 @@ export const updateSpaceSchema = object({
   params,
 });
 
-export const getSpaceSchema = params;
+export const getSpaceSchema = object({
+  params,
+});
 
 const query = {
   query: object({
@@ -42,8 +44,8 @@ export const deleteSpaceSchema = object({
 });
 
 export type CreateSpaceInput = Partial<TypeOf<typeof createSpaceSchema>>;
-export type LoadSpaceInput = Partial<TypeOf<typeof getSpaceSchema>>;
+export type LoadSpaceInput = Partial<TypeOf<typeof getSpaceSchema>>['params'];
 export type UpdateSpaceInput = Partial<TypeOf<typeof updateSpaceSchema>>;
 export type ListSpacesInput = TypeOf<typeof listSpacesSchema>;
-export type GetSpacesInput = TypeOf<typeof getSpaceSchema>;
+export type GetSpacesInput = TypeOf<typeof getSpaceSchema>['params'];
 export type DeleteSpaceInput = TypeOf<typeof deleteSpaceSchema>;
