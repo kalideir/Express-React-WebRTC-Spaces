@@ -1,4 +1,5 @@
 import { BsFillStarFill } from 'react-icons/bs';
+import { Participant } from '.';
 
 const PARTICIPANTS = [
   {
@@ -697,16 +698,9 @@ const PARTICIPANTS = [
 
 function Participants() {
   return (
-    <div className="grid grid-cols-5 auto-rows-fr text-center self-center gap-4 mx-5">
+    <div className="mt-5 bg-slate-50 dark:bg-slate-900 flex-col py-2 justify-center items-center shadow-md rounded-md grid grid-cols-5 auto-rows-fr text-center self-center gap-1">
       {PARTICIPANTS.map(participant => (
-        <div
-          key={participant.id}
-          className="padding-2 flex-col w-full items-center justify-center rounded-md shadow-md bg-slate-100 dark:bg-slate-900 py-4"
-        >
-          <img src={participant.avatar} alt="" className="bg-slate-500 h-20 w-20 rounded-full self-center mx-auto" />
-          <span className="text-xs self-center block mt-2 text-slate-700 dark:text-slate-200">@{participant.fullName.split(' ')[0]}</span>
-          <span className="text-xs self-center mt-1 text-gray-500 flex items-center justify-center">{participant.isSpeaker && 'Speaker  '}</span>
-        </div>
+        <Participant key={participant.id} participant={{ type: 'GUEST', fullName: 'Ali H. Kudeir', id: '', profilePicture: {}, username: '' }} />
       ))}
     </div>
   );

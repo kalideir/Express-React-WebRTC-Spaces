@@ -38,10 +38,10 @@ export async function create(req: Request<CreateSpaceInput>, res: Response) {
 }
 
 export async function update(req: Request<UpdateSpaceInput>, res: Response) {
+  console.log(req.body, req.params, res.locals.space);
   const space = Object.assign(res.locals.space, req.body);
   const savedSpace = await space.save();
-  res.status(httpStatus.OK);
-  res.json(savedSpace);
+  res.status(httpStatus.OK).json(savedSpace);
 }
 
 export async function remove(req: Request, res: Response) {

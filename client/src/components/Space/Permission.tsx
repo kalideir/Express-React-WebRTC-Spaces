@@ -36,7 +36,9 @@ function Permission() {
         <div className="relative p-10 bg-slate-50 rounded-lg shadow dark:bg-slate-700">
           <div className="text-center">
             <BsFillMicFill className="text-indigo-400 self-center mx-auto mb-5" size={30} />
-            <h3 className="mb-5 text-lg font-normal text-gray-50 dark:text-gray-400">Access to your microphone is required to start a new space.</h3>
+            <h3 className="mb-5 text-lg font-normal text-slate-50 dark:text-slate-400">
+              Access to your microphone is required to start a new space.
+            </h3>
             <button
               onClick={grant}
               data-modal-toggle="popup-modal"
@@ -48,7 +50,7 @@ function Permission() {
             <button
               data-modal-toggle="popup-modal"
               type="button"
-              className="text-gray-500 bg-white hover:bg-black focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-slate-900 dark:focus:ring-gray-600"
+              className="text-slate-500 bg-white hover:bg-black focus:ring-4 focus:outline-none focus:ring-slate-200 rounded-lg text-sm font-medium px-5 py-2.5 hover:text-slate-900 focus:z-10 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-500 dark:hover:text-white dark:hover:bg-slate-900 dark:focus:ring-slate-600"
             >
               No, cancel
             </button>

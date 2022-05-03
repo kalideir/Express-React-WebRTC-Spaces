@@ -1,14 +1,17 @@
 import { MdGroups } from 'react-icons/md';
 import { BsPlusSquareFill } from 'react-icons/bs';
 import { Dot } from '../../layout';
-import { useTypedSelector } from '../../hooks';
+import { useAppDispatch, useTypedSelector } from '../../hooks';
 import { selectActiveSpace } from '../../store/spaceSlice';
+import { selectNewParticipantModal, showAddParticipantModal } from '../../store/uiSlice';
 
 function SpaceActions() {
   const activeSpace = useTypedSelector(selectActiveSpace);
 
+  const dispatch = useAppDispatch();
+
   return (
-    <div className="mx-5 py-2">
+    <div className="py-2">
       <div className="flex items-center justify-between">
         <div className="mt-3 w-5/12 self-center">
           <div className="relative rounded-full">
@@ -24,16 +27,19 @@ function SpaceActions() {
             <input
               type="text"
               id="table-search"
-              className="block w-full rounded-full border border-none bg-slate-200 dark:bg-slate-900 p-2.5 pl-10 text-sm text-slate-200 focus:outline-0 focus:ring-0"
+              className="block w-full rounded-full border border-none bg-slate-200 dark:bg-slate-800 p-2.5 pl-10 text-sm text-slate-200 focus:outline-0 focus:ring-0"
               placeholder="Search for items"
             />
           </div>
         </div>
         <div className="flex items-center justify-start">
-          <div className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 px-4 cursor-pointer">
+          <button
+            onClick={() => dispatch(showAddParticipantModal())}
+            className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 px-4 cursor-pointer"
+          >
             <BsPlusSquareFill size={17} className="mr-1" />
             <span className="font-bold">Invite a participant</span>
-          </div>
+          </button>
           <div className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 dark:border-slate-400 px-4 border-2 border-slate-400 rounded-full cursor-pointer">
             <MdGroups size={20} className="mr-1" />
             <span>10</span>

@@ -1,5 +1,11 @@
 import { boolean, object, string, TypeOf } from 'zod';
+import { SpaceStatus } from '../models';
 import { t } from '../utils';
+
+const oneOf = (keys: string[]) => val => {
+  if (keys.includes(val)) return true;
+  return false;
+};
 
 const payload = {
   body: object({
@@ -7,6 +13,9 @@ const payload = {
       required_error: t('space_title_required'),
     }).optional(),
     isPublic: boolean().default(false),
+    status: string({ required_error: t('') })
+      .refine(oneOf(Object.keys(SpaceStatus)), t(''))
+      .default(SpaceStatus.CREATED),
   }),
 };
 

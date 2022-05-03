@@ -11,3 +11,9 @@ export enum SpaceStatus {
   ENDED = 'ENDED',
   HIDDEN = 'HIDDEN',
 }
+
+export enum ParticipantTypes {
+  HOST = 'CREATED',
+  GUEST = 'STARTED',
+  SPEAKER = 'SPEAKER',
+}

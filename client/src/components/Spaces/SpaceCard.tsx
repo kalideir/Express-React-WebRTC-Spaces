@@ -15,7 +15,7 @@ function SpaceCard(props: IProps) {
     <div className="max-w-sm bg-white rounded-lg border border-slate-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
       <div className="flex justify-end px-2 pt-2 relative">
         <button
-          onMouseOver={() => setDropDownVisible(true)}
+          onClick={() => setDropDownVisible(true)}
           data-dropdown-toggle="dropdown"
           className="hidden sm:inline-block text-slate-500 dark:text-slate-400  hover:bg-slate-100 dark:hover:bg-slate-700  focus:ring-4 focus:outline-none focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-1.5"
           type="button"
@@ -27,8 +27,8 @@ function SpaceCard(props: IProps) {
         <DropDown visible={dropDownVisible} setVisible={setDropDownVisible} />
       </div>
       <div className="flex flex-col items-center pb-10">
-        <h5 className="mb-1 text-xl font-medium text-slate-900 dark:text-white">{props.item.title}</h5>
-        <span className="text-sm text-slate-500 dark:text-slate-400">Visual Designer</span>
+        <h5 className="mb-1 text-xl font-medium text-slate-900 text-center dark:text-white flex break-all mx-5">{props.item.title}</h5>
+        <span className="text-sm text-slate-500 dark:text-slate-400 mt-1">{props.item.status}</span>
         {!!props.item.participantIds.length && <UsersFooter users={[]} />}
       </div>
       <Divider />

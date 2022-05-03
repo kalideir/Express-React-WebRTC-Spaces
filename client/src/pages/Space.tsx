@@ -1,4 +1,4 @@
-import { Participants, Permission, SpaceActions, SpaceHeader } from '../components/Space';
+import { AddParticipant, Participants, Permission, SpaceActions, SpaceHeader } from '../components/Space';
 import { useDispatch } from 'react-redux';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { getActiveSpace, selectActiveSpace, togglePermissionModal } from '../store/spaceSlice';
@@ -25,18 +25,19 @@ function Space() {
   }, [dispatch]);
 
   return (
-    <div className="max-w-5xl mx-auto mb-10">
+    <div className="max-w-5xl mx-auto mb-10" id="space">
       <div className="w-full">
         <Nav
           items={[
+            { name: 'My Spaces', to: '/my-spaces' },
             { name: slug || '', to: `/${key}/${slug}` },
             { name: '', to: '' },
           ]}
         />
       </div>
-      <div className="mx-auto rounded-xl bg-slate-100  dark:bg-slate-800 pb-10 w-full mt-3 pt-2">
+      <div className="mx-auto rounded-xl pb-10 w-full mt-3 pt-2">
         <SpaceHeader />
-        {activeSpace?.status !== SpaceStatus.CREATED && (
+        {activeSpace && activeSpace?.status !== SpaceStatus.CREATED && (
           <>
             <SpaceActions />
             <Participants />
@@ -44,6 +45,7 @@ function Space() {
         )}
 
         <Permission />
+        <AddParticipant />
       </div>
     </div>
   );

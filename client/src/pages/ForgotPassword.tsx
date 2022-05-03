@@ -71,7 +71,7 @@ function ForgotPassword() {
                 {...register('email')}
                 type="text"
                 placeholder="@email"
-                className="w-full border border-gray-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
+                className="w-full border border-slate-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
               />
               {errors.email && <div className="text-red-500 font-semibold">{errors.email.message}</div>}
             </div>

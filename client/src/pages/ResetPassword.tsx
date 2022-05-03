@@ -72,7 +72,7 @@ function ResetPassword() {
                 {...register('password')}
                 type="password"
                 placeholder="password"
-                className="w-full border border-gray-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
+                className="w-full border border-slate-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
               />
               {errors.password && <div className="text-red-500 font-semibold">{errors.password.message}</div>}
             </div>
@@ -84,7 +84,7 @@ function ResetPassword() {
                 {...register('passwordConfirmation')}
                 type="password"
                 placeholder="password confirmation"
-                className="w-full border border-gray-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
+                className="w-full border border-slate-300 py-4 pl-3 rounded mt-2 outline-none focus:ring-indigo-600 :ring-indigo-600"
               />
               {errors.passwordConfirmation && <div className="text-red-500 font-semibold">{errors.passwordConfirmation.message}</div>}
             </div>

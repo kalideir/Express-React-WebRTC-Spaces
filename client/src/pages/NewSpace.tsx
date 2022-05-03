@@ -42,8 +42,7 @@ function NewSpace() {
       enqueueSnackbar(message, {
         variant: 'success',
       });
-      setTimeout(() => navigate(`/space/${space.key}/${slugify(space.title)}`), 1000);
-      reset({});
+      setTimeout(() => navigate('/my-spaces'), 1000);
     } catch (err: any | SerializedError) {
       const message = err?.message || 'Error';
       enqueueSnackbar(message, {

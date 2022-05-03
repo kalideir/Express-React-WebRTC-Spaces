@@ -34,6 +34,21 @@ export const createSpace = createAsyncThunk('space/createSpace', async (data: Sp
   }
 });
 
+export const updateSpace = createAsyncThunk(
+  'space/updateSpace',
+  async ({ key, data }: { key: string; data: Partial<SpaceData> }, { rejectWithValue }) => {
+    try {
+      const res = await apiService.patch('/space/' + key, data);
+      return res?.data;
+    } catch (error: any | AxiosError) {
+      const errors = error.response?.data?.errors;
+      const extra = error.response?.data?.extra;
+      const message = error?.response.data.message || 'Update error';
+      return rejectWithValue({ errors, message, extra });
+    }
+  },
+);
+
 export const getMySpaces = createAsyncThunk('space/getMySpaces', async (_, { rejectWithValue }) => {
   try {
     const res = await apiService.get('/space/list/mySpaces');
@@ -75,6 +90,10 @@ const spaceSlice = createSlice({
       state.mySpaces = payload;
     },
     [getActiveSpace.fulfilled.type]: (state, action: PayloadAction<SpaceItem>) => {
+      const { payload } = action;
+      state.activeSpace = payload;
+    },
+    [updateSpace.fulfilled.type]: (state, action: PayloadAction<SpaceItem>) => {
       const { payload } = action;
       state.activeSpace = payload;
     },

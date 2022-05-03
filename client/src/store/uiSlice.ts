@@ -1,12 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SpaceUser } from '../@types';
 import { RootState } from './store';
 
 export type UiSliceData = {
   newSpaceModalVisible: boolean;
+  newParticipantModal: boolean;
 };
 
 const initialState: Partial<UiSliceData> = {
   newSpaceModalVisible: false,
+  newParticipantModal: false,
 };
 
 const uiSlice = createSlice({
@@ -16,12 +19,20 @@ const uiSlice = createSlice({
     toggleNewSpaceModal: (state, action: PayloadAction<boolean>) => {
       state.newSpaceModalVisible = action.payload;
     },
+    showAddParticipantModal: state => {
+      state.newParticipantModal = true;
+    },
+    hideAddParticipantModal: state => {
+      state.newParticipantModal = false;
+    },
   },
   extraReducers: {},
 });
 
 export default uiSlice.reducer;
 
-export const { toggleNewSpaceModal } = uiSlice.actions;
+export const { toggleNewSpaceModal, showAddParticipantModal, hideAddParticipantModal } = uiSlice.actions;
 
 export const selectNewSpaceVisible = (state: RootState) => state.ui.newSpaceModalVisible;
+
+export const selectNewParticipantModal = (state: RootState) => state.ui.newParticipantModal;

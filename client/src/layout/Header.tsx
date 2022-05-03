@@ -34,12 +34,12 @@ function Header() {
               <nav className="hidden md:flex md:flex-grow">
                 <ul className="flex flex-grow justify-end flex-wrap items-center">
                   <li>
-                    <Link className="block font-medium text-gray-300 hover:text-gray-200 py-2" to="/register">
+                    <Link className="block font-medium text-slate-300 hover:text-slate-200 py-2" to="/register">
                       Register
                     </Link>
                   </li>
                   <li>
-                    <Link className="font-medium text-gray-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/login">
+                    <Link className="font-medium text-slate-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/login">
                       Login
                     </Link>
                   </li>
@@ -50,12 +50,12 @@ function Header() {
             {isAuthenticated && (
               <ul className="flex flex-grow justify-end flex-wrap items-center">
                 <li>
-                  <Link className="font-medium text-gray-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/profile">
+                  <Link className="font-medium text-slate-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/profile">
                     Profile
                   </Link>
                 </li>
                 <li>
-                  <Link className="font-medium text-gray-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/my-spaces">
+                  <Link className="font-medium text-slate-300 hover:underline ml-3 sm:ml-6 lg:ml-10 py-2" to="/my-spaces">
                     My Spaces
                   </Link>
                 </li>
@@ -75,7 +75,7 @@ function Header() {
             <div className="flex md:hidden ml-3 sm:ml-6">
               <button className="hamburger" aria-controls="mobile-nav">
                 <span className="sr-only pointer-events-none">Menu</span>
-                <svg className="w-6 h-6 fill-current text-gray-900 pointer-events-none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-6 h-6 fill-current text-slate-900 pointer-events-none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <rect y="4" width="24" height="2"></rect>
                   <rect y="11" width="24" height="2"></rect>
                   <rect y="18" width="24" height="2"></rect>
@@ -83,16 +83,16 @@ function Header() {
               </button>
               <nav
                 id="mobile-nav"
-                className="absolute top-full z-20 left-0 w-full bg-gray-800 px-3 sm:px-5 overflow-hidden opacity-0 max-h-0 transition-all duration-300 ease-in-out"
+                className="absolute top-full z-20 left-0 w-full bg-slate-800 px-3 sm:px-5 overflow-hidden opacity-0 max-h-0 transition-all duration-300 ease-in-out"
               >
                 <ul className="py-3 text-center">
                   <li>
-                    <a className="block font-medium text-gray-300 hover:text-gray-200 py-2" href="https://cruip.com/login">
+                    <a className="block font-medium text-slate-300 hover:text-slate-200 py-2" href="https://cruip.com/login">
                       Login
                     </a>
                   </li>
                   <li>
-                    <a className="block font-medium text-gray-300 hover:text-gray-200 py-2" href="https://cruip.com/login">
+                    <a className="block font-medium text-slate-300 hover:text-slate-200 py-2" href="https://cruip.com/login">
                       Register
                     </a>
                   </li>

@@ -1,4 +1,4 @@
-import { MediaTypes, SpaceStatus } from '../constants';
+import { MediaTypes, ParticipantTypes, SpaceStatus } from '../constants';
 
 export type NewTokenData = {
   refreshToken: string;
@@ -102,6 +102,7 @@ export type NewSpaceResponse = ISpace;
 export type SpaceData = {
   title: string;
   isPublic: boolean;
+  status?: keyof typeof SpaceStatus;
 };
 
 export type SpaceItem = {
@@ -121,4 +122,5 @@ export type SpaceUser = {
   profilePicture: ProfilePicture;
   username: string;
   fullName: string;
+  type: keyof typeof ParticipantTypes;
 };
