@@ -1,8 +1,12 @@
 import { MdGroups } from 'react-icons/md';
 import { BsPlusSquareFill } from 'react-icons/bs';
 import { Dot } from '../../layout';
+import { useTypedSelector } from '../../hooks';
+import { selectActiveSpace } from '../../store/spaceSlice';
 
 function SpaceHeader() {
+  const activeSpace = useTypedSelector(selectActiveSpace);
+
   return (
     <div className="w-10/12 mx-auto py-2">
       <div className="flex items-center justify-between">
@@ -30,11 +34,11 @@ function SpaceHeader() {
             <BsPlusSquareFill size={17} className="mr-1" />
             <span className="font-bold">Invite a participant</span>
           </div>
-          <div className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 dark:border-slate-200 px-4 border-2 border-slate-500 rounded-full cursor-pointer">
+          <div className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 dark:border-slate-400 px-4 border-2 border-slate-400 rounded-full cursor-pointer">
             <MdGroups size={20} className="mr-1" />
             <span>10</span>
           </div>
-          <div className="ml-8 w-auto h-8 flex items-center justify-center text-red-500 px-4 border-2 border-red-500 rounded-full cursor-pointer">
+          <div className="ml-8 w-auto h-8 flex items-center justify-center text-red-500 px-4 border-2 border-slate-400 rounded-full cursor-pointer">
             <Dot size={3} color="bg-red-600" />
             <span>10:12:34</span>
           </div>

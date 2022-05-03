@@ -1,4 +1,3 @@
-import React from 'react';
 import HeroHome from '../components/Home/Hero';
 
 function Home() {

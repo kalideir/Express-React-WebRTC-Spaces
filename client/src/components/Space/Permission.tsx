@@ -1,12 +1,11 @@
 import clsx from 'clsx';
-import { useSelector } from 'react-redux';
 import { togglePermissionModal } from '../../store/spaceSlice';
 import { BsFillMicFill } from 'react-icons/bs';
 import { MIC_ACCESS_GRANTED } from '../../constants';
 import { useDispatch } from 'react-redux';
 
 function Permission() {
-  const isModalVisible = false; //useSelector(({ space }) => space.permissionModalVisible);
+  const isModalVisible = false; //useTypedSelector(({ space }) => space.permissionModalVisible);
   const dispatch = useDispatch();
 
   function grant() {

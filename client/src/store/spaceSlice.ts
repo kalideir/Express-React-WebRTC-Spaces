@@ -10,6 +10,7 @@ export type SpaceSliceData = {
   spaces: SpaceItem[];
   createSpaceErrors: unknown;
   mySpaces: SpaceItem[];
+  activeSpace: null | SpaceItem;
 };
 
 const initialState: SpaceSliceData = {
@@ -18,6 +19,7 @@ const initialState: SpaceSliceData = {
   spaces: [],
   createSpaceErrors: [],
   mySpaces: [],
+  activeSpace: null,
 };
 
 export const createSpace = createAsyncThunk('space/createSpace', async (data: SpaceData, { rejectWithValue }) => {
@@ -35,7 +37,17 @@ export const createSpace = createAsyncThunk('space/createSpace', async (data: Sp
 export const getMySpaces = createAsyncThunk('space/getMySpaces', async (_, { rejectWithValue }) => {
   try {
     const res = await apiService.get('/space/list/mySpaces');
-    return res?.data;
+    return res?.data?.spaces;
+  } catch (error: any | AxiosError) {
+    const message = error?.response.data.message || 'Error';
+    return rejectWithValue({ message });
+  }
+});
+
+export const getActiveSpace = createAsyncThunk('space/getSpace', async (key: string, { rejectWithValue }) => {
+  try {
+    const res = await apiService.get('/space/' + key);
+    return res?.data?.spaces;
   } catch (error: any | AxiosError) {
     const message = error?.response.data.message || 'Error';
     return rejectWithValue({ message });
@@ -62,6 +74,10 @@ const spaceSlice = createSlice({
       const { payload } = action;
       state.mySpaces = payload;
     },
+    [getActiveSpace.fulfilled.type]: (state, action: PayloadAction<SpaceItem>) => {
+      const { payload } = action;
+      state.activeSpace = payload;
+    },
   },
 });
 
@@ -70,3 +86,5 @@ export const { togglePermissionModal, setPermission } = spaceSlice.actions;
 export default spaceSlice.reducer;
 
 export const selectMySpaces = (state: RootState) => state.spaces.mySpaces;
+
+export const selectActiveSpace = (state: RootState) => state.spaces.activeSpace;

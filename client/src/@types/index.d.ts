@@ -114,7 +114,7 @@ export type SpaceData = {
 export type SpaceItem = {
   title: string;
   isPublic: boolean;
-  url: string;
+  key: string;
   participants: string[];
   participantIds: string[];
   status: keyof typeof SpaceStatus;
@@ -122,3 +122,10 @@ export type SpaceItem = {
 };
 
 export type NavItem = { name: string; to: string };
+
+export type SpaceUser = {
+  id: string;
+  profilePicture: ProfilePicture;
+  username: string;
+  fullName: string;
+};

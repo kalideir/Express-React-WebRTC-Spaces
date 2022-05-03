@@ -30,7 +30,7 @@ export default function AppRoutes() {
         <Route path="/verify-account/:token" element={<NoAuthRoute element={VerifyAccount} />} />
 
         <Route path="/profile" element={<RequireAuthRoute element={Profile} />} />
-        <Route path="/space" element={<RequireAuthRoute element={Space} />} />
+        <Route path="/space/:key/:slug" element={<RequireAuthRoute element={Space} />} />
         <Route path="/my-spaces" element={<RequireAuthRoute element={MySpaces} />} />
 
         <Route path="/new-space" element={<RequireAuthRoute element={NewSpace} />} />

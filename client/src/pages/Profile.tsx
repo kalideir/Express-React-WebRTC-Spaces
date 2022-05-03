@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../store/authSlice';
 import { formatDistanceToNow } from 'date-fns';
 import { FieldValues, useForm } from 'react-hook-form';
@@ -10,7 +9,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { IUser, MediaResponse } from '../@types';
 import type { SerializedError } from '@reduxjs/toolkit';
-import { useAppDispatch } from '../hooks';
+import { useAppDispatch, useTypedSelector } from '../hooks';
 import { updateProfile } from '../store/profileSlice';
 import { createMedia, getUploadUrl, selectIsUploading, selectUploadProgress, upload } from '../store/uploadslice';
 import { MediaTypes } from '../constants';
@@ -28,9 +27,9 @@ function Profile() {
   const { enqueueSnackbar } = useSnackbar();
   const [file, setFile] = useState<File | null>(null);
   const dispatch = useAppDispatch();
-  const currentUser = useSelector(selectCurrentUser) as IUser;
-  const isUploading = useSelector(selectIsUploading) as boolean;
-  const uploadProgress = useSelector(selectUploadProgress) as number;
+  const currentUser = useTypedSelector(selectCurrentUser) as IUser;
+  const isUploading = useTypedSelector(selectIsUploading) as boolean;
+  const uploadProgress = useTypedSelector(selectUploadProgress) as number;
   const [isEditing, setIsEditing] = useState(false);
   const contentType = file?.type as string;
   const id = currentUser.id;

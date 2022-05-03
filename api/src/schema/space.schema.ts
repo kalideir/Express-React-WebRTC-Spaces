@@ -11,7 +11,7 @@ const payload = {
 };
 
 const params = object({
-  id: string(),
+  key: string(),
 });
 
 export const createSpaceSchema = object({

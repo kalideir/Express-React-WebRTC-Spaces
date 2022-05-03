@@ -15,17 +15,17 @@ import { use } from '../utils';
 
 const router = Router();
 
-router.param('id', controller.load);
+router.param('key', controller.load);
 
 router.route('/').post(authorizeUser, validate(createSpaceSchema), use(controller.create));
 
 router
-  .route('/:id')
+  .route('/:key')
   .get(authorizeUser, validate(getSpaceSchema), use(controller.get))
   .patch(authorizeUser, validate(updateSpaceSchema), controller.update)
   .delete(authorizeUser, validate(deleteSpaceSchema), controller.remove);
 
-router.route('/:id/participants/').post(authorizeUser, validate(createParticipantSchema), use(controller.createParticipant));
+router.route('/:key/participants/').post(authorizeUser, validate(createParticipantSchema), use(controller.createParticipant));
 router.route('/list/mySpaces').get(authorizeUser, use(controller.mySpaces));
 
 router

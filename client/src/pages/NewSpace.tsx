@@ -1,4 +1,4 @@
-import { useSelector } from 'react-redux';
+import { useTypedSelector } from '../hooks';
 import { useAppDispatch } from '../hooks';
 import { selectNewSpaceVisible, toggleNewSpaceModal } from '../store/uiSlice';
 import { useSnackbar } from 'notistack';
@@ -9,8 +9,7 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import type { SerializedError } from '@reduxjs/toolkit';
 import { createSpace } from '../store/spaceSlice';
-import { BsLink } from 'react-icons/bs';
-import { SpaceData } from '../@types';
+import type { SpaceData } from '../@types';
 import { slugify } from '../utils';
 
 const schema = yup.object({
@@ -20,7 +19,7 @@ const schema = yup.object({
 
 function NewSpace() {
   const dispatch = useAppDispatch();
-  const modalVisible = useSelector(selectNewSpaceVisible);
+  const modalVisible = useTypedSelector(selectNewSpaceVisible);
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -92,20 +91,6 @@ function NewSpace() {
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmitHandler)}>
             <div className="p-6 space-y-6">
-              {/* <div className="w-full mb-10">
-                <div className="relative z-0 mb-6 w-full group">
-                  <input
-                    type="url"
-                    id="url"
-                    {...register('url')}
-                    className="bg-slate-100 border relative border-slate-300 text-gray-900 text-sm rounded focus:border-none block w-full p-2.5 dark:bg-slate-600 dark:border-slate-600 dark:text-white dark:focus:ring-none dark:focus:border-none"
-                    required
-                  />
-                  <div className="w-12 h-full absolute right-0 top-0 bg-indigo-500 flex items-center justify-center rounded">
-                    <BsLink className="rotate-90 text-white w-3/5 h-3/5" />
-                  </div>
-                </div>
-              </div> */}
               <div className="w-full">
                 <div className="relative z-0 mb-6 w-full group">
                   <input

@@ -14,8 +14,8 @@ import {
 import { t } from '../utils';
 
 export async function load(req: Request<LoadSpaceInput>, res: Response, next: NextFunction) {
-  const { id } = req.params;
-  const space = await SpaceModel.findById(id);
+  const { key } = req.params;
+  const space = await SpaceModel.findOne({ key });
   res.locals.space = space;
   return next();
 }

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BsPlusSquareFill } from 'react-icons/bs';
-import { useSelector } from 'react-redux';
 import { selectIsAuthenticated } from '../store/authSlice';
-import { useAppDispatch } from '../hooks';
+import { useAppDispatch, useTypedSelector } from '../hooks';
 
 function Header() {
   const [top, setTop] = useState(true);
-  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const isAuthenticated = useTypedSelector(selectIsAuthenticated);
   const dispatch = useAppDispatch();
   // detect whether user has scrolled the page down by 10px
   useEffect(() => {
