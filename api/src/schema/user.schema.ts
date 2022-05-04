@@ -39,7 +39,6 @@ const params = {
 
 const query = {
   query: object({
-    role: string({}).optional(),
     page: string({}).optional(),
     limit: string({}).optional(),
     search: string({}).optional(),

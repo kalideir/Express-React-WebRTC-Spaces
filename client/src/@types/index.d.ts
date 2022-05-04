@@ -124,3 +124,17 @@ export type SpaceUser = {
   fullName: string;
   type: keyof typeof ParticipantTypes;
 };
+
+export type ListUsersQueryType = {
+  limit: number;
+  page: number;
+  search: string;
+  [name: string]: unknown;
+};
+
+export type UsersSearch = {
+  users: SpaceUser[];
+  subTotal: number;
+  total: number;
+  page: number;
+};

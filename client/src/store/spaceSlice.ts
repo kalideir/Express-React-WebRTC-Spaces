@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { AxiosError } from 'axios';
-import { Error, ErrorPayload, ISpace, SpaceData, SpaceItem } from '../@types';
+import { Error, ErrorPayload, ISpace, ListUsersQueryType, SpaceData, SpaceItem, SpaceUser, UsersSearch } from '../@types';
 import { apiService } from '../services';
 import { RootState } from './store';
 
@@ -11,6 +11,7 @@ export type SpaceSliceData = {
   createSpaceErrors: unknown;
   mySpaces: SpaceItem[];
   activeSpace: null | SpaceItem;
+  usersSearch: UsersSearch;
 };
 
 const initialState: SpaceSliceData = {
@@ -20,6 +21,12 @@ const initialState: SpaceSliceData = {
   createSpaceErrors: [],
   mySpaces: [],
   activeSpace: null,
+  usersSearch: {
+    users: [],
+    page: 0,
+    subTotal: 0,
+    total: 0,
+  },
 };
 
 export const createSpace = createAsyncThunk('space/createSpace', async (data: SpaceData, { rejectWithValue }) => {
@@ -69,6 +76,16 @@ export const getActiveSpace = createAsyncThunk('space/getSpace', async (key: str
   }
 });
 
+export const getUsers = createAsyncThunk('space/getUsers', async (params: ListUsersQueryType, { rejectWithValue }) => {
+  try {
+    const res = await apiService.get('/user/list/users', { params });
+    return res?.data;
+  } catch (error: any | AxiosError) {
+    const message = error?.response.data.message || 'Error';
+    return rejectWithValue({ message });
+  }
+});
+
 const spaceSlice = createSlice({
   name: 'space',
   initialState,
@@ -97,6 +114,10 @@ const spaceSlice = createSlice({
       const { payload } = action;
       state.activeSpace = payload;
     },
+    [getUsers.fulfilled.type]: (state, action: PayloadAction<UsersSearch>) => {
+      const { payload } = action;
+      state.usersSearch = payload;
+    },
   },
 });
 
@@ -107,3 +128,5 @@ export default spaceSlice.reducer;
 export const selectMySpaces = (state: RootState) => state.spaces.mySpaces;
 
 export const selectActiveSpace = (state: RootState) => state.spaces.activeSpace;
+
+export const selectSpaceUsersSearch = (state: RootState) => state.spaces.usersSearch;

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { Role, UserDocument, UserModel } from '../models';
+import { UserDocument, UserModel } from '../models';
 import { DeleteUserInput, GetUsersInput, ListUsersInput, UpdateUserInput } from '../schema';
 import { findUserById, updateUser } from '../services';
 
@@ -8,10 +8,6 @@ import { logger, t } from '../utils';
 import { ApiError } from '../errors';
 
 export type ListUsersQueryType = Partial<{
-  companyId: string;
-  employeeId: string;
-  verified: boolean;
-  role: string;
   limit: string;
   page: string;
   search: string;
@@ -53,20 +49,17 @@ export async function remove(req: Request<DeleteUserInput['params']>, res: Respo
   return res.send({ message: t('delete_success') });
 }
 
-export async function listUsers(req: Request<ListUsersInput['query']>, res: Response, next: NextFunction) {
+export async function listUsers(req: Request<ListUsersInput['query']>, res: Response) {
   logger.debug(req.query);
   const search = req.query.search as string | null;
-  const limit = +req.query.limit || 10;
+  const limit = +req.query.limit || 8;
   let page = +req.query.page;
   page = page > 1 ? page : 1;
   page = page - 1;
   const skip = page * (limit - 1);
   const user = res.locals.user;
-  const { role } = req.query as ListUsersInput['query'];
-  if (user.role !== Role.ADMIN && role === Role.ADMIN) {
-    return next(ApiError.unauthorized(t('no_auth')));
-  }
-  const query: ListUsersQueryType & { $and: unknown[] } = { role, $and: [], _id: { $ne: user.id } };
+
+  const query: ListUsersQueryType & { $and: unknown[] } = { $and: [], _id: { $ne: user.id } };
   query.$and.push({
     $or: [
       { firstName: new RegExp(search, 'i') },
@@ -86,13 +79,22 @@ export async function listUsers(req: Request<ListUsersInput['query']>, res: Resp
   }
 
   const totalDocumentsCount = await UserModel.countDocuments({});
-  const filteredTotal = await UserModel.countDocuments(query);
-  const users: UserDocument[] = await UserModel.find({ ...query })
-    .limit(role === Role.USER ? limit : totalDocumentsCount)
+  const subTotal = await UserModel.countDocuments(query);
+  const users: UserDocument[] = await UserModel.find(
+    { ...query },
+    {
+      email: 1,
+      firstName: 1,
+      lastName: 1,
+      profilePictureId: 1,
+    },
+  )
+    .limit(limit)
     .skip(skip)
     .sort(orderBy)
     .populate('profilePicture')
     .exec();
+
   const result = users.map(user => user.toJSON());
-  return res.send({ users: result, page, filteredTotal, total: totalDocumentsCount });
+  return res.send({ users: result, page, subTotal, total: totalDocumentsCount });
 }

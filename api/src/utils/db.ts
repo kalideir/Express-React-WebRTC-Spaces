@@ -12,7 +12,7 @@ function connect() {
   }
 
   return mongoose
-    .connect(dbURI, { authSource: 'admin' })
+    .connect(dbURI, { authSource: 'admin', directConnection: true })
     .then(() => {
       logger.info('Database connected');
     })

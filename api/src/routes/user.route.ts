@@ -14,6 +14,6 @@ router
   .patch(authorizeUser, validate(updateUserSchema), controller.update)
   .delete(authorizeUser, validate(deleteUserSchema), controller.remove);
 
-router.get('list', authorizeUser, validate(listUsersSchema), use(controller.listUsers));
+router.get('/list/users', authorizeUser, validate(listUsersSchema), use(controller.listUsers));
 
 export default router;

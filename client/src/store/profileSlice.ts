@@ -17,7 +17,7 @@ export const updateProfile = createAsyncThunk(
   async ({ data, id }: { data: Partial<IUser>; id: string }, { rejectWithValue }) => {
     try {
       const res = await apiService.patch(`/user/${id}`, data);
-      return res?.data?.spaces;
+      return res?.data;
     } catch (error: any | AxiosError) {
       const errors = error.response?.data?.errors;
       const extra = error.response?.data?.extra;

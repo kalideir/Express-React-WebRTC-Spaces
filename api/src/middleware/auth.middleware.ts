@@ -27,6 +27,7 @@ const handler = (req, res, next) => async (err, user, info) => {
     return next(new ApiError(e.message, httpStatus.INTERNAL_SERVER_ERROR, e.stack));
   }
   req.user = user;
+  res.locals.user = user;
   return next();
 };
 

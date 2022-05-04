@@ -90,8 +90,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     restart: 'always'
-    logging:
-      driver: "none"
+
     depends_on:
       - server
       - client
