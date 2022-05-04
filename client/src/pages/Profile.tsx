@@ -13,6 +13,7 @@ import { useAppDispatch, useTypedSelector } from '../hooks';
 import { updateProfile } from '../store/profileSlice';
 import { createMedia, getUploadUrl, selectIsUploading, selectUploadProgress, upload } from '../store/uploadslice';
 import { MediaTypes } from '../constants';
+import { getAvatar } from '../utils';
 
 const schema = yup.object({
   username: yup.string().min(3, 'Must be at least 3 letters').required('Username required'),
@@ -37,9 +38,7 @@ function Profile() {
   const avatar = useMemo(() => {
     return file
       ? URL.createObjectURL(file)
-      : currentUser.profilePicture?.smallUrl ||
-          currentUser.profilePicture?.originalUrl ||
-          `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${currentUser.username}`;
+      : currentUser.profilePicture?.smallUrl || currentUser.profilePicture?.originalUrl || getAvatar(currentUser.username);
   }, [currentUser.profilePicture, currentUser.username, file]);
 
   const {

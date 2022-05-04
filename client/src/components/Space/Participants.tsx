@@ -700,7 +700,10 @@ function Participants() {
   return (
     <div className="mt-5 bg-slate-50 dark:bg-slate-900 flex-col py-2 justify-center items-center shadow-md rounded-md grid grid-cols-5 auto-rows-fr text-center self-center gap-1">
       {PARTICIPANTS.map(participant => (
-        <Participant key={participant.id} participant={{ type: 'GUEST', fullName: 'Ali H. Kudeir', id: '', profilePicture: {}, username: '' }} />
+        <Participant
+          key={participant.id}
+          participant={{ type: 'GUEST', fullName: 'Ali H. Kudeir', id: '', profilePicture: {}, username: '', email: '' }}
+        />
       ))}
     </div>
   );

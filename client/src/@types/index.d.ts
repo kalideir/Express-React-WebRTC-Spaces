@@ -1,4 +1,4 @@
-import { MediaTypes, ParticipantTypes, SpaceStatus } from '../constants';
+import { ParticipantTypes, SpaceStatus } from '../constants';
 
 export type NewTokenData = {
   refreshToken: string;
@@ -117,12 +117,15 @@ export type SpaceItem = {
 
 export type NavItem = { name: string; to: string };
 
+export type ParticipantStatus = keyof typeof ParticipantTypes;
+
 export type SpaceUser = {
   id: string;
+  email: string;
   profilePicture: ProfilePicture;
   username: string;
   fullName: string;
-  type: keyof typeof ParticipantTypes;
+  type?: ParticipantStatus;
 };
 
 export type ListUsersQueryType = {
@@ -133,7 +136,7 @@ export type ListUsersQueryType = {
 };
 
 export type UsersSearch = {
-  users: SpaceUser[];
+  users: Omit<SpaceUser, 'type'>[];
   subTotal: number;
   total: number;
   page: number;

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { AxiosError } from 'axios';
-import { Error, ErrorPayload, ISpace, ListUsersQueryType, SpaceData, SpaceItem, SpaceUser, UsersSearch } from '../@types';
+import { Error, ErrorPayload, ISpace, ListUsersQueryType, ParticipantStatus, SpaceData, SpaceItem, SpaceUser, UsersSearch } from '../@types';
 import { apiService } from '../services';
 import { RootState } from './store';
 
@@ -40,6 +40,21 @@ export const createSpace = createAsyncThunk('space/createSpace', async (data: Sp
     return rejectWithValue({ errors, message, extra });
   }
 });
+
+export const addDeleteParticipant = createAsyncThunk(
+  'space/addDeleteParticipant',
+  async ({ key, type, userId }: { key: string; type: ParticipantStatus; userId: string }, { rejectWithValue }) => {
+    try {
+      const res = await apiService.post(`/space/${key}/participants`, { type, userId });
+      return res?.data;
+    } catch (error: any | AxiosError) {
+      const errors = error.response?.data?.errors;
+      const extra = error.response?.data?.extra;
+      const message = error?.response.data.message || 'Create error';
+      return rejectWithValue({ errors, message, extra });
+    }
+  },
+);
 
 export const updateSpace = createAsyncThunk(
   'space/updateSpace',

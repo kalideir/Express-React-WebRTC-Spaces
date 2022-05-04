@@ -5,3 +5,4 @@ export { default as SpaceHeader } from './SpaceHeader';
 export { default as Permission } from './Permission';
 export { default as Participant } from './Participant';
 export { default as AddParticipant } from './AddParticipant';
+export { default as UserRow } from './UserRow';

@@ -86,6 +86,7 @@ export async function listUsers(req: Request<ListUsersInput['query']>, res: Resp
       email: 1,
       firstName: 1,
       lastName: 1,
+      username: 1,
       profilePictureId: 1,
     },
   )
