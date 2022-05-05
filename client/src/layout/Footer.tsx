@@ -7,10 +7,9 @@ function Footer() {
       <div className="sm:flex sm:items-center sm:justify-between">
         <span className="text-sm text-slate-500 sm:text-center dark:text-slate-400">
           © 2022{' '}
-          <a href="https://flowbite.com" className="hover:underline">
-            Flowbite™
+          <a href="https://alihkudeir.com" className="hover:underline">
+            . Done by Ali H. Kudeir
           </a>
-          . All Rights Reserved.
         </span>
         <div className="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
           <a href="#" className="text-slate-500 hover:text-slate-900 dark:hover:text-white">

@@ -1,6 +1,6 @@
 import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { AxiosError } from 'axios';
-import { ErrorPayload, ListUsersQueryType, ParticipantItem, ParticipantStatus, SpaceData, SpaceItem, SpaceUser, UsersSearch } from '../@types';
+import { ErrorPayload, ListUsersQueryType, ParticipantItem, ParticipantStatus, SpaceData, SpaceItem, UsersSearch } from '../@types';
 import { ParticipantTypes } from '../constants';
 import { apiService } from '../services';
 import { RootState } from './store';
@@ -32,15 +32,28 @@ const initialState: SpaceSliceData = {
   spaceGuestQuery: '',
 };
 
-export const createSpace = createAsyncThunk('space/createSpace', async (data: SpaceData, { rejectWithValue }) => {
+export const createSpace = createAsyncThunk('space/createSpace', async (data: SpaceData, { rejectWithValue, dispatch }) => {
   try {
     const res = await apiService.post('/space/', data);
+    await dispatch(getMySpaces());
     return res?.data;
   } catch (error: any | AxiosError) {
     const errors = error.response?.data?.errors;
     const extra = error.response?.data?.extra;
     const message = error?.response.data.message || 'Create error';
     return rejectWithValue({ errors, message, extra });
+  }
+});
+
+export const deleteSpace = createAsyncThunk('space/deleteSpace', async (key: string, { rejectWithValue, dispatch }) => {
+  try {
+    const res = await apiService.delete('/space/' + key);
+    await dispatch(getMySpaces());
+    return res?.data;
+  } catch (error: any | AxiosError) {
+    const errors = error.response?.data?.errors;
+    const message = error?.response.data.message || 'Delete error';
+    return rejectWithValue({ errors, message });
   }
 });
 

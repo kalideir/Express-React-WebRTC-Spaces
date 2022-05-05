@@ -1,4 +1,5 @@
 import { MdGroups } from 'react-icons/md';
+import { IoMdPersonAdd } from 'react-icons/io';
 import { ChangeEvent } from 'react';
 import { BsPlusSquareFill } from 'react-icons/bs';
 import { Dot } from '../../layout';
@@ -33,6 +34,10 @@ function SpaceActions() {
           </div>
         </div>
         <div className="flex items-center justify-start">
+          <div className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 dark:border-slate-400 px-4 border-2 border-slate-400 rounded-xs cursor-pointer">
+            <IoMdPersonAdd size={20} className="mr-1" />
+            <span>130+</span>
+          </div>
           <button
             onClick={() => dispatch(showAddParticipantModal())}
             className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 px-4 cursor-pointer"

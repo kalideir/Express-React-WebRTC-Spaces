@@ -11,6 +11,7 @@ interface IProps {
 
 function SpaceCard(props: IProps) {
   const [dropDownVisible, setDropDownVisible] = useState(false);
+
   return (
     <div className="max-w-sm bg-white rounded-lg border border-slate-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
       <div className="flex justify-end px-2 pt-2 relative">
@@ -24,7 +25,7 @@ function SpaceCard(props: IProps) {
             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
           </svg>
         </button>
-        <DropDown visible={dropDownVisible} setVisible={setDropDownVisible} />
+        <DropDown visible={dropDownVisible} setVisible={setDropDownVisible} spaceKey={props.item?.key} />
       </div>
       <div className="flex flex-col items-center pb-2">
         <h5 className="mb-1 text-xl font-medium text-slate-900 text-center dark:text-white flex break-all mx-5">{props.item.title}</h5>

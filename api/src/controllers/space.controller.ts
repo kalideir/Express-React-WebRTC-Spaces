@@ -19,6 +19,9 @@ export async function load(req: Request<LoadSpaceInput>, res: Response, next: Ne
   const space = await SpaceModel.findOne({ key })
     .populate('participants')
     .populate({ path: 'participants', populate: { path: 'user' } });
+  if (!space) {
+    return next(ApiError.notFound(t('')));
+  }
   res.locals.space = space;
   return next();
 }

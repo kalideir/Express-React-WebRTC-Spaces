@@ -6,3 +6,4 @@ export { default as Permission } from './Permission';
 export { default as Participant } from './Participant';
 export { default as AddParticipant } from './AddParticipant';
 export { default as UserRow } from './UserRow';
+export { default as Requests } from './Requests';
