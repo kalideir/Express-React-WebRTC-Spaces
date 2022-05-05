@@ -1,6 +1,7 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { AxiosError } from 'axios';
-import { Error, ErrorPayload, ISpace, ListUsersQueryType, ParticipantStatus, SpaceData, SpaceItem, SpaceUser, UsersSearch } from '../@types';
+import { ErrorPayload, ListUsersQueryType, ParticipantItem, ParticipantStatus, SpaceData, SpaceItem, SpaceUser, UsersSearch } from '../@types';
+import { ParticipantTypes } from '../constants';
 import { apiService } from '../services';
 import { RootState } from './store';
 
@@ -12,6 +13,7 @@ export type SpaceSliceData = {
   mySpaces: SpaceItem[];
   activeSpace: null | SpaceItem;
   usersSearch: UsersSearch;
+  spaceGuestQuery: string;
 };
 
 const initialState: SpaceSliceData = {
@@ -27,6 +29,7 @@ const initialState: SpaceSliceData = {
     subTotal: 0,
     total: 0,
   },
+  spaceGuestQuery: '',
 };
 
 export const createSpace = createAsyncThunk('space/createSpace', async (data: SpaceData, { rejectWithValue }) => {
@@ -56,6 +59,8 @@ export const addDeleteParticipant = createAsyncThunk(
     }
   },
 );
+
+export const setSpaceGuestQuery = createAction<string>('spaces/setSpaceGuestQuery');
 
 export const updateSpace = createAsyncThunk(
   'space/updateSpace',
@@ -134,6 +139,10 @@ const spaceSlice = createSlice({
       const { payload } = action;
       state.usersSearch = payload;
     },
+    [setSpaceGuestQuery.type]: (state, action: PayloadAction<string>) => {
+      const { payload } = action;
+      state.spaceGuestQuery = payload;
+    },
   },
 });
 
@@ -146,3 +155,11 @@ export const selectMySpaces = (state: RootState) => state.spaces.mySpaces;
 export const selectActiveSpace = (state: RootState) => state.spaces.activeSpace;
 
 export const selectSpaceUsersSearch = (state: RootState) => state.spaces.usersSearch;
+
+export const selectSpaceBoard = (state: RootState) =>
+  (state.spaces.activeSpace?.participants || []).filter((participant: ParticipantItem) => participant.type !== ParticipantTypes.GUEST);
+
+export const selectSpaceGuests = (state: RootState) =>
+  (state.spaces.activeSpace?.participants || []).filter((participant: ParticipantItem) => participant.type === ParticipantTypes.GUEST);
+
+export const spaceGuestQuery = (state: RootState) => state.spaces.spaceGuestQuery;

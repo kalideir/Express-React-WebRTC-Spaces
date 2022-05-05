@@ -11,11 +11,11 @@ const NUM_OF_ITEMS = 10;
 function UsersFooter(props: IProps) {
   const participants = props.participants;
   return (
-    <div className="flex -space-x-4 items-center flex-wrap mt-2 justify-center bg-red-400">
+    <div className="flex -space-x-3 items-center flex-wrap mt-10 justify-center">
       {participants.slice(0, 10).map((participant: ParticipantItem) => (
         <img
           key={participant.id}
-          className="w-12 h-12 border-2 border-white rounded-full dark:border-slate-800"
+          className="w-10 h-10 border-2 border-white rounded-full dark:border-slate-800"
           src={participant.user?.profilePicture?.smallUrl || getAvatar(participant.user?.username || '')}
           alt=""
         />

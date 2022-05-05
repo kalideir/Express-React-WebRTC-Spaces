@@ -1,16 +1,14 @@
 import { useSnackbar } from 'notistack';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect, useState, useRef, UIEvent, ReactNode, UIEventHandler } from 'react';
-import { FieldValues, useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { SerializedError } from '@reduxjs/toolkit';
 import { useAppDispatch, useTypedSelector } from '../../hooks';
-import { hideAddParticipantModal, selectNewParticipantModal, selectNewSpaceVisible } from '../../store/uiSlice';
-import { getAvatar, range } from '../../utils';
+import { hideAddParticipantModal, selectNewParticipantModal } from '../../store/uiSlice';
 import { Divider } from '../../layout';
-import { addDeleteParticipant, getUsers, selectActiveSpace, selectSpaceUsersSearch } from '../../store/spaceSlice';
-import { ParticipantStatus, SpaceItem, SpaceUser } from '../../@types';
+import { getUsers, selectSpaceUsersSearch } from '../../store/spaceSlice';
+import type { SpaceUser } from '../../@types';
 import { UserRow } from '.';
 
 function AddParticipant() {
@@ -33,7 +31,7 @@ function AddParticipant() {
   }, [dispatch, navigate]);
 
   useEffect(() => {
-    isModalVisible && dispatch(getUsers({ search: query, limit: 20, page: usersSearch.page + 1 })).unwrap();
+    query.length > 3 && isModalVisible && dispatch(getUsers({ search: query, limit: 20, page: usersSearch.page + 1 })).unwrap();
   }, [query, isModalVisible, dispatch, usersSearch.page]);
 
   if (!isModalVisible) {
@@ -47,9 +45,9 @@ function AddParticipant() {
       aria-hidden="true"
       className="overflow-x-hidden fixed top-0 mx-auto left-0 right-0 z-50 w-full md:inset-0 h-modal h-auto justify-center items-center"
     >
-      <div className="fixed inset-0 bg-slate-500 bg-opacity-80 transition-opacity"></div>
+      <div onClick={() => dispatch(hideAddParticipantModal())} className="fixed inset-0 bg-slate-500 bg-opacity-80 transition-opacity"></div>
       <div
-        className="p-2 w-full max-w-2xl overflow-y-scroll h-1/2 top-32 mx-auto relative bg-white rounded-lg dark:bg-slate-700 shadow-2xl"
+        className="p-2 w-full max-w-2xl overflow-y-scroll h-2/3 top-32 mx-auto relative bg-white rounded-lg dark:bg-slate-700 shadow-2xl"
         id="add-participant"
       >
         <div className="mt-2 space-y-6">

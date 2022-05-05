@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { getActiveSpace, selectActiveSpace, togglePermissionModal } from '../store/spaceSlice';
 import { MIC_ACCESS_GRANTED, SpaceStatus } from '../constants';
 import { useParams } from 'react-router-dom';
-import { Nav } from '../layout';
+import { Divider, Nav } from '../layout';
 import { useTypedSelector } from '../hooks';
 
 function Space() {
@@ -39,7 +39,9 @@ function Space() {
         <SpaceHeader />
         {activeSpace && activeSpace?.status !== SpaceStatus.CREATED && (
           <>
+            <Divider />
             <SpaceActions />
+            <Divider />
             <Participants />
           </>
         )}

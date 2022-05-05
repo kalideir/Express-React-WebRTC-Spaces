@@ -9,7 +9,7 @@ export type UiSliceData = {
 
 const initialState: Partial<UiSliceData> = {
   newSpaceModalVisible: false,
-  newParticipantModal: true,
+  newParticipantModal: false,
 };
 
 const uiSlice = createSlice({
