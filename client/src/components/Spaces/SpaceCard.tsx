@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { UsersFooter } from '.';
 import { SpaceItem } from '../../@types';
@@ -29,7 +29,7 @@ function SpaceCard(props: IProps) {
       <div className="flex flex-col items-center pb-10">
         <h5 className="mb-1 text-xl font-medium text-slate-900 text-center dark:text-white flex break-all mx-5">{props.item.title}</h5>
         <span className="text-sm text-slate-500 dark:text-slate-400 mt-1">{props.item.status}</span>
-        {!!props.item.participantIds.length && <UsersFooter users={[]} />}
+        {!!props.item.participantIds.length && <UsersFooter participants={props.item.participants} />}
       </div>
       <Divider />
       <div className="flex items-center p-6 space-x-2 rounded-b">
@@ -45,4 +45,4 @@ function SpaceCard(props: IProps) {
   );
 }
 
-export default SpaceCard;
+export default memo(SpaceCard);

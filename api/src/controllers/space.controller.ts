@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
+import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
 import { ApiError, CustomError } from '../errors';
 import { ParticipantModel, SpaceModel, UserDocument, SpaceDocument } from '../models';
@@ -15,14 +16,18 @@ import { t } from '../utils';
 
 export async function load(req: Request<LoadSpaceInput>, res: Response, next: NextFunction) {
   const { key } = req.params;
-  const space = await SpaceModel.findOne({ key });
+  const space = await SpaceModel.findOne({ key })
+    .populate('participants')
+    .populate({ path: 'participants', populate: { path: 'user' } });
   res.locals.space = space;
   return next();
 }
 
 export async function mySpaces(req: Request, res: Response) {
   const user = req.user as UserDocument;
-  const spaces = await SpaceModel.find({ ownerId: user.id });
+  const spaces = await SpaceModel.find({ ownerId: user.id })
+    .populate('participants')
+    .populate({ path: 'participants', populate: { path: 'user' } });
   return res.json({ spaces });
 }
 
@@ -50,12 +55,20 @@ export async function remove(req: Request, res: Response) {
   return res.status(httpStatus.OK).send({ message: t('delete_success') });
 }
 
-export async function createParticipant(req: Request<CreateParticipantInput>, res: Response) {
-  const space = res.locals.space;
+export async function createParticipant(req: Request, res: Response) {
+  let space = res.locals.space;
   const input = { ...req.body };
+  const exists = await ParticipantModel.findOne({ userId: input.userId });
+  if (exists) {
+    await exists.delete();
+    await space.update({ $pull: { participantIds: exists.id } });
+    return res.json({ space: space.toJSON(), message: 'Participant was removed' });
+  }
   const participant = await ParticipantModel.create(input);
-  await space.participants.push(participant.id);
-  return res.json({ participants: [], message: '' });
+  space.participantIds.push(participant.id);
+  await space.save();
+  space = await (await space.populate('participants')).populate({ path: 'participants', populate: { path: 'user' } });
+  return res.json({ space: space.toJSON(), message: 'Participant was added' });
 }
 
 export async function updateParticipant(

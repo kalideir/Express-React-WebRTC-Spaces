@@ -109,7 +109,7 @@ export type SpaceItem = {
   title: string;
   isPublic: boolean;
   key: string;
-  participants: string[];
+  participants: ParticipantItem[];
   participantIds: string[];
   status: keyof typeof SpaceStatus;
   id?: string;
@@ -122,8 +122,8 @@ export type ParticipantStatus = keyof typeof ParticipantTypes;
 export type SpaceUser = {
   id: string;
   email: string;
-  profilePicture: ProfilePicture;
   username: string;
+  profilePicture: ProfilePicture;
   fullName: string;
   type?: ParticipantStatus;
 };
@@ -140,4 +140,14 @@ export type UsersSearch = {
   subTotal: number;
   total: number;
   page: number;
+};
+
+export type ParticipantItem = {
+  id: string;
+  email: string;
+  profilePicture: ProfilePicture;
+  userId: string;
+  user?: IUser;
+  fullName: string;
+  type?: ParticipantStatus;
 };

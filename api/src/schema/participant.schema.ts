@@ -26,6 +26,9 @@ const params = {
 
 export const createParticipantSchema = object({
   ...payload,
+  params: object({
+    key: string(),
+  }),
 });
 
 export const getParticipantSchema = object({
@@ -51,7 +54,7 @@ export const deleteParticipantSchema = object({
   ...params,
 });
 
-export type CreateParticipantInput = TypeOf<typeof createParticipantSchema>['body'];
+export type CreateParticipantInput = TypeOf<typeof createParticipantSchema>;
 export type UpdateParticipantInput = TypeOf<typeof updateParticipantSchema>;
 export type ListParticipantsInput = TypeOf<typeof listParticipantsSchema>;
 export type GetParticipantsInput = TypeOf<typeof getParticipantSchema>;

@@ -6,8 +6,8 @@ export interface ParticipantInput {
 }
 
 export enum ParticipantTypes {
-  HOST = 'CREATED',
-  GUEST = 'STARTED',
+  HOST = 'HOST',
+  GUEST = 'GUEST',
   SPEAKER = 'SPEAKER',
 }
 

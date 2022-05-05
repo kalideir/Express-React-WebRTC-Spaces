@@ -43,9 +43,10 @@ export const createSpace = createAsyncThunk('space/createSpace', async (data: Sp
 
 export const addDeleteParticipant = createAsyncThunk(
   'space/addDeleteParticipant',
-  async ({ key, type, userId }: { key: string; type: ParticipantStatus; userId: string }, { rejectWithValue }) => {
+  async ({ key, type, userId }: { key: string; type: ParticipantStatus; userId: string }, { rejectWithValue, dispatch }) => {
     try {
       const res = await apiService.post(`/space/${key}/participants`, { type, userId });
+      await dispatch(getActiveSpace(key));
       return res?.data;
     } catch (error: any | AxiosError) {
       const errors = error.response?.data?.errors;

@@ -74,7 +74,7 @@ function AddParticipant() {
         </div>
         <div className="mx-6 space-y-2 mb-2" id="results">
           {usersSearch.users.map((user: SpaceUser) => (
-            <UserRow user={user} />
+            <UserRow key={user.id} user={user} />
           ))}
         </div>
       </div>

@@ -24,8 +24,8 @@ router
   .get(authorizeUser, validate(getSpaceSchema), use(controller.get))
   .patch(authorizeUser, validate(updateSpaceSchema), controller.update)
   .delete(authorizeUser, validate(deleteSpaceSchema), controller.remove);
-
-router.route('/:key/participants/').post(authorizeUser, validate(createParticipantSchema), use(controller.createParticipant));
+//validate(createParticipantSchema)
+router.route('/:key/participants/').post(authorizeUser, use(controller.createParticipant));
 router.route('/list/mySpaces').get(authorizeUser, use(controller.mySpaces));
 
 router
