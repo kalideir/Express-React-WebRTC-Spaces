@@ -5,7 +5,7 @@ import { BsPlusSquareFill } from 'react-icons/bs';
 import { Dot } from '../../layout';
 import { useAppDispatch } from '../../hooks';
 import { setSpaceGuestQuery } from '../../store/spaceSlice';
-import { showAddParticipantModal } from '../../store/uiSlice';
+import { hideAddParticipantModal, showAddParticipantModal, showRequestsModal } from '../../store/uiSlice';
 
 function SpaceActions() {
   const dispatch = useAppDispatch();
@@ -34,10 +34,6 @@ function SpaceActions() {
           </div>
         </div>
         <div className="flex items-center justify-start">
-          <div className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 dark:border-slate-400 px-4 border-2 border-slate-400 rounded-xs cursor-pointer">
-            <IoMdPersonAdd size={20} className="mr-1" />
-            <span>130+</span>
-          </div>
           <button
             onClick={() => dispatch(showAddParticipantModal())}
             className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 px-4 cursor-pointer"
@@ -45,12 +41,19 @@ function SpaceActions() {
             <BsPlusSquareFill size={17} className="mr-1" />
             <span className="">Invite a participant</span>
           </button>
-          <div className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 dark:border-slate-400 px-4 border-2 border-slate-400 rounded-xs cursor-pointer">
+          <div
+            onClick={() => dispatch(showRequestsModal())}
+            className="mx-1 text-sm w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 bg-green-500 rounded-full  px-4  rounded-xs cursor-pointer"
+          >
+            <IoMdPersonAdd className="mr-1" />
+            <span>130+</span>
+          </div>
+          <div className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 bg-slate-700 px-4 rounded-full cursor-pointer">
             <MdGroups size={20} className="mr-1" />
             <span>10</span>
           </div>
-          <div className="ml-1 w-auto h-8 flex items-center justify-center text-red-500 px-4 border-2 border-slate-400 rounded-xs cursor-pointer">
-            <Dot size={3} color="bg-red-600" />
+          <div className="ml-1 w-auto h-8 flex items-center justify-center bg-red-500 dark:bg-red-500 text-slate-50 px-4 rounded-full cursor-pointer">
+            <Dot size={3} color="bg-slate-600" />
             <span>10:12:34</span>
           </div>
         </div>

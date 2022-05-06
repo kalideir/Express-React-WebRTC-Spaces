@@ -6,6 +6,7 @@ import { MIC_ACCESS_GRANTED, SpaceStatus } from '../constants';
 import { useParams } from 'react-router-dom';
 import { Divider, Nav } from '../layout';
 import { useTypedSelector } from '../hooks';
+import { Requests } from '../components';
 
 function Space() {
   const dispatch = useDispatch();
@@ -48,6 +49,7 @@ function Space() {
 
         <Permission />
         <AddParticipant />
+        <Requests />
       </div>
     </div>
   );

@@ -13,7 +13,8 @@ export enum SpaceStatus {
 }
 
 export enum ParticipantTypes {
-  HOST = 'HOST',
+  PENDING = 'PENDING',
   GUEST = 'GUEST',
   SPEAKER = 'SPEAKER',
+  HOST = 'HOST',
 }

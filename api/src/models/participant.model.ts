@@ -9,6 +9,7 @@ export enum ParticipantTypes {
   HOST = 'HOST',
   GUEST = 'GUEST',
   SPEAKER = 'SPEAKER',
+  PENDING = 'PENDING',
 }
 
 export interface ParticipantDocument extends ParticipantInput, mongoose.Document {}

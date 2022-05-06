@@ -5,11 +5,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { SerializedError } from '@reduxjs/toolkit';
 import { useAppDispatch, useTypedSelector } from '../../hooks';
-import { hideAddParticipantModal, selectNewParticipantModal, selectRequestsModal } from '../../store/uiSlice';
+import { hideRequestsModal, selectRequestsModal } from '../../store/uiSlice';
 import { Divider } from '../../layout';
 import { getUsers, selectSpaceUsersSearch } from '../../store/spaceSlice';
 import type { SpaceUser } from '../../@types';
-import { UserRow } from '.';
+import { RequestRow, UserRow } from '.';
 
 function Requests() {
   const isModalVisible = useTypedSelector(selectRequestsModal);
@@ -23,7 +23,7 @@ function Requests() {
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        dispatch(hideAddParticipantModal());
+        dispatch(hideRequestsModal());
       }
     };
     window.addEventListener('keydown', close);
@@ -31,7 +31,7 @@ function Requests() {
   }, [dispatch, navigate]);
 
   useEffect(() => {
-    query.length > 3 && isModalVisible && dispatch(getUsers({ search: query, limit: 20, page: usersSearch.page + 1 })).unwrap();
+    isModalVisible && dispatch(getUsers({ search: '', limit: 20, page: usersSearch.page + 1 })).unwrap();
   }, [query, isModalVisible, dispatch, usersSearch.page]);
 
   if (!isModalVisible) {
@@ -45,7 +45,7 @@ function Requests() {
       aria-hidden="true"
       className="overflow-x-hidden fixed top-0 mx-auto left-0 right-0 z-50 w-full md:inset-0 h-modal h-auto justify-center items-center"
     >
-      <div onClick={() => dispatch(hideAddParticipantModal())} className="fixed inset-0 bg-slate-500 bg-opacity-80 transition-opacity"></div>
+      <div onClick={() => dispatch(hideRequestsModal())} className="fixed inset-0 bg-slate-500 bg-opacity-80 transition-opacity"></div>
       <div
         className="p-2 w-full max-w-2xl overflow-y-scroll h-2/3 top-32 mx-auto relative bg-white rounded-lg dark:bg-slate-700 shadow-2xl"
         id="add-participant"
@@ -72,7 +72,7 @@ function Requests() {
         </div>
         <div className="mx-6 space-y-2 mb-2" id="results">
           {usersSearch.users.map((user: SpaceUser) => (
-            <UserRow key={user.id} user={user} />
+            <RequestRow key={user.id} user={user} />
           ))}
         </div>
       </div>

@@ -2,14 +2,14 @@ import React, { ChangeEvent, memo, useMemo, useState } from 'react';
 import { ParticipantItem, ParticipantStatus, SpaceItem, SpaceUser } from '../../@types';
 import { Divider } from '../../layout';
 import { getAvatar } from '../../utils';
-import { BsPlus, BsTrash } from 'react-icons/bs';
+import { AiOutlineCheck, AiOutlineClose } from 'react-icons/ai';
 import { useAppDispatch, useTypedSelector } from '../../hooks';
 import { addDeleteParticipant, selectActiveSpace } from '../../store/spaceSlice';
 import { ParticipantTypes } from '../../constants';
 import { useSnackbar } from 'notistack';
 import clsx from 'clsx';
 
-function UserRow({ user }: { user: SpaceUser }) {
+function RequestRow({ user }: { user: SpaceUser }) {
   const [isLoading, setIsLoading] = useState(false);
   const activeSpace = useTypedSelector(selectActiveSpace) as SpaceItem;
   const [type, setType] = useState<ParticipantStatus>('GUEST');
@@ -38,23 +38,14 @@ function UserRow({ user }: { user: SpaceUser }) {
             className="h-10 w-10 rounded-full bg-slate-500"
           />
 
-          <span className="text-sm ml-4 text-slate-800 dark:text-slate-300">{user.id.trim() || user.username || user.email}</span>
+          <span className="text-sm ml-4 text-slate-800 dark:text-slate-300">{user.fullName.trim() || user.username || user.email}</span>
         </div>
         <div className="flex items-center">
-          <select
-            id="countries"
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => setType(e.target.value as ParticipantStatus)}
-            className="bg-slate-50 border px-4 border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:placeholder-slate-400 dark:text-slate-300 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          >
-            <option value={ParticipantTypes.GUEST}>Guest</option>
-            <option value={ParticipantTypes.SPEAKER}>Speaker</option>
-            <option value={ParticipantTypes.HOST}>Host</option>
-          </select>
           <button
             onClick={toggleParticipant}
             className={clsx(
-              isParticipant && 'bg-red-500 dark:bg-red-500',
-              'text-white ml-4 w-16 flex items-center justify-center bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-sm text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800',
+              !isParticipant && 'bg-green-500 dark:bg-green-500',
+              'text-white ml-4 w-20 flex items-center justify-center bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-sm text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800',
             )}
           >
             {isLoading ? (
@@ -75,9 +66,13 @@ function UserRow({ user }: { user: SpaceUser }) {
                 />
               </svg>
             ) : !isParticipant ? (
-              <BsPlus size={20} className="text-slate-100" />
+              <div className="flex items-center justify-around text-xs">
+                <AiOutlineCheck size={14} className="text-slate-100" /> Add
+              </div>
             ) : (
-              <BsTrash size={20} className="text-slate-100" />
+              <div className="flex items-center justify-around text-xs">
+                <AiOutlineClose size={14} className="text-slate-100" /> Cancel
+              </div>
             )}
           </button>
         </div>
@@ -87,4 +82,4 @@ function UserRow({ user }: { user: SpaceUser }) {
   );
 }
 
-export default memo(UserRow);
+export default memo(RequestRow);

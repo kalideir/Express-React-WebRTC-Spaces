@@ -27,10 +27,10 @@ const uiSlice = createSlice({
     hideAddParticipantModal: state => {
       state.newParticipantModal = false;
     },
-    showRequestModal: state => {
+    showRequestsModal: state => {
       state.requestsModal = true;
     },
-    hideRequestModal: state => {
+    hideRequestsModal: state => {
       state.requestsModal = false;
     },
   },
@@ -39,9 +39,10 @@ const uiSlice = createSlice({
 
 export default uiSlice.reducer;
 
-export const { toggleNewSpaceModal, showAddParticipantModal, hideAddParticipantModal, showRequestModal, hideRequestModal } = uiSlice.actions;
+export const { toggleNewSpaceModal, showAddParticipantModal, hideAddParticipantModal, showRequestsModal, hideRequestsModal } = uiSlice.actions;
 
 export const selectNewSpaceVisible = (state: RootState) => state.ui.newSpaceModalVisible;
 
 export const selectNewParticipantModal = (state: RootState) => state.ui.newParticipantModal;
+
 export const selectRequestsModal = (state: RootState) => state.ui.requestsModal;

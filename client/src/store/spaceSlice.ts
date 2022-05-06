@@ -170,9 +170,14 @@ export const selectActiveSpace = (state: RootState) => state.spaces.activeSpace;
 export const selectSpaceUsersSearch = (state: RootState) => state.spaces.usersSearch;
 
 export const selectSpaceBoard = (state: RootState) =>
-  (state.spaces.activeSpace?.participants || []).filter((participant: ParticipantItem) => participant.type !== ParticipantTypes.GUEST);
+  (state.spaces.activeSpace?.participants || []).filter(
+    (participant: ParticipantItem) => !([ParticipantTypes.GUEST, ParticipantTypes.PENDING] as string[]).includes(participant.type as string),
+  );
 
 export const selectSpaceGuests = (state: RootState) =>
   (state.spaces.activeSpace?.participants || []).filter((participant: ParticipantItem) => participant.type === ParticipantTypes.GUEST);
+
+export const selectPendingRequests = (state: RootState) =>
+  (state.spaces.activeSpace?.participants || []).filter((participant: ParticipantItem) => participant.type === ParticipantTypes.PENDING);
 
 export const spaceGuestQuery = (state: RootState) => state.spaces.spaceGuestQuery;
