@@ -7,6 +7,16 @@ import { selectMySpaces } from '../store/spaceSlice';
 import { getMySpaces } from '../store/spaceSlice';
 import { range } from '../utils';
 
+const Loading = () => {
+  return (
+    <>
+      {range(12).map(index => (
+        <SpaceSkeleton key={index} />
+      ))}
+    </>
+  );
+};
+
 function Spaces() {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -32,9 +42,7 @@ function Spaces() {
         />
       </div>
       <div className="dark:bg-slate-800 bg-slate-100 rounded p-5 mt-3 grid grid-cols-3 gap-2">
-        {isLoading
-          ? range(3).map(index => <SpaceSkeleton key={index} />)
-          : mySpaces?.map((item: SpaceItem) => <SpaceCard key={item.id} item={item} />)}
+        {isLoading ? <Loading /> : mySpaces?.map((item: SpaceItem) => <SpaceCard source="MY_SPACES" key={item.id} item={item} />)}
       </div>
     </div>
   );

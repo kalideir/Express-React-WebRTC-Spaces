@@ -10,6 +10,7 @@ import {
   Space,
   NewSpace,
   MySpaces,
+  Spaces,
 } from '../pages';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { NoAuthRoute, RequireAuthRoute } from './wrappers';
@@ -32,6 +33,7 @@ export default function AppRoutes() {
         <Route path="/profile" element={<RequireAuthRoute element={Profile} />} />
         <Route path="/space/:key/:slug" element={<RequireAuthRoute element={Space} />} />
         <Route path="/my-spaces" element={<RequireAuthRoute element={MySpaces} />} />
+        <Route path="/spaces" element={<RequireAuthRoute element={Spaces} />} />
 
         <Route path="/new-space" element={<RequireAuthRoute element={NewSpace} />} />
       </Routes>

@@ -11,7 +11,7 @@ const NUM_OF_ITEMS = 10;
 function UsersFooter(props: IProps) {
   const participants = props.participants;
   return (
-    <div className="flex -space-x-3 items-center flex-wrap mt-10 justify-center">
+    <div className="flex -space-x-3 items-center w-full px-2  flex-wrap mt-10 justify-center">
       {participants.slice(0, 10).map((participant: ParticipantItem) => (
         <img
           key={participant.id}
