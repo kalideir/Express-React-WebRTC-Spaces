@@ -5,6 +5,8 @@ import { useAppDispatch } from './hooks';
 import Wrapper from './layout/Wrapper';
 import { Routes } from './routes';
 import { autoLogin } from './store/authSlice';
+import io from 'socket.io-client';
+import SocketProvider from './spaces';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -21,9 +23,11 @@ function App() {
       }}
     >
       <div className="h-screen bg-slate-900">
-        <Wrapper>
-          <Routes />
-        </Wrapper>
+        <SocketProvider>
+          <Wrapper>
+            <Routes />
+          </Wrapper>
+        </SocketProvider>
       </div>
     </SnackbarProvider>
   );

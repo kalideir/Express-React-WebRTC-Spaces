@@ -1,4 +1,5 @@
 import path from 'path';
+import http from 'http';
 
 if (process.env.NODE_ENV) {
   require('dotenv').config({
@@ -11,13 +12,14 @@ if (process.env.NODE_ENV) {
 import config from 'config';
 import app from './app';
 import { dbConnect, logger, validateEnv } from './utils';
+import { initSocketServer } from './spaces';
 
 validateEnv();
 
 const PORT = config.get<number>('port');
-
-app.listen(PORT, async () => {
+const server = http.createServer(app);
+server.listen(PORT, async () => {
   await dbConnect();
-
+  initSocketServer(server);
   logger.info(`App started at http://localhost:${PORT}`);
 });

@@ -18,3 +18,5 @@ export enum ParticipantTypes {
   SPEAKER = 'SPEAKER',
   HOST = 'HOST',
 }
+
+export * from './socketTypes';

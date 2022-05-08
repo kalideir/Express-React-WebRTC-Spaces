@@ -151,3 +151,5 @@ export type ParticipantItem = {
   fullName: string;
   type?: ParticipantStatus;
 };
+
+export type Maybe<T> = T | undefined | null;

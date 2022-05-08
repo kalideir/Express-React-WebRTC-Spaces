@@ -1,8 +1,11 @@
 import { memo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { UsersFooter } from '.';
 import { SpaceItem } from '../../@types';
+import { MIC_ACCESS_GRANTED } from '../../constants';
+import { useAppDispatch } from '../../hooks';
 import { Divider, DropDown } from '../../layout';
+import { togglePermissionModal } from '../../store/spaceSlice';
 import { slugify } from '../../utils';
 
 interface IProps {
@@ -12,6 +15,17 @@ interface IProps {
 
 function SpaceCard(props: IProps) {
   const [dropDownVisible, setDropDownVisible] = useState(false);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  function goToSpace(url: string) {
+    const access = Boolean(localStorage.getItem(MIC_ACCESS_GRANTED));
+    if (!access) {
+      dispatch(togglePermissionModal(true));
+      return;
+    }
+    navigate(url);
+  }
 
   return (
     <div className="max-w-sm bg-white rounded-lg border border-slate-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
@@ -39,13 +53,13 @@ function SpaceCard(props: IProps) {
       </div>
       <Divider />
       <div className="flex items-center p-6 space-x-2 rounded-b">
-        <Link
-          to={`/space/${props.item.key}/${slugify(props.item.title)}`}
+        <button
+          onClick={() => goToSpace(`/space/${props.item.key}/${slugify(props.item.title)}`)}
           data-modal-toggle="defaultModal"
           className="text-white  w-full  bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
         >
           {props.source === 'MY_SPACES' ? 'View' : 'Join'}
-        </Link>
+        </button>
       </div>
     </div>
   );

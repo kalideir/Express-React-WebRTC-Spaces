@@ -3,7 +3,7 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
 import { ApiError, CustomError } from '../errors';
-import { ParticipantModel, SpaceModel, UserDocument, SpaceDocument } from '../models';
+import { ParticipantModel, SpaceModel, UserDocument, SpaceDocument, SpaceStatus } from '../models';
 import {
   CreateParticipantInput,
   CreateSpaceInput,
@@ -33,7 +33,12 @@ export async function mySpaces(req: Request, res: Response) {
     .populate({ path: 'participants', populate: { path: 'user' } });
   return res.json({ spaces });
 }
-
+export async function onlineSpaces(req: Request, res: Response) {
+  const spaces = await SpaceModel.find({ status: SpaceStatus.STARTED, isPublic: true })
+    .populate('participants')
+    .populate({ path: 'participants', populate: { path: 'user' } });
+  return res.json({ spaces });
+}
 export async function get(req, res) {
   res.json(res.locals.space);
 }

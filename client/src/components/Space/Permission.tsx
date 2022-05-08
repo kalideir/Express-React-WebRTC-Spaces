@@ -1,11 +1,12 @@
 import clsx from 'clsx';
-import { togglePermissionModal } from '../../store/spaceSlice';
+import { selectPermissionModal, togglePermissionModal } from '../../store/spaceSlice';
 import { BsFillMicFill } from 'react-icons/bs';
 import { MIC_ACCESS_GRANTED } from '../../constants';
 import { useDispatch } from 'react-redux';
+import { useTypedSelector } from '../../hooks';
 
 function Permission() {
-  const isModalVisible = false; //useTypedSelector(({ space }) => space.permissionModalVisible);
+  const isModalVisible = useTypedSelector(selectPermissionModal);
   const dispatch = useDispatch();
 
   function grant() {
@@ -13,7 +14,7 @@ function Permission() {
       .getUserMedia({ video: false, audio: true })
       .then(stream => {
         localStorage.setItem(MIC_ACCESS_GRANTED, 'true');
-        dispatch(togglePermissionModal());
+        dispatch(togglePermissionModal(false));
         // window.localStream = stream; // A
         // window.localAudio.srcObject = stream; // B
         // window.localAudio.autoplay = true; // C

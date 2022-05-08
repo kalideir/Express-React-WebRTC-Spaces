@@ -112,11 +112,10 @@ export async function verifyUser(req: Request<VerifyUserInput>, res: Response, n
 
   res.cookie(cookieName, accessToken, {
     httpOnly: true,
-    sameSite: 'strict',
+    sameSite: 'none',
     path: '/',
-    secure: process.env.NODE_ENV !== 'development',
+    secure: true, //process.env.NODE_ENV !== 'development',
   });
-
   const refreshToken = await signRefreshToken({ sub: user._id });
 
   return res.send({

@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useTypedSelector } from '../../hooks';
+import { selectCurrentUser } from '../../store/authSlice';
 
 function HeroHome() {
+  const currentUser = useTypedSelector(selectCurrentUser);
   return (
     <section className="relative h-screen">
       <div className="bg-slate-50 dark:bg-slate-900">
@@ -16,17 +19,19 @@ function HeroHome() {
             </p>
           </div>
           <div className="flex justify-center items-center">
-            <Link
-              to="/register"
-              className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 bg-indigo-700 transition duration-150 ease-in-out hover:bg-indigo-600 lg:text-xl lg:font-bold  rounded text-white px-4 sm:px-10 border border-indigo-700 py-2 sm:py-4 text-sm"
-            >
-              Get Started
-            </Link>
+            {!currentUser && (
+              <Link
+                to="/register"
+                className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 bg-indigo-700 transition duration-150 ease-in-out hover:bg-indigo-600 lg:text-xl lg:font-bold  rounded text-white px-4 sm:px-10 border border-indigo-700 py-2 sm:py-4 text-sm"
+              >
+                Get Started
+              </Link>
+            )}
             <Link
               to="/spaces"
               className="ml-4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 bg-transparent transition duration-150 ease-in-out hover:border-indigo-600 lg:text-xl lg:font-bold  hover:text-indigo-600 rounded border border-indigo-700 text-indigo-700 px-4 sm:px-10 py-2 sm:py-4 text-sm"
             >
-              View Recent Spaces
+              View Online Spaces
             </Link>
           </div>
         </div>

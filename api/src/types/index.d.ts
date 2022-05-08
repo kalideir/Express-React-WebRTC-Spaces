@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import type { S3 } from 'aws-sdk';
 import { SendMailOptions } from 'nodemailer';
-import { MediaTypes, UserDocument } from '../models';
+import { MediaTypes, SpaceStatus, UserDocument } from '../models';
 
 export interface EnhancedRequest<T = void> extends Request<T> {
   user?: UserDocument;
@@ -69,3 +69,5 @@ export type MediaItem = Partial<{
   MediaData;
 
 export type ResizeMediaData = MediaData & { id: string };
+
+export type StatusKeys = keyof typeof SpaceStatus;

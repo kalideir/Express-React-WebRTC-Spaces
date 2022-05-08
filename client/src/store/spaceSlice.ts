@@ -8,7 +8,7 @@ import { RootState } from './store';
 export type SpaceSliceData = {
   permissionFulfilled: boolean;
   permissionModalVisible: boolean;
-  spaces: SpaceItem[];
+  onlineSpaces: SpaceItem[];
   createSpaceErrors: unknown;
   mySpaces: SpaceItem[];
   activeSpace: null | SpaceItem;
@@ -19,7 +19,7 @@ export type SpaceSliceData = {
 const initialState: SpaceSliceData = {
   permissionFulfilled: false,
   permissionModalVisible: false,
-  spaces: [],
+  onlineSpaces: [],
   createSpaceErrors: [],
   mySpaces: [],
   activeSpace: null,
@@ -100,6 +100,16 @@ export const getMySpaces = createAsyncThunk('space/getMySpaces', async (_, { rej
   }
 });
 
+export const getOnlineSpaces = createAsyncThunk('space/getOnlineSpaces', async (_, { rejectWithValue }) => {
+  try {
+    const res = await apiService.get('/space/list/onlineSpaces');
+    return res?.data?.spaces;
+  } catch (error: any | AxiosError) {
+    const message = error?.response.data.message || 'Error';
+    return rejectWithValue({ message });
+  }
+});
+
 export const getActiveSpace = createAsyncThunk('space/getSpace', async (key: string, { rejectWithValue }) => {
   try {
     const res = await apiService.get('/space/' + key);
@@ -124,8 +134,8 @@ const spaceSlice = createSlice({
   name: 'space',
   initialState,
   reducers: {
-    togglePermissionModal: state => {
-      state.permissionModalVisible = !state.permissionModalVisible;
+    togglePermissionModal: (state, action: PayloadAction<boolean>) => {
+      state.permissionModalVisible = action.payload;
     },
     setPermission: (state, { payload }: { payload: boolean }) => {
       state.permissionFulfilled = payload;
@@ -156,6 +166,10 @@ const spaceSlice = createSlice({
       const { payload } = action;
       state.spaceGuestQuery = payload;
     },
+    [getOnlineSpaces.fulfilled.type]: (state, action: PayloadAction<SpaceItem[]>) => {
+      const { payload } = action;
+      state.onlineSpaces = payload;
+    },
   },
 });
 
@@ -164,6 +178,8 @@ export const { togglePermissionModal, setPermission } = spaceSlice.actions;
 export default spaceSlice.reducer;
 
 export const selectMySpaces = (state: RootState) => state.spaces.mySpaces;
+
+export const selectOnlineSpaces = (state: RootState) => state.spaces.onlineSpaces;
 
 export const selectActiveSpace = (state: RootState) => state.spaces.activeSpace;
 
@@ -181,3 +197,5 @@ export const selectPendingRequests = (state: RootState) =>
   (state.spaces.activeSpace?.participants || []).filter((participant: ParticipantItem) => participant.type === ParticipantTypes.PENDING);
 
 export const spaceGuestQuery = (state: RootState) => state.spaces.spaceGuestQuery;
+
+export const selectPermissionModal = (state: RootState) => state.spaces.permissionModalVisible;

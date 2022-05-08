@@ -27,6 +27,7 @@ router
 //validate(createParticipantSchema)
 router.route('/:key/participants/').post(authorizeUser, use(controller.createParticipant));
 router.route('/list/mySpaces').get(authorizeUser, use(controller.mySpaces));
+router.route('/list/onlineSpaces').get(authorizeUser, use(controller.onlineSpaces));
 
 router
   .route('/:id/participants/:pid')

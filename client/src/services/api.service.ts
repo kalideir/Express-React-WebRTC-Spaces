@@ -29,6 +29,7 @@ if (process.env.NODE_ENV !== 'production') {
 } else {
   apiService.defaults.baseURL = 'http://localhost:8000/api/';
 }
+let retries = 0;
 
 apiService.interceptors.response.use(
   (response: AxiosResponse) => {
@@ -38,13 +39,15 @@ apiService.interceptors.response.use(
     const originalRequest = error.config;
     const refreshToken = getRefreshToken();
     if (refreshToken && error?.response?.status === 401) {
-      return newCookie(refreshToken)
-        .then(() => {
-          return apiService(originalRequest);
-        })
-        .catch(err => {
-          return Promise.reject(err);
-        });
+      retries += 1;
+      if (retries < 3)
+        return newCookie(refreshToken)
+          .then(() => {
+            return apiService(originalRequest);
+          })
+          .catch(err => {
+            return Promise.reject(err);
+          });
     }
     return Promise.reject(error);
   },
