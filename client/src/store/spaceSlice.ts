@@ -1,6 +1,6 @@
 import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { AxiosError } from 'axios';
-import { ErrorPayload, ListUsersQueryType, ParticipantItem, ParticipantStatus, SpaceData, SpaceItem, UsersSearch } from '../@types';
+import { ErrorPayload, JoinSpace, ListUsersQueryType, ParticipantItem, ParticipantStatus, SpaceData, SpaceItem, UsersSearch } from '../@types';
 import { ParticipantTypes } from '../constants';
 import { apiService } from '../services';
 import { RootState } from './store';
@@ -140,6 +140,9 @@ const spaceSlice = createSlice({
     setPermission: (state, { payload }: { payload: boolean }) => {
       state.permissionFulfilled = payload;
     },
+    setActiveSpace: (state, { payload }: { payload: SpaceItem }) => {
+      state.activeSpace = payload;
+    },
   },
   extraReducers: {
     [createSpace.rejected.type]: (state, action: PayloadAction<ErrorPayload>) => {
@@ -173,7 +176,7 @@ const spaceSlice = createSlice({
   },
 });
 
-export const { togglePermissionModal, setPermission } = spaceSlice.actions;
+export const { togglePermissionModal, setPermission, setActiveSpace } = spaceSlice.actions;
 
 export default spaceSlice.reducer;
 

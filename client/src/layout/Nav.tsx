@@ -26,9 +26,12 @@ function Nav({ items }: { items: NavItem[] }) {
                   clipRule="evenodd"
                 />
               </svg>
-              <a href="#" className="ml-1 text-sm font-medium text-slate-700 hover:text-slate-900 md:ml-2 dark:text-slate-400 dark:hover:text-white">
+              <Link
+                to={item.to}
+                className="ml-1 text-sm font-medium text-slate-700 hover:text-slate-900 md:ml-2 dark:text-slate-400 dark:hover:text-white"
+              >
                 {item.name}
-              </a>
+              </Link>
             </div>
           </li>
         ))}

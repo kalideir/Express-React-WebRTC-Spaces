@@ -1,13 +1,12 @@
 import { AddParticipant, Participants, SpaceActions, SpaceHeader } from '../components/Space';
-import { useDispatch, useSelector } from 'react-redux';
-import { useContext, useEffect, useLayoutEffect, useState } from 'react';
-import { getActiveSpace, selectActiveSpace, togglePermissionModal } from '../store/spaceSlice';
-import { ENTERED_SPACE, ME, MIC_ACCESS_GRANTED, SpaceStatus } from '../constants';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { getActiveSpace, selectActiveSpace } from '../store/spaceSlice';
+import { JOIN_SPACE, ME, ParticipantTypes, SpaceStatus } from '../constants';
 import { useParams } from 'react-router-dom';
 import { Divider, Nav } from '../layout';
-import { useTypedSelector } from '../hooks';
+import { useSocket, useTypedSelector } from '../hooks';
 import { Requests } from '../components';
-import { SocketContext } from '../spaces';
 import { selectCurrentUser } from '../store/authSlice';
 
 function Space() {
@@ -15,21 +14,22 @@ function Space() {
   const { key, slug } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const activeSpace = useTypedSelector(selectActiveSpace);
-  const socket = useContext(SocketContext);
-  const currentUser = useSelector(selectCurrentUser);
+  const [me, setMe] = useState('');
+  const currentUser = useTypedSelector(selectCurrentUser);
+  const { socket, joinSpace } = useSocket();
+
+  useEffect(() => {
+    if (activeSpace && socket && currentUser) {
+      socket?.emit(ME);
+      socket?.on(ME, (id: string) => setMe(id));
+    }
+  }, [socket, activeSpace, currentUser, joinSpace]);
 
   useEffect(() => {
     setIsLoading(true);
     dispatch(getActiveSpace(key || ''));
     setIsLoading(false);
   }, [dispatch, key]);
-
-  useEffect(() => {
-    socket?.emit(ENTERED_SPACE, { id: activeSpace?.id, userId: currentUser?.id });
-    socket?.on(ME, (e: any) => {
-      console.log({ e });
-    });
-  }, [activeSpace, socket, currentUser?.id]);
 
   return (
     <div className="max-w-5xl mx-auto mb-10" id="space">
@@ -44,7 +44,7 @@ function Space() {
       </div>
       <div className="mx-auto rounded-xl pb-10 w-full mt-3 pt-2">
         <SpaceHeader />
-        {activeSpace && activeSpace?.status !== SpaceStatus.CREATED && (
+        {!isLoading && activeSpace && activeSpace?.status !== SpaceStatus.CREATED && (
           <>
             <Divider />
             <SpaceActions />

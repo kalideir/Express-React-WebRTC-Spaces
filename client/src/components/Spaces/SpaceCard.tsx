@@ -1,10 +1,11 @@
-import { memo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UsersFooter } from '.';
-import { SpaceItem } from '../../@types';
-import { MIC_ACCESS_GRANTED } from '../../constants';
-import { useAppDispatch } from '../../hooks';
-import { Divider, DropDown } from '../../layout';
+import { ParticipantItem, SpaceItem } from '../../@types';
+import { JOIN_SPACE, MIC_ACCESS_GRANTED, ParticipantTypes } from '../../constants';
+import { useAppDispatch, useSocket, useTypedSelector } from '../../hooks';
+import { Divider, DropDown, Loading } from '../../layout';
+import { selectCurrentUser } from '../../store/authSlice';
 import { togglePermissionModal } from '../../store/spaceSlice';
 import { slugify } from '../../utils';
 
@@ -15,8 +16,18 @@ interface IProps {
 
 function SpaceCard(props: IProps) {
   const [dropDownVisible, setDropDownVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const currentSpace = props.item;
+  const currentUser = useTypedSelector(selectCurrentUser);
+
+  const { socket, joinSpace } = useSocket();
+
+  const isParticipant = useMemo(
+    () => !!currentSpace?.participants?.find((participant: ParticipantItem) => participant.userId === currentUser?.id),
+    [currentSpace?.participants, currentUser?.id],
+  );
 
   function goToSpace(url: string) {
     const access = Boolean(localStorage.getItem(MIC_ACCESS_GRANTED));
@@ -24,7 +35,17 @@ function SpaceCard(props: IProps) {
       dispatch(togglePermissionModal(true));
       return;
     }
-    navigate(url);
+    if (isParticipant) {
+      return navigate(url);
+    }
+    participate(url);
+  }
+
+  async function participate(url: string) {
+    socket?.emit(JOIN_SPACE, { key: currentSpace?.key, userId: currentUser?.id, type: ParticipantTypes.GUEST });
+    socket?.on(JOIN_SPACE, e => {
+      console.log({ e });
+    });
   }
 
   return (
@@ -58,7 +79,7 @@ function SpaceCard(props: IProps) {
           data-modal-toggle="defaultModal"
           className="text-white  w-full  bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
         >
-          {props.source === 'MY_SPACES' ? 'View' : 'Join'}
+          {isLoading ? <Loading /> : props.source === 'MY_SPACES' ? 'View' : isParticipant ? 'View' : 'Join'}
         </button>
       </div>
     </div>

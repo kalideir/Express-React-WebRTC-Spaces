@@ -153,3 +153,8 @@ export type ParticipantItem = {
 };
 
 export type Maybe<T> = T | undefined | null;
+
+export type JoinSpace = {
+  message: string;
+  space: SpaceItem;
+};
