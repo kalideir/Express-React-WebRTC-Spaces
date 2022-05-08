@@ -3,12 +3,15 @@ import { IoMdPersonAdd } from 'react-icons/io';
 import { ChangeEvent } from 'react';
 import { BsPlusSquareFill } from 'react-icons/bs';
 import { Dot } from '../../layout';
-import { useAppDispatch } from '../../hooks';
-import { setSpaceGuestQuery } from '../../store/spaceSlice';
-import { hideAddParticipantModal, showAddParticipantModal, showRequestsModal } from '../../store/uiSlice';
+import { useAppDispatch, useTypedSelector } from '../../hooks';
+import { selectParticipants, selectPendingRequests, setSpaceGuestQuery } from '../../store/spaceSlice';
+import { showAddParticipantModal, showRequestsModal } from '../../store/uiSlice';
 
 function SpaceActions() {
   const dispatch = useAppDispatch();
+
+  const participants = useTypedSelector(selectParticipants);
+  const pending = useTypedSelector(selectPendingRequests);
 
   return (
     <div className="my-4">
@@ -46,11 +49,11 @@ function SpaceActions() {
             className="mx-1 text-sm w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 bg-green-500 rounded-full  px-4  rounded-xs cursor-pointer"
           >
             <IoMdPersonAdd className="mr-1" />
-            <span>130+</span>
+            <span>{pending.length}</span>
           </div>
           <div className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 bg-slate-700 px-4 rounded-full cursor-pointer">
             <MdGroups size={20} className="mr-1" />
-            <span>10</span>
+            <span>{participants.length}</span>
           </div>
           <div className="ml-1 w-auto h-8 flex items-center justify-center bg-red-500 dark:bg-red-500 text-slate-50 px-4 rounded-full cursor-pointer">
             <Dot size={3} color="bg-slate-600" />

@@ -147,6 +147,7 @@ export type ParticipantItem = {
   email: string;
   profilePicture: ProfilePicture;
   userId: string;
+  username: string;
   user?: IUser;
   fullName: string;
   type?: ParticipantStatus;

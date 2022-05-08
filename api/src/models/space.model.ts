@@ -6,6 +6,7 @@ export interface SpaceInput {
   isPublic: boolean;
   status: keyof typeof SpaceStatus;
   participantIds: string[];
+  startDate: string;
 }
 
 export enum SpaceStatus {
@@ -37,6 +38,9 @@ const spaceSchema = new mongoose.Schema(
       type: String,
       enum: SpaceStatus,
       default: SpaceStatus.CREATED,
+    },
+    startDate: {
+      type: Date,
     },
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,

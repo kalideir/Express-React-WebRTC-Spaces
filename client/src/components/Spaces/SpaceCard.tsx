@@ -1,6 +1,7 @@
 import { memo, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UsersFooter } from '.';
+import { useSnackbar } from 'notistack';
 import { ParticipantItem, SpaceItem } from '../../@types';
 import { JOIN_SPACE, MIC_ACCESS_GRANTED, ParticipantTypes } from '../../constants';
 import { useAppDispatch, useSocket, useTypedSelector } from '../../hooks';
@@ -21,6 +22,7 @@ function SpaceCard(props: IProps) {
   const navigate = useNavigate();
   const currentSpace = props.item;
   const currentUser = useTypedSelector(selectCurrentUser);
+  const { enqueueSnackbar } = useSnackbar();
 
   const { socket, joinSpace } = useSocket();
 
@@ -29,7 +31,8 @@ function SpaceCard(props: IProps) {
     [currentSpace?.participants, currentUser?.id],
   );
 
-  function goToSpace(url: string) {
+  async function goToSpace(url: string) {
+    setIsLoading(true);
     const access = Boolean(localStorage.getItem(MIC_ACCESS_GRANTED));
     if (!access) {
       dispatch(togglePermissionModal(true));
@@ -38,14 +41,13 @@ function SpaceCard(props: IProps) {
     if (isParticipant) {
       return navigate(url);
     }
-    participate(url);
+    await participate(url);
+    setIsLoading(false);
   }
 
   async function participate(url: string) {
     socket?.emit(JOIN_SPACE, { key: currentSpace?.key, userId: currentUser?.id, type: ParticipantTypes.GUEST });
-    socket?.on(JOIN_SPACE, e => {
-      console.log({ e });
-    });
+    socket?.on(JOIN_SPACE, res => joinSpace(res, url));
   }
 
   return (

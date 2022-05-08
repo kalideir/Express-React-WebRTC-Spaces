@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useContext, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch, useTypedSelector } from '.';
@@ -6,7 +7,9 @@ import { useSnackbar } from 'notistack';
 
 import { SocketContext } from '../spaces';
 import { selectCurrentUser } from '../store/authSlice';
-import { selectActiveSpace, setActiveSpace } from '../store/spaceSlice';
+import { getOnlineSpaces, selectActiveSpace, setActiveSpace } from '../store/spaceSlice';
+import { useNavigate } from 'react-router-dom';
+import { slugify } from '../utils';
 
 export default function useSocket() {
   const socket = useContext(SocketContext);
@@ -14,6 +17,7 @@ export default function useSocket() {
   const { enqueueSnackbar } = useSnackbar();
   const currentUser = useSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   useEffect(() => {
     return () => {
       socket?.removeAllListeners();
@@ -21,12 +25,26 @@ export default function useSocket() {
   }, [activeSpace, socket, currentUser?.id]);
 
   const joinSpace = useCallback(
-    (joinResult: JoinSpace) => {
-      enqueueSnackbar(joinResult.message, { variant: 'success' });
-      dispatch(setActiveSpace(joinResult.space));
+    (joinResult: JoinSpace, url: string) => {
+      if (!joinResult.space) {
+        dispatch(getOnlineSpaces());
+      }
+
+      enqueueSnackbar(joinResult.message, { variant: joinResult.space ? 'success' : 'warning' });
+      navigate(url);
     },
     [dispatch, enqueueSnackbar],
   );
 
-  return { socket, joinSpace };
+  const switchParticipantType = useCallback(
+    (joinResult: JoinSpace) => {
+      if (!joinResult.space) {
+        dispatch(getOnlineSpaces());
+      }
+      enqueueSnackbar(joinResult.message, { variant: joinResult.space ? 'success' : 'error' });
+    },
+    [enqueueSnackbar, dispatch],
+  );
+
+  return { socket, joinSpace, switchParticipantType };
 }

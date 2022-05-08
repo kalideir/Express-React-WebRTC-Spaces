@@ -199,6 +199,9 @@ export const selectSpaceGuests = (state: RootState) =>
 export const selectPendingRequests = (state: RootState) =>
   (state.spaces.activeSpace?.participants || []).filter((participant: ParticipantItem) => participant.type === ParticipantTypes.PENDING);
 
+export const selectParticipants = (state: RootState) =>
+  (state.spaces.activeSpace?.participants || []).filter((participant: ParticipantItem) => participant.type !== ParticipantTypes.PENDING);
+
 export const spaceGuestQuery = (state: RootState) => state.spaces.spaceGuestQuery;
 
 export const selectPermissionModal = (state: RootState) => state.spaces.permissionModalVisible;

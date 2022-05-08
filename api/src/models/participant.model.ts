@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 export interface ParticipantInput {
   userId: string;
+  spaceId: string;
   type: keyof typeof ParticipantTypes;
 }
 
@@ -14,7 +15,7 @@ export enum ParticipantTypes {
 
 export interface ParticipantDocument extends ParticipantInput, mongoose.Document {}
 
-const spaceSchema = new mongoose.Schema(
+const participantSchema = new mongoose.Schema(
   {
     type: {
       type: String,
@@ -24,6 +25,10 @@ const spaceSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+    },
+    spaceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Space',
     },
   },
   {
@@ -40,13 +45,13 @@ const spaceSchema = new mongoose.Schema(
   },
 );
 
-spaceSchema.virtual('user', {
+participantSchema.virtual('user', {
   ref: 'User',
   localField: 'userId',
   foreignField: '_id',
   justOne: true,
 });
 
-const ParticipantModel = mongoose.model<ParticipantDocument>('Participant', spaceSchema);
+const ParticipantModel = mongoose.model<ParticipantDocument>('Participant', participantSchema);
 
 export { ParticipantModel };

@@ -66,7 +66,7 @@ export async function remove(req: Request, res: Response) {
 export async function createParticipant(req: Request, res: Response) {
   let space = res.locals.space;
   const input = { ...req.body };
-  const exists = await ParticipantModel.findOne({ userId: input.userId });
+  const exists = await ParticipantModel.findOne({ userId: input.userId, spaceId: space.id });
   if (exists) {
     await exists.delete();
     await space.update({ $pull: { participantIds: exists.id } });

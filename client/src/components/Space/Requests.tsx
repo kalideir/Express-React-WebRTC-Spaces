@@ -7,8 +7,8 @@ import type { SerializedError } from '@reduxjs/toolkit';
 import { useAppDispatch, useTypedSelector } from '../../hooks';
 import { hideRequestsModal, selectRequestsModal } from '../../store/uiSlice';
 import { Divider } from '../../layout';
-import { getUsers, selectSpaceUsersSearch } from '../../store/spaceSlice';
-import type { SpaceUser } from '../../@types';
+import { getUsers, selectPendingRequests, selectSpaceUsersSearch } from '../../store/spaceSlice';
+import type { ParticipantItem, SpaceUser } from '../../@types';
 import { RequestRow, UserRow } from '.';
 
 function Requests() {
@@ -17,6 +17,7 @@ function Requests() {
   const { enqueueSnackbar } = useSnackbar();
   const usersSearch = useTypedSelector(selectSpaceUsersSearch);
   const navigate = useNavigate();
+  const pending = useTypedSelector(selectPendingRequests);
 
   const dispatch = useAppDispatch();
 
@@ -71,8 +72,8 @@ function Requests() {
           </div>
         </div>
         <div className="mx-6 space-y-2 mb-2" id="results">
-          {usersSearch.users.map((user: SpaceUser) => (
-            <RequestRow key={user.id} user={user} />
+          {pending.map((participant: ParticipantItem) => (
+            <RequestRow key={participant.id} participant={participant} />
           ))}
         </div>
       </div>

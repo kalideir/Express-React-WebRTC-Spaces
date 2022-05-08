@@ -12,6 +12,9 @@ const payload = {
     userId: string({
       required_error: t('participant_id_required'),
     }).optional(),
+    spaceId: string({
+      required_error: t('space_id_required'),
+    }).optional(),
     type: string({ required_error: t('participant_type_required') }).refine(oneOf(Object.keys(ParticipantTypes)), t('participant_type_invalpid')),
   }),
 };
