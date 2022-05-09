@@ -1,13 +1,13 @@
-import { AddParticipant, Participants, SpaceActions, SpaceHeader } from '../components/Space';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useEffect, useState } from 'react';
-import { getActiveSpace, selectActiveSpace } from '../store/spaceSlice';
-import { JOIN_SPACE, ME, ParticipantTypes, SpaceStatus } from '../constants';
 import { useParams } from 'react-router-dom';
-import { Divider, Nav } from '../layout';
-import { useSocket, useTypedSelector } from '../hooks';
 import { Requests } from '../components';
+import { AddParticipant, Participants, SpaceActions, SpaceHeader } from '../components/Space';
+import { SpaceStatus } from '../constants';
+import { useSocket, useTypedSelector } from '../hooks';
+import { Divider, Nav } from '../layout';
 import { selectCurrentUser } from '../store/authSlice';
+import { getActiveSpace, selectActiveSpace } from '../store/spaceSlice';
 
 function Space() {
   const dispatch = useDispatch();
@@ -18,10 +18,13 @@ function Space() {
   const currentUser = useTypedSelector(selectCurrentUser);
   const { socket, joinSpace } = useSocket();
 
+  useLayoutEffect(() => {
+    window.history.replaceState({}, document.title);
+  }, []);
   useEffect(() => {
     if (activeSpace && socket && currentUser) {
-      socket?.emit(ME);
-      socket?.on(ME, (id: string) => setMe(id));
+      // socket?.emit(ME);
+      // socket?.on(ME, (id: string) => setMe(id));
     }
   }, [socket, activeSpace, currentUser, joinSpace]);
 

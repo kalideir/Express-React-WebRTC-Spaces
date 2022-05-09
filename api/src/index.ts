@@ -18,8 +18,10 @@ validateEnv();
 
 const PORT = config.get<number>('port');
 const server = http.createServer(app);
+
+initSocketServer(server);
+
 server.listen(PORT, async () => {
   await dbConnect();
-  initSocketServer(server);
   logger.info(`App started at http://localhost:${PORT}`);
 });

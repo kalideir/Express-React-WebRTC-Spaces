@@ -1,5 +1,6 @@
 import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { AxiosError } from 'axios';
+import { string } from 'yup/lib/locale';
 import { ErrorPayload, JoinSpace, ListUsersQueryType, ParticipantItem, ParticipantStatus, SpaceData, SpaceItem, UsersSearch } from '../@types';
 import { ParticipantTypes } from '../constants';
 import { apiService } from '../services';
@@ -14,6 +15,7 @@ export type SpaceSliceData = {
   activeSpace: null | SpaceItem;
   usersSearch: UsersSearch;
   spaceGuestQuery: string;
+  ownSocketId?: string;
 };
 
 const initialState: SpaceSliceData = {
@@ -30,6 +32,7 @@ const initialState: SpaceSliceData = {
     total: 0,
   },
   spaceGuestQuery: '',
+  ownSocketId: '',
 };
 
 export const createSpace = createAsyncThunk('space/createSpace', async (data: SpaceData, { rejectWithValue, dispatch }) => {
@@ -143,6 +146,9 @@ const spaceSlice = createSlice({
     setActiveSpace: (state, { payload }: { payload: SpaceItem }) => {
       state.activeSpace = payload;
     },
+    setOwnSocketId: (state, { payload }: { payload: string }) => {
+      state.ownSocketId = payload;
+    },
   },
   extraReducers: {
     [createSpace.rejected.type]: (state, action: PayloadAction<ErrorPayload>) => {
@@ -176,7 +182,7 @@ const spaceSlice = createSlice({
   },
 });
 
-export const { togglePermissionModal, setPermission, setActiveSpace } = spaceSlice.actions;
+export const { togglePermissionModal, setPermission, setActiveSpace, setOwnSocketId } = spaceSlice.actions;
 
 export default spaceSlice.reducer;
 
@@ -205,3 +211,5 @@ export const selectParticipants = (state: RootState) =>
 export const spaceGuestQuery = (state: RootState) => state.spaces.spaceGuestQuery;
 
 export const selectPermissionModal = (state: RootState) => state.spaces.permissionModalVisible;
+
+export const selectActiveSocket = (state: RootState) => state.spaces.ownSocketId;

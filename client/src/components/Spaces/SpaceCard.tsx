@@ -39,7 +39,7 @@ function SpaceCard(props: IProps) {
       return;
     }
     if (isParticipant) {
-      return navigate(url);
+      return navigate(url, { replace: true });
     }
     await participate(url);
     setIsLoading(false);
@@ -48,6 +48,13 @@ function SpaceCard(props: IProps) {
   async function participate(url: string) {
     socket?.emit(JOIN_SPACE, { key: currentSpace?.key, userId: currentUser?.id, type: ParticipantTypes.GUEST });
     socket?.on(JOIN_SPACE, res => joinSpace(res, url));
+  }
+
+  async function goToMySpace(url: string) {
+    if (currentSpace.status !== 'CREATED') {
+      socket?.emit(JOIN_SPACE, { key: currentSpace?.key, userId: currentUser?.id, type: ParticipantTypes.GUEST });
+      socket?.on(JOIN_SPACE, res => joinSpace(res, url));
+    }
   }
 
   return (
@@ -76,13 +83,23 @@ function SpaceCard(props: IProps) {
       </div>
       <Divider />
       <div className="flex items-center p-6 space-x-2 rounded-b">
-        <button
-          onClick={() => goToSpace(`/space/${props.item.key}/${slugify(props.item.title)}`)}
-          data-modal-toggle="defaultModal"
-          className="text-white  w-full  bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
-        >
-          {isLoading ? <Loading /> : props.source === 'MY_SPACES' ? 'View' : isParticipant ? 'View' : 'Join'}
-        </button>
+        {props.source === 'MY_SPACES' ? (
+          <button
+            onClick={() => goToMySpace(`/space/${props.item.key}/${slugify(props.item.title)}`)}
+            data-modal-toggle="defaultModal"
+            className="text-white  w-full  bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
+          >
+            {isLoading ? <Loading /> : currentSpace.status === 'CREATED' ? 'View' : 'Start'}
+          </button>
+        ) : (
+          <button
+            onClick={() => goToSpace(`/space/${props.item.key}/${slugify(props.item.title)}`)}
+            data-modal-toggle="defaultModal"
+            className="text-white  w-full  bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
+          >
+            {isLoading ? <Loading /> : isParticipant ? 'View' : 'Join'}
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
 export { default as useClipboard } from './useClipboard';
-export { default as useSocket } from './useSocket';
 
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 

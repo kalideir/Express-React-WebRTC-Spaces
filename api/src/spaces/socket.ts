@@ -1,11 +1,9 @@
+import config from 'config';
 import { Server } from 'http';
 import { Server as SocketServer } from 'socket.io';
-import config from 'config';
-import { logger } from '../utils';
-import { ENTERED_SPACE, ME, JOIN_SPACE, SWITCH_PARTICIPANT_TYPE } from './types';
-import { nanoid } from 'nanoid';
 import { joinSpace, switchType } from '../services';
 import { ParticipantStatus } from '../types';
+import { ENTERED_SPACE, JOIN_SPACE, ME, START_SPACE, SWITCH_PARTICIPANT_TYPE } from './types';
 
 const clientUrl = config.get<string>('clientUrl');
 
@@ -19,13 +17,15 @@ export function initSocketServer(server: Server) {
     },
   });
 
-  io?.on('connection', socket => {
-    console.log('a user connected', socket.id);
-    socket.on(ME, () => {
-      socket.emit(ME, nanoid(25));
-    });
+  io?.on('connect', socket => {
+    socket.emit(ME, socket.id);
+
     socket.on(ENTERED_SPACE, s => {
-      console.log({ s: s });
+      // console.log({ s: s });
+    });
+
+    socket.on(START_SPACE, async () => {
+      return [];
     });
 
     socket.on(JOIN_SPACE, async ({ key, userId, type }: { key: string; userId: string; type: ParticipantStatus }) => {

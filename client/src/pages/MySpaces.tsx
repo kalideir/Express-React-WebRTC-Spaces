@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { SpaceItem } from '../@types';
 import { Permission, SpaceCard, SpaceSkeleton } from '../components';
 import { useAppDispatch, useTypedSelector } from '../hooks';
 import { Nav } from '../layout';
+import { SocketContext } from '../spaces';
 import { selectMySpaces } from '../store/spaceSlice';
 import { getMySpaces } from '../store/spaceSlice';
 import { range } from '../utils';
@@ -24,7 +25,11 @@ function Spaces() {
   const getItems = useCallback(async () => {
     await dispatch(getMySpaces());
   }, [dispatch]);
-
+  const socket = useContext(SocketContext);
+  socket?.on('connection', () => {
+    console.log('ds');
+    // dispatch(setOwnSocketId(id));
+  });
   useEffect(() => {
     setIsLoading(true);
     getItems();
