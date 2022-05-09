@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { createContext, ReactNode, useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
 import { useSnackbar } from 'notistack';
@@ -8,8 +9,9 @@ import { useAppDispatch, useTypedSelector } from '../hooks';
 import { JoinSpace } from '../@types';
 import { selectCurrentUser } from '../store/authSlice';
 import { getOnlineSpaces, selectActiveSpace, setOwnSocketId } from '../store/spaceSlice';
+import { ME } from '../constants';
 
-export const SocketContext = createContext<{ socket: Socket; joinSpace: unknown; switchParticipantType: unknown } | null>(null);
+export const SocketContext = createContext<{ socket: Socket | null; joinSpace: unknown; switchParticipantType: unknown } | any>({});
 
 export default function SocketProvider({ children }: { children: ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -18,6 +20,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
   const currentUser = useSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
   useEffect(() => {
     setSocket(io(`http://localhost:8000`, { forceNew: true }));
   }, []);

@@ -4,7 +4,7 @@ import { UsersFooter } from '.';
 import { useSnackbar } from 'notistack';
 import { ParticipantItem, SpaceItem } from '../../@types';
 import { JOIN_SPACE, MIC_ACCESS_GRANTED, ParticipantTypes } from '../../constants';
-import { useAppDispatch, useSocket, useTypedSelector } from '../../hooks';
+import { useAppDispatch, useTypedSelector } from '../../hooks';
 import { Divider, DropDown, Loading } from '../../layout';
 import { selectCurrentUser } from '../../store/authSlice';
 import { togglePermissionModal } from '../../store/spaceSlice';
@@ -23,8 +23,6 @@ function SpaceCard(props: IProps) {
   const currentSpace = props.item;
   const currentUser = useTypedSelector(selectCurrentUser);
   const { enqueueSnackbar } = useSnackbar();
-
-  const { socket, joinSpace } = useSocket();
 
   const isParticipant = useMemo(
     () => !!currentSpace?.participants?.find((participant: ParticipantItem) => participant.userId === currentUser?.id),
@@ -46,14 +44,14 @@ function SpaceCard(props: IProps) {
   }
 
   async function participate(url: string) {
-    socket?.emit(JOIN_SPACE, { key: currentSpace?.key, userId: currentUser?.id, type: ParticipantTypes.GUEST });
-    socket?.on(JOIN_SPACE, res => joinSpace(res, url));
+    // socket?.emit(JOIN_SPACE, { key: currentSpace?.key, userId: currentUser?.id, type: ParticipantTypes.GUEST });
+    // socket?.on(JOIN_SPACE, res => joinSpace(res, url));
   }
 
   async function goToMySpace(url: string) {
     if (currentSpace.status !== 'CREATED') {
-      socket?.emit(JOIN_SPACE, { key: currentSpace?.key, userId: currentUser?.id, type: ParticipantTypes.GUEST });
-      socket?.on(JOIN_SPACE, res => joinSpace(res, url));
+      // socket?.emit(JOIN_SPACE, { key: currentSpace?.key, userId: currentUser?.id, type: ParticipantTypes.GUEST });
+      // socket?.on(JOIN_SPACE, res => joinSpace(res, url));
     }
   }
 

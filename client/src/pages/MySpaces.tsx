@@ -25,7 +25,8 @@ function Spaces() {
   const getItems = useCallback(async () => {
     await dispatch(getMySpaces());
   }, [dispatch]);
-  const socket = useContext(SocketContext);
+  const { socket } = useContext(SocketContext);
+
   socket?.on('connection', () => {
     console.log('ds');
     // dispatch(setOwnSocketId(id));

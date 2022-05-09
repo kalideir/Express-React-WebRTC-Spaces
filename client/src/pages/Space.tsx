@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Requests } from '../components';
 import { AddParticipant, Participants, SpaceActions, SpaceHeader } from '../components/Space';
 import { SpaceStatus } from '../constants';
-import { useSocket, useTypedSelector } from '../hooks';
+import { useTypedSelector } from '../hooks';
 import { Divider, Nav } from '../layout';
 import { selectCurrentUser } from '../store/authSlice';
 import { getActiveSpace, selectActiveSpace } from '../store/spaceSlice';
@@ -16,17 +16,10 @@ function Space() {
   const activeSpace = useTypedSelector(selectActiveSpace);
   const [me, setMe] = useState('');
   const currentUser = useTypedSelector(selectCurrentUser);
-  const { socket, joinSpace } = useSocket();
 
   useLayoutEffect(() => {
     window.history.replaceState({}, document.title);
   }, []);
-  useEffect(() => {
-    if (activeSpace && socket && currentUser) {
-      // socket?.emit(ME);
-      // socket?.on(ME, (id: string) => setMe(id));
-    }
-  }, [socket, activeSpace, currentUser, joinSpace]);
 
   useEffect(() => {
     setIsLoading(true);
