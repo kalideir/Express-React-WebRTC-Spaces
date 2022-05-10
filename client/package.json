@@ -84,6 +84,7 @@
     "@types/react-icons": "^3.0.0",
     "@types/react-router-dom": "^5.3.3",
     "@types/redux-logger": "^3.0.9",
+    "@types/simple-peer": "^9.11.4",
     "@types/socket.io-client": "^3.0.0",
     "@types/wavesurfer.js": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^5.17.0",

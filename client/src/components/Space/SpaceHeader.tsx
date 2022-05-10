@@ -16,12 +16,6 @@ function SpaceHeader() {
   const { key } = useParams();
   const dispatch = useAppDispatch();
 
-  async function startSpace() {
-    setIsLoading(true);
-    activeSpace?.id && (await dispatch(updateSpace({ key: activeSpace?.key, data: { status: SpaceStatus.STARTED } })));
-    setIsLoading(false);
-  }
-
   return (
     <div className={`mt-5 bg-slate-50 dark:bg-slate-900 flex-col py-2 justify-center items-center shadow-md rounded-md`}>
       <div className="flex items-center justify-between">
@@ -36,13 +30,6 @@ function SpaceHeader() {
         </button>
       </div>
       <Divider />
-      {activeSpace?.status === SpaceStatus.CREATED && (
-        <div onClick={startSpace} className="flex items-center p-6 space-x-2 rounded-b">
-          <button className="text-white mx-auto w-1/5 self-center  bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
-            Start
-          </button>
-        </div>
-      )}
       <Board />
     </div>
   );

@@ -1,8 +1,9 @@
 import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { AxiosError } from 'axios';
+import Peer from 'peerjs';
 import { string } from 'yup/lib/locale';
 import { ErrorPayload, JoinSpace, ListUsersQueryType, ParticipantItem, ParticipantStatus, SpaceData, SpaceItem, UsersSearch } from '../@types';
-import { ParticipantTypes } from '../constants';
+import { ParticipantTypes, SpaceStatus } from '../constants';
 import { apiService } from '../services';
 import { RootState } from './store';
 
@@ -16,6 +17,8 @@ export type SpaceSliceData = {
   usersSearch: UsersSearch;
   spaceGuestQuery: string;
   ownSocketId?: string;
+  peers: Peer[];
+  streams: { [key: string]: MediaStream };
 };
 
 const initialState: SpaceSliceData = {
@@ -33,6 +36,8 @@ const initialState: SpaceSliceData = {
   },
   spaceGuestQuery: '',
   ownSocketId: '',
+  peers: [],
+  streams: {},
 };
 
 export const createSpace = createAsyncThunk('space/createSpace', async (data: SpaceData, { rejectWithValue, dispatch }) => {
@@ -113,6 +118,19 @@ export const getOnlineSpaces = createAsyncThunk('space/getOnlineSpaces', async (
   }
 });
 
+export const setSpaceStatus = createAsyncThunk(
+  'space/setSpaceStatus',
+  async ({ key, status }: { key: string; status: keyof typeof SpaceStatus }, { rejectWithValue }) => {
+    try {
+      const res = await apiService.patch('/space/' + key + '/status', { status });
+      return res?.data;
+    } catch (error: any | AxiosError) {
+      const message = error?.response.data.message || 'Error';
+      return rejectWithValue({ message });
+    }
+  },
+);
+
 export const getActiveSpace = createAsyncThunk('space/getSpace', async (key: string, { rejectWithValue }) => {
   try {
     const res = await apiService.get('/space/' + key);
@@ -149,6 +167,12 @@ const spaceSlice = createSlice({
     setOwnSocketId: (state, { payload }: { payload: string }) => {
       state.ownSocketId = payload;
     },
+    setPeers: (state, { payload }: { payload: Peer[] }) => {
+      state.peers = payload;
+    },
+    setStreams: (state, { payload }: { payload: { key: string; stream: MediaStream } }) => {
+      state.streams[payload.key] = payload.stream;
+    },
   },
   extraReducers: {
     [createSpace.rejected.type]: (state, action: PayloadAction<ErrorPayload>) => {
@@ -183,10 +207,14 @@ const spaceSlice = createSlice({
       const { payload } = action;
       state.activeSpace = payload.space;
     },
+    [setSpaceStatus.fulfilled.type]: (state, action: PayloadAction<SpaceItem>) => {
+      const { payload } = action;
+      state.activeSpace = payload;
+    },
   },
 });
 
-export const { togglePermissionModal, setPermission, setActiveSpace, setOwnSocketId } = spaceSlice.actions;
+export const { togglePermissionModal, setPermission, setActiveSpace, setOwnSocketId, setPeers, setStreams } = spaceSlice.actions;
 
 export default spaceSlice.reducer;
 

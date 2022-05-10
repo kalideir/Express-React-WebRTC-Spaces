@@ -1,5 +1,10 @@
 {
   "devDependencies": {
-    "@types/node-fetch": "^2.6.1"
+    "@types/node-fetch": "^2.6.1",
+    "@types/simple-peer": "^9.11.4"
+  },
+  "dependencies": {
+    "peerjs": "^1.3.2",
+    "simple-peer": "^9.11.1"
   }
 }

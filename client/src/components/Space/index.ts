@@ -8,3 +8,5 @@ export { default as AddParticipant } from './AddParticipant';
 export { default as UserRow } from './UserRow';
 export { default as Requests } from './Requests';
 export { default as RequestRow } from './RequestRow';
+export { default as Streams } from './Streams';
+export { default as StreamPlayer } from './StreamPlayer';

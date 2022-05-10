@@ -79,6 +79,12 @@ export async function createParticipant(req: Request, res: Response) {
   return res.json({ space: space.toJSON(), message: 'Participant was added' });
 }
 
+export async function switchStatus(req: Request<UpdateSpaceInput>, res: Response) {
+  const space = Object.assign(res.locals.space, { status: req.body.status, startedAt: req.body.status === SpaceStatus.STARTED ? new Date() : null });
+  const savedSpace = await space.save();
+  res.status(httpStatus.OK).json(savedSpace);
+}
+
 export async function updateParticipant(
   req: Request<UpdateParticipantInput['params'], Omit<UpdateParticipantInput['body'], 'userId'>>,
   res: Response,

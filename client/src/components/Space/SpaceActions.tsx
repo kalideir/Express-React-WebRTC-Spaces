@@ -6,7 +6,6 @@ import { Dot } from '../../layout';
 import { useAppDispatch, useNow, useTypedSelector } from '../../hooks';
 import { selectActiveSpace, selectParticipants, selectPendingRequests, setSpaceGuestQuery } from '../../store/spaceSlice';
 import { showAddParticipantModal, showRequestsModal } from '../../store/uiSlice';
-import { formatDistanceToNow, formatDuration, intervalToDuration } from 'date-fns';
 import { duration } from '../../utils';
 
 function SpaceActions() {

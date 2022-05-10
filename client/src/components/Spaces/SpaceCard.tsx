@@ -1,16 +1,16 @@
-import { memo, useContext, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { UsersFooter } from '.';
+import { SerializedError } from '@reduxjs/toolkit';
 import { useSnackbar } from 'notistack';
+import { memo, useContext, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { UsersFooter } from '.';
 import { ParticipantItem, SpaceItem } from '../../@types';
-import { JOIN_SPACE, MIC_ACCESS_GRANTED, ParticipantTypes, START_SPACE } from '../../constants';
+import { MIC_ACCESS_GRANTED, ParticipantTypes, SpaceStatus, START_SPACE } from '../../constants';
 import { useAppDispatch, useTypedSelector } from '../../hooks';
 import { Divider, DropDown, Loading } from '../../layout';
-import { selectCurrentUser } from '../../store/authSlice';
-import { addDeleteParticipant, togglePermissionModal } from '../../store/spaceSlice';
-import { slugify } from '../../utils';
 import { SocketContext } from '../../spaces';
-import { SerializedError } from '@reduxjs/toolkit';
+import { selectCurrentUser } from '../../store/authSlice';
+import { addDeleteParticipant, setSpaceStatus, togglePermissionModal } from '../../store/spaceSlice';
+import { slugify } from '../../utils';
 
 interface IProps {
   item: SpaceItem;
@@ -70,12 +70,15 @@ function SpaceCard(props: IProps) {
   }
 
   async function goToMySpace(url: string) {
+    setIsLoading(true);
     if (currentSpace.status === 'CREATED') {
-      socket?.emit(START_SPACE, { key: currentSpace.key, ownerId: currentSpace.ownerId });
-      socket?.on(START_SPACE, (res: any) => startSpace(res, url));
+      const res = await dispatch(setSpaceStatus({ key: currentSpace.key, status: SpaceStatus.STARTED })).unwrap();
+      enqueueSnackbar(res.message || 'Started successfully', { variant: 'success' });
+      navigate(url);
     } else if (currentSpace.status === 'STARTED') {
       navigate(url);
     }
+    setIsLoading(false);
   }
 
   return (
