@@ -1,10 +1,12 @@
-import { ParticipantDocument, ParticipantModel, SpaceDocument, SpaceModel } from '../models';
+import { ParticipantDocument, ParticipantModel, SpaceDocument, SpaceInput, SpaceModel } from '../models';
 import { FilterQuery } from 'mongoose';
 import { ParticipantStatus, StatusKeys } from '../types';
 import { UpdateSpaceInput } from '../schema';
 
-export async function setSpaceStatus(key: string, status: StatusKeys) {
-  return await updateSpace(key, { status });
+export async function setSpaceStatus(key: string, ownerId: string, status: StatusKeys) {
+  let space = await updateSpace({ key, ownerId }, { status, startedAt: new Date() });
+  space = await (await space.populate('participants')).populate({ path: 'participants', populate: { path: 'user' } });
+  return { space: space.toJSON(), message: 'Space is started.' };
 }
 
 export async function joinSpace(key: string, userId: string, type: ParticipantStatus) {
@@ -22,13 +24,14 @@ export async function joinSpace(key: string, userId: string, type: ParticipantSt
 }
 
 export async function switchType(key: string, userId: string, type: ParticipantStatus) {
-  const space = await findSpace({ key });
+  let space = await findSpace({ key });
   const participant = await findParticipant({ userId, spaceId: space.id });
   if (!participant) {
     return { message: 'Not found' };
   }
   await participant.update({ type });
-  return { space: space.toJSON(), message: 'You joined successfully.' };
+  space = await (await space.populate('participants')).populate({ path: 'participants', populate: { path: 'user' } });
+  return { space: space.toJSON(), message: 'Participant was added.' };
 }
 
 export async function findSpace(query: FilterQuery<SpaceDocument>) {
@@ -39,8 +42,8 @@ export function findSpaceById(id: string) {
   return SpaceModel.findById(id);
 }
 
-export async function updateSpace(key: string, input: UpdateSpaceInput['body']) {
-  const space = await SpaceModel.findOneAndUpdate({ key }, { ...input }, { new: true });
+export async function updateSpace({ query }: FilterQuery<SpaceInput>, input: UpdateSpaceInput['body']) {
+  const space = await SpaceModel.findOneAndUpdate(query, { ...input }, { new: true });
   return await space.save();
 }
 

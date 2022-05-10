@@ -1,4 +1,4 @@
-import { boolean, object, string, TypeOf } from 'zod';
+import { boolean, date, object, string, TypeOf } from 'zod';
 import { SpaceStatus } from '../models';
 import { t } from '../utils';
 
@@ -13,6 +13,7 @@ const payload = {
       required_error: t('space_title_required'),
     }).optional(),
     isPublic: boolean().default(false),
+    startedAt: date().optional(),
     status: string({ required_error: t('') })
       .refine(oneOf(Object.keys(SpaceStatus)), t(''))
       .default(SpaceStatus.CREATED),

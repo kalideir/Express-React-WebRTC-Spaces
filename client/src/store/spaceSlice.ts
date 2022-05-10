@@ -179,6 +179,10 @@ const spaceSlice = createSlice({
       const { payload } = action;
       state.onlineSpaces = payload;
     },
+    [addDeleteParticipant.fulfilled.type]: (state, action: PayloadAction<{ message: string; space: SpaceItem }>) => {
+      const { payload } = action;
+      state.activeSpace = payload.space;
+    },
   },
 });
 

@@ -3,7 +3,7 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import { nanoid } from 'nanoid';
 import { ApiError, CustomError } from '../errors';
-import { ParticipantModel, SpaceModel, UserDocument, SpaceDocument, SpaceStatus } from '../models';
+import { ParticipantModel, SpaceModel, UserDocument, SpaceDocument, SpaceStatus, ParticipantTypes } from '../models';
 import {
   CreateParticipantInput,
   CreateSpaceInput,

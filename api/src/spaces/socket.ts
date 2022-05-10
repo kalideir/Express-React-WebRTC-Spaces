@@ -1,7 +1,7 @@
 import config from 'config';
 import { Server } from 'http';
 import { Server as SocketServer } from 'socket.io';
-import { joinSpace, switchType } from '../services';
+import { joinSpace, setSpaceStatus, switchType } from '../services';
 import { ParticipantStatus } from '../types';
 import { ENTERED_SPACE, JOIN_SPACE, ME, START_SPACE, SWITCH_PARTICIPANT_TYPE } from './types';
 
@@ -24,8 +24,11 @@ export function initSocketServer(server: Server) {
       // console.log({ s: s });
     });
 
-    socket.on(START_SPACE, async () => {
-      return [];
+    socket.on(START_SPACE, async ({ key, ownerId }: { key: string; ownerId: string }) => {
+      if (key && ownerId) {
+        const space = await setSpaceStatus(key, ownerId, 'STARTED');
+        socket.emit(START_SPACE, space);
+      }
     });
 
     socket.on(JOIN_SPACE, async ({ key, userId, type }: { key: string; userId: string; type: ParticipantStatus }) => {

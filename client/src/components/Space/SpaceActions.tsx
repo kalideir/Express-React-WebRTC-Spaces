@@ -3,15 +3,19 @@ import { IoMdPersonAdd } from 'react-icons/io';
 import { ChangeEvent } from 'react';
 import { BsPlusSquareFill } from 'react-icons/bs';
 import { Dot } from '../../layout';
-import { useAppDispatch, useTypedSelector } from '../../hooks';
-import { selectParticipants, selectPendingRequests, setSpaceGuestQuery } from '../../store/spaceSlice';
+import { useAppDispatch, useNow, useTypedSelector } from '../../hooks';
+import { selectActiveSpace, selectParticipants, selectPendingRequests, setSpaceGuestQuery } from '../../store/spaceSlice';
 import { showAddParticipantModal, showRequestsModal } from '../../store/uiSlice';
+import { formatDistanceToNow, formatDuration, intervalToDuration } from 'date-fns';
+import { duration } from '../../utils';
 
 function SpaceActions() {
   const dispatch = useAppDispatch();
 
   const participants = useTypedSelector(selectParticipants);
   const pending = useTypedSelector(selectPendingRequests);
+  const activeSpace = useTypedSelector(selectActiveSpace);
+  const { now } = useNow();
 
   return (
     <div className="my-4">
@@ -55,9 +59,9 @@ function SpaceActions() {
             <MdGroups size={20} className="mr-1" />
             <span>{participants.length}</span>
           </div>
-          <div className="ml-1 w-auto h-8 flex items-center justify-center bg-red-500 dark:bg-red-500 text-slate-50 px-4 rounded-full cursor-pointer">
-            <Dot size={3} color="bg-slate-600" />
-            <span>10:12:34</span>
+          <div className="ml-1 w-45 max-w-45 min-w-45 text-xs h-8 flex items-center justify-center bg-red-500 dark:bg-red-500 text-slate-50 px-4 rounded-full cursor-pointer">
+            <Dot size={3} color="bg-green-100" />
+            <span>{duration(now, activeSpace?.startedAt as string)}</span>
           </div>
         </div>
       </div>

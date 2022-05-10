@@ -1,14 +1,16 @@
-import { memo, useMemo, useState } from 'react';
+import { memo, useContext, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UsersFooter } from '.';
 import { useSnackbar } from 'notistack';
 import { ParticipantItem, SpaceItem } from '../../@types';
-import { JOIN_SPACE, MIC_ACCESS_GRANTED, ParticipantTypes } from '../../constants';
+import { JOIN_SPACE, MIC_ACCESS_GRANTED, ParticipantTypes, START_SPACE } from '../../constants';
 import { useAppDispatch, useTypedSelector } from '../../hooks';
 import { Divider, DropDown, Loading } from '../../layout';
 import { selectCurrentUser } from '../../store/authSlice';
-import { togglePermissionModal } from '../../store/spaceSlice';
+import { addDeleteParticipant, togglePermissionModal } from '../../store/spaceSlice';
 import { slugify } from '../../utils';
+import { SocketContext } from '../../spaces';
+import { SerializedError } from '@reduxjs/toolkit';
 
 interface IProps {
   item: SpaceItem;
@@ -23,11 +25,14 @@ function SpaceCard(props: IProps) {
   const currentSpace = props.item;
   const currentUser = useTypedSelector(selectCurrentUser);
   const { enqueueSnackbar } = useSnackbar();
+  const { socket, joinSpace, startSpace } = useContext(SocketContext);
 
   const isParticipant = useMemo(
     () => !!currentSpace?.participants?.find((participant: ParticipantItem) => participant.userId === currentUser?.id),
     [currentSpace?.participants, currentUser?.id],
   );
+
+  const isOwner = currentSpace.ownerId === currentUser?.id;
 
   async function goToSpace(url: string) {
     setIsLoading(true);
@@ -39,19 +44,37 @@ function SpaceCard(props: IProps) {
     if (isParticipant) {
       return navigate(url, { replace: true });
     }
+
     await participate(url);
     setIsLoading(false);
   }
 
   async function participate(url: string) {
-    // socket?.emit(JOIN_SPACE, { key: currentSpace?.key, userId: currentUser?.id, type: ParticipantTypes.GUEST });
-    // socket?.on(JOIN_SPACE, res => joinSpace(res, url));
+    setIsLoading(true);
+    try {
+      const res = await dispatch(
+        addDeleteParticipant({ key: currentSpace.key, type: ParticipantTypes.GUEST, userId: currentUser?.id as string }),
+      ).unwrap();
+
+      enqueueSnackbar(res.message, {
+        variant: 'success',
+      });
+      navigate(url);
+    } catch (err: any | SerializedError) {
+      const message = err?.message || 'Error';
+      enqueueSnackbar(message, {
+        variant: 'error',
+      });
+    }
+    setIsLoading(false);
   }
 
   async function goToMySpace(url: string) {
-    if (currentSpace.status !== 'CREATED') {
-      // socket?.emit(JOIN_SPACE, { key: currentSpace?.key, userId: currentUser?.id, type: ParticipantTypes.GUEST });
-      // socket?.on(JOIN_SPACE, res => joinSpace(res, url));
+    if (currentSpace.status === 'CREATED') {
+      socket?.emit(START_SPACE, { key: currentSpace.key, ownerId: currentSpace.ownerId });
+      socket?.on(START_SPACE, (res: any) => startSpace(res, url));
+    } else if (currentSpace.status === 'STARTED') {
+      navigate(url);
     }
   }
 
@@ -87,7 +110,7 @@ function SpaceCard(props: IProps) {
             data-modal-toggle="defaultModal"
             className="text-white  w-full  bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
           >
-            {isLoading ? <Loading /> : currentSpace.status === 'CREATED' ? 'View' : 'Start'}
+            {isLoading ? <Loading /> : currentSpace.status === 'STARTED' ? 'View' : 'Start'}
           </button>
         ) : (
           <button

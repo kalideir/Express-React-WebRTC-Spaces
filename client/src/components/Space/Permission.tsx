@@ -11,7 +11,7 @@ function Permission() {
 
   function grant() {
     navigator.mediaDevices
-      .getUserMedia({ video: false, audio: true })
+      .getUserMedia({ video: true, audio: true })
       .then(stream => {
         localStorage.setItem(MIC_ACCESS_GRANTED, 'true');
         dispatch(togglePermissionModal(false));

@@ -113,6 +113,9 @@ export type SpaceItem = {
   participantIds: string[];
   status: keyof typeof SpaceStatus;
   id?: string;
+  owner?: IUser;
+  ownerId?: string;
+  startedAt: string;
 };
 
 export type NavItem = { name: string; to: string };

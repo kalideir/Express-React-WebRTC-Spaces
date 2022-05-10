@@ -1,4 +1,5 @@
 export { default as useClipboard } from './useClipboard';
+export { default as useNow } from './useNow';
 
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
