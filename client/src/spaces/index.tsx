@@ -10,7 +10,7 @@ import { useAppDispatch, useTypedSelector } from '../hooks';
 import { JoinSpace } from '../@types';
 import { selectCurrentUser } from '../store/authSlice';
 import { getOnlineSpaces, selectActiveSpace, setActiveSpace, setOwnSocketId } from '../store/spaceSlice';
-import { JOIN_SPACE, ME, USER_JOINED } from '../constants';
+import { ALL_PARTICIPANTS, JOIN_SPACE, RECEIVING_RETURNED_SIGNAL, RETURNING_SIGNAL, SENDING_SIGNAL, USER_JOINED } from '../constants';
 import { nanoid } from '@reduxjs/toolkit';
 
 export const SocketContext = createContext<
@@ -48,8 +48,8 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
 
     navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
       userVideo.current.srcObject = stream;
-      socketRef.current?.emit('join room', roomID);
-      socketRef.current?.on('all users', users => {
+      socketRef.current?.emit(JOIN_SPACE, roomID);
+      socketRef.current?.on(ALL_PARTICIPANTS, users => {
         const peers: Peer.Instance[] = [];
         users.forEach((userID: string) => {
           const peer = createPeer(userID, socketRef.current?.id as string, stream);
@@ -62,7 +62,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
         setPeers(peers);
       });
 
-      socketRef.current?.on('user joined', payload => {
+      socketRef.current?.on(USER_JOINED, payload => {
         const peer = addPeer(payload.signal, payload.callerID, stream);
         peersRef.current.push({
           peerID: payload.callerID,
@@ -72,7 +72,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
         setPeers(users => [...users, peer]);
       });
 
-      socketRef.current?.on('receiving returned signal', payload => {
+      socketRef.current?.on(RECEIVING_RETURNED_SIGNAL, payload => {
         const item = peersRef.current.find(p => p.peerID === payload.id);
         item?.peer.signal(payload.signal);
       });
@@ -87,7 +87,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
     });
 
     peer.on('signal', signal => {
-      socketRef.current?.emit('sending signal', { userToSignal, callerID, signal });
+      socketRef.current?.emit(SENDING_SIGNAL, { userToSignal, callerID, signal });
     });
 
     return peer;
@@ -101,7 +101,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
     });
 
     peer.on('signal', signal => {
-      socketRef.current?.emit('returning signal', { signal, callerID });
+      socketRef.current?.emit(RETURNING_SIGNAL, { signal, callerID });
     });
 
     peer.signal(incomingSignal);

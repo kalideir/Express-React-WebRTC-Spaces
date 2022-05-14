@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import React, { memo, useContext, useMemo, useState } from 'react';
 import { AiOutlineCheck, AiOutlineClose } from 'react-icons/ai';
 import { ParticipantItem, SpaceItem } from '../../@types';
-import { SWITCH_PARTICIPANT_TYPE } from '../../constants';
 import { useAppDispatch, useTypedSelector } from '../../hooks';
 import { Divider, Loading } from '../../layout';
 import { SocketContext } from '../../spaces';
@@ -20,8 +19,8 @@ function RequestRow({ participant }: { participant: ParticipantItem }) {
   const dispatch = useAppDispatch();
   async function setParticipantGuest() {
     setIsLoading(true);
-    socket?.emit(SWITCH_PARTICIPANT_TYPE, { key: activeSpace.key, userId: currentUser?.id, type: 'GUEST' });
-    socket?.on(SWITCH_PARTICIPANT_TYPE, switchParticipantType);
+    // socket?.emit(SWITCH_PARTICIPANT_TYPE, { key: activeSpace.key, userId: currentUser?.id, type: 'GUEST' });
+    // socket?.on(SWITCH_PARTICIPANT_TYPE, switchParticipantType);
     setIsLoading(false);
     // dispatch(hideRequestsModal());
   }

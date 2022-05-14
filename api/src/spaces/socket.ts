@@ -3,15 +3,13 @@ import { Server } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import { joinSpace, setSpaceStatus, switchType } from '../services';
 import { ParticipantStatus } from '../types';
-import { ENTERED_SPACE, JOIN_SPACE, ME, START_SPACE, SWITCH_PARTICIPANT_TYPE, USER_JOINED } from './types';
+import { getValue, setValue } from '../utils';
+
+import { ALL_PARTICIPANTS, JOIN_SPACE, RECEIVING_RETURNED_SIGNAL, RETURNING_SIGNAL, SENDING_SIGNAL, USER_JOINED } from './types';
 
 const clientUrl = config.get<string>('clientUrl');
 
 let io: null | SocketServer;
-
-const users = {};
-
-const socketToRoom = {};
 
 export function initSocketServer(server: Server) {
   io = new SocketServer(server, {
@@ -22,35 +20,33 @@ export function initSocketServer(server: Server) {
   });
 
   io.on('connection', socket => {
-    socket.on('join room', roomID => {
-      console.log({ roomID });
+    socket.on(JOIN_SPACE, async roomID => {
+      if (!roomID) return;
+      const prevUsers = ((await getValue(roomID)) as string[]) || [];
 
-      if (users[roomID]) {
-        const length = users[roomID].length;
-        if (length === 4) {
-          socket.emit('room full');
-          return;
-        }
-        users[roomID].push(socket.id);
-      } else {
-        users[roomID] = [socket.id];
-      }
-      socketToRoom[socket.id] = roomID;
-      const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
+      const users = prevUsers.length ? [...prevUsers, socket.id] : [socket.id];
 
-      socket.emit('all users', usersInThisRoom);
+      await setValue(roomID, users);
+
+      await setValue(socket.id, roomID);
+
+      const usersInThisRoom = users.filter(id => id !== socket.id);
+
+      socket.emit(ALL_PARTICIPANTS, usersInThisRoom);
     });
 
-    socket.on('sending signal', payload => {
-      io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
+    socket.on(SENDING_SIGNAL, payload => {
+      io.to(payload.userToSignal).emit(USER_JOINED, { signal: payload.signal, callerID: payload.callerID });
     });
 
-    socket.on('returning signal', payload => {
-      io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
+    socket.on(RETURNING_SIGNAL, payload => {
+      io.to(payload.callerID).emit(RECEIVING_RETURNED_SIGNAL, { signal: payload.signal, id: socket.id });
     });
 
-    socket.on('disconnect', () => {
-      const roomID = socketToRoom[socket.id];
+    socket.on('disconnect', async () => {
+      const roomID = (await getValue(socket.id)) as string;
+      const users = ((await getValue(roomID)) as string[]) || [];
+
       let room = users[roomID];
       if (room) {
         room = room.filter(id => id !== socket.id);

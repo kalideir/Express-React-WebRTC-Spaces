@@ -4,7 +4,7 @@ import { memo, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UsersFooter } from '.';
 import { ParticipantItem, SpaceItem } from '../../@types';
-import { MIC_ACCESS_GRANTED, ParticipantTypes, SpaceStatus, START_SPACE } from '../../constants';
+import { MIC_ACCESS_GRANTED, ParticipantTypes, SpaceStatus } from '../../constants';
 import { useAppDispatch, useTypedSelector } from '../../hooks';
 import { Divider, DropDown, Loading } from '../../layout';
 import { SocketContext } from '../../spaces';
