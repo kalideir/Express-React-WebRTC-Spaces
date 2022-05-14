@@ -1,11 +1,11 @@
 import config from 'config';
 import { Server } from 'http';
 import { Server as SocketServer } from 'socket.io';
-import { joinSpace, setSpaceStatus, switchType } from '../services';
+import { findParticipant, joinSpace, setSpaceStatus, switchType } from '../services';
 import { ParticipantStatus } from '../types';
 import { getValue, setValue } from '../utils';
 
-import { ALL_PARTICIPANTS, JOIN_SPACE, RECEIVING_RETURNED_SIGNAL, RETURNING_SIGNAL, SENDING_SIGNAL, USER_JOINED } from './types';
+import { ALL_PARTICIPANTS, JOIN_SPACE, RECEIVING_RETURNED_SIGNAL, RETURNING_SIGNAL, SENDING_SIGNAL, UPDATED_SPACE, USER_JOINED } from './types';
 
 const clientUrl = config.get<string>('clientUrl');
 
@@ -20,19 +20,36 @@ export function initSocketServer(server: Server) {
   });
 
   io.on('connection', socket => {
-    socket.on(JOIN_SPACE, async roomID => {
-      if (!roomID) return;
-      const prevUsers = ((await getValue(roomID)) as string[]) || [];
+    socket.on(JOIN_SPACE, async ({ spaceId, userId, type }: { spaceId: string; userId: string; type: ParticipantStatus }) => {
+      if (!spaceId || !userId || !type) return;
 
-      const users = prevUsers.length ? [...prevUsers, socket.id] : [socket.id];
+      const prevUsers = ((await getValue(spaceId)) as { userId: string; socketId: string }[]) || [];
 
-      await setValue(roomID, users);
+      let users = prevUsers.length ? [...prevUsers, { socketId: socket.id, userId }] : [{ socketId: socket.id, userId }];
 
-      await setValue(socket.id, roomID);
+      if (users.length > 2) {
+        users = users.reduce((acc, curr) => {
+          const exists = !!acc.find(user => user.userId === userId);
 
-      const usersInThisRoom = users.filter(id => id !== socket.id);
+          if (!exists) {
+            acc.push(curr);
+            return acc;
+          }
+          return acc;
+        }, []);
+      }
+
+      await setValue(spaceId, users);
+
+      await setValue(socket.id, spaceId);
+
+      const usersInThisRoom = users.filter(user => user.socketId !== socket.id);
+
+      const space = await joinSpace(spaceId, userId, type);
 
       socket.emit(ALL_PARTICIPANTS, usersInThisRoom);
+
+      socket.emit(UPDATED_SPACE, space);
     });
 
     socket.on(SENDING_SIGNAL, payload => {
@@ -44,48 +61,19 @@ export function initSocketServer(server: Server) {
     });
 
     socket.on('disconnect', async () => {
-      const roomID = (await getValue(socket.id)) as string;
-      const users = ((await getValue(roomID)) as string[]) || [];
+      const spaceId = (await getValue(socket.id)) as string;
+      const users = ((await getValue(spaceId)) as { userId: string; socketId: string }[]) || [];
 
-      let room = users[roomID];
+      let room = users[spaceId];
       if (room) {
-        room = room.filter(id => id !== socket.id);
-        users[roomID] = room;
+        room = room.filter(user => user.socketId !== socket.id);
+        users[spaceId] = room;
+
+        setValue(spaceId, []); // users
+        setValue(socket.id, null);
       }
     });
   });
-
-  // io?.on('connection', socket => {
-  //   socket.emit(ME, socket.id);
-
-  //   socket.on(ENTERED_SPACE, s => {
-  //     // // console.log({ s: s });
-  //   });
-
-  //   socket.on('callUser', data => {
-  //     // console.log({ data }, 'xx');
-  //     io.to(data.userToCall).emit('callUser', { signal: data.signalData, from: data.from, name: data.name });
-  //   });
-
-  //   socket.on('answerCall', data => {
-  //     io.to(data.to).emit('callAccepted', data.signal);
-  //   });
-
-  //   socket.on(START_SPACE, async ({ key, ownerId }: { key: string; ownerId: string }) => {
-  //     if (key && ownerId) {
-  //       const space = await setSpaceStatus(key, ownerId, 'STARTED');
-  //       socket.emit(START_SPACE, space);
-  //     }
-  //   });
-
-  //   socket.on(JOIN_SPACE, async ({ roomId, key, userId, peerId }: { roomId: string; key: string; userId: string; peerId: string }) => {
-  //     // console.log('JOIN_SPACE', { roomId, peerId });
-  //     socket.join(roomId);
-  //     // if (key && userId && type) {
-  //     // const space = await joinSpace(key, userId, type);
-  //     socket.emit(USER_JOINED, { peerId });
-  //     // }
-  //   });
 
   //   socket.on(SWITCH_PARTICIPANT_TYPE, async ({ key, userId, type }: { key: string; userId: string; type: ParticipantStatus }) => {
   //     if (key && userId && type) {
