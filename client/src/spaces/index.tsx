@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { createContext, ReactNode, useEffect, useState } from 'react';
+import { createContext, ReactNode, useEffect, useRef, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
 import { useSnackbar } from 'notistack';
-import Peer from 'peerjs';
+import Peer from 'simple-peer';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -20,73 +20,94 @@ export const SocketContext = createContext<
       switchParticipantType: unknown;
       startSpace: unknown;
       stream: MediaStream | null;
-      me: Peer;
+      me: Peer.Instance;
       streams: { [key: string]: MediaStream };
+
+      userVideo: MediaStream | null;
+      peers: Peer.Instance[];
     }
   | any
 >({});
 
 export default function SocketProvider({ children }: { children: ReactNode }) {
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const socket = useRef<Socket | null>(null);
   const activeSpace = useTypedSelector(selectActiveSpace);
   const { enqueueSnackbar } = useSnackbar();
   const currentUser = useSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [streams, setStreams] = useState<{ [key: string]: MediaStream }>({});
-  const [me, setMe] = useState<Peer>();
-  const [stream, setStream] = useState<MediaStream>();
+
+  const [peers, setPeers] = useState<Peer.Instance[]>([]);
+  const socketRef = useRef<Socket | null>();
+  const userVideo = useRef<any | null>({});
+  const peersRef = useRef<{ peerID: string; peer: Peer.Instance }[]>([]);
+  const roomID = activeSpace?.key;
 
   useEffect(() => {
-    setSocket(io(`http://localhost:8000`, { forceNew: true }));
+    socketRef.current = io('http://localhost:8000');
+
     navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-      setStream(stream);
-    });
-  }, []);
+      userVideo.current.srcObject = stream;
+      socketRef.current?.emit('join room', roomID);
+      socketRef.current?.on('all users', users => {
+        const peers: Peer.Instance[] = [];
+        users.forEach((userID: string) => {
+          const peer = createPeer(userID, socketRef.current?.id as string, stream);
+          peersRef.current.push({
+            peerID: userID,
+            peer,
+          });
+          peers.push(peer);
+        });
+        setPeers(peers);
+      });
 
-  useEffect(() => {
-    socket?.on(ME, sockId => {
-      dispatch(setOwnSocketId(sockId));
-    });
-  }, [socket]);
+      socketRef.current?.on('user joined', payload => {
+        const peer = addPeer(payload.signal, payload.callerID, stream);
+        peersRef.current.push({
+          peerID: payload.callerID,
+          peer,
+        });
 
-  useEffect(() => {
-    const savedId = localStorage.getItem('userId');
-    const meId = savedId || nanoid(20);
+        setPeers(users => [...users, peer]);
+      });
 
-    localStorage.setItem('userId', meId);
-
-    const peer = new Peer(meId);
-    setMe(peer);
-    console.log({ me, peer });
-  }, []);
-
-  console.log({ streams });
-
-  useEffect(() => {
-    // if (!me) return;
-    if (!stream) return;
-    socket?.on(USER_JOINED, ({ peerId }: { peerId: string }) => {
-      console.log({ peerId, myid: me?.id, x: 1 });
-
-      enqueueSnackbar('User joined ' + peerId, { variant: 'info' });
-      const call = me?.call(peerId, stream, {});
-      call?.on('stream', (peerStream: any) => {
-        console.log({ peerStream });
-
-        setStreams({ ...streams, [peerId]: peerStream });
-        // dispatch(setStreams({ key: peerId, stream: peerStream }));
+      socketRef.current?.on('receiving returned signal', payload => {
+        const item = peersRef.current.find(p => p.peerID === payload.id);
+        item?.peer.signal(payload.signal);
       });
     });
-    me?.on('call', (call: any) => {
-      call.answer(stream);
-      call.on('stream', (peerStream: any) => {
-        console.log({ peerStream }, 'x');
+  }, [roomID]);
 
-        setStreams({ ...streams, [call.peer]: peerStream });
-      });
+  function createPeer(userToSignal: string, callerID: string, stream: MediaStream) {
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream,
     });
-  }, [me, stream]);
+
+    peer.on('signal', signal => {
+      socketRef.current?.emit('sending signal', { userToSignal, callerID, signal });
+    });
+
+    return peer;
+  }
+
+  function addPeer(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream) {
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream,
+    });
+
+    peer.on('signal', signal => {
+      socketRef.current?.emit('returning signal', { signal, callerID });
+    });
+
+    peer.signal(incomingSignal);
+
+    return peer;
+  }
 
   const startSpace = useCallback(
     (startResult: JoinSpace, url: string) => {
@@ -123,6 +144,8 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <SocketContext.Provider value={{ socket, joinSpace, switchParticipantType, startSpace, stream, me, streams }}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={{ socket: socket.current, joinSpace, switchParticipantType, startSpace, userVideo, peers }}>
+      {children}
+    </SocketContext.Provider>
   );
 }

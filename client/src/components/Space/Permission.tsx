@@ -17,7 +17,7 @@ function Permission() {
         dispatch(togglePermissionModal(false));
       })
       .catch(err => {
-        console.log('u got an error:' + err);
+        // console.log('u got an error:' + err);
       });
   }
   return (

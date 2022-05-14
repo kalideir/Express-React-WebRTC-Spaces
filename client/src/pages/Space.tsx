@@ -27,14 +27,14 @@ function Space() {
     setIsLoading(false);
   }, [dispatch, key]);
 
-  const { me, stream, socket } = useContext(SocketContext);
-  const currentUser = useTypedSelector(selectCurrentUser);
-  useEffect(() => {
-    console.log({ spaceSocketId });
+  // const { me, stream, socket } = useContext(SocketContext);
+  // const currentUser = useTypedSelector(selectCurrentUser);
+  // useEffect(() => {
+  //   // console.log({ spaceSocketId });
 
-    if (me && stream && activeSpace?.key && spaceSocketId)
-      socket.emit(JOIN_SPACE, { roomId: spaceSocketId, key: activeSpace?.key, peerId: me._id, userId: currentUser?.id });
-  }, [activeSpace?.key, me, socket, stream, currentUser?.id, spaceSocketId]);
+  //   if (me && stream && activeSpace?.key && spaceSocketId)
+  //     socket.emit(JOIN_SPACE, { roomId: spaceSocketId, key: activeSpace?.key, peerId: me._id, userId: currentUser?.id });
+  // }, [activeSpace?.key, me, socket, stream, currentUser?.id, spaceSocketId]);
 
   return (
     <div className="max-w-5xl mx-auto mb-10" id="space">

@@ -1,12 +1,16 @@
 import { useEffect, useRef } from 'react';
+import Peer from 'simple-peer';
 
-const StreamPlayer: React.FC<{ stream?: MediaStream }> = ({ stream }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+const Video = (props: { peer: Peer.Instance }) => {
+  const ref = useRef<any | null>(null);
 
   useEffect(() => {
-    if (videoRef.current && stream) videoRef.current.srcObject = stream;
-  }, [stream]);
-  return <video style={{ width: '100%' }} ref={videoRef} autoPlay muted={true} />;
+    props.peer.on('stream', (stream: unknown) => {
+      ref.current.srcObject = stream;
+    });
+  }, [props.peer]);
+
+  return <video style={{ width: '100%', height: '100%' }} playsInline autoPlay ref={ref} />;
 };
 
-export default StreamPlayer;
+export default Video;

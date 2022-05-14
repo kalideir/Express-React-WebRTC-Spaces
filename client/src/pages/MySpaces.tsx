@@ -28,7 +28,7 @@ function Spaces() {
   const { socket } = useContext(SocketContext);
 
   socket?.on('connection', () => {
-    console.log('ds');
+    // console.log('ds');
     // dispatch(setOwnSocketId(id));
   });
   useEffect(() => {
