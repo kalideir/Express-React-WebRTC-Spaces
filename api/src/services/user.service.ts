@@ -30,6 +30,10 @@ export function findUserById(id: string) {
   return UserModel.findById(id);
 }
 
+export async function getUserById(id: string) {
+  return (await UserModel.findById(id)).toJSON();
+}
+
 export function findUserByEmail(email: string) {
   return UserModel.findOne({ email });
 }

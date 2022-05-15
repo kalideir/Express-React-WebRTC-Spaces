@@ -16,7 +16,7 @@ redisClient.on('error', function (error) {
   logger.error(error);
 });
 
-export const setValue = (key: string, value: unknown) => redisClient.set(key, JSON.stringify(value));
+export const setValue = (key: string, value: unknown) => key && redisClient.set(key, JSON.stringify(value));
 
 export const getValue = async (key: string) => {
   console.log({ key });

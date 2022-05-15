@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useContext, useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { Requests, Streams } from '../components';
+import { Requests } from '../components';
 import { AddParticipant, Participants, SpaceActions, SpaceHeader } from '../components/Space';
-import { JOIN_SPACE, SpaceStatus } from '../constants';
+import { SpaceStatus } from '../constants';
 import { useTypedSelector } from '../hooks';
 import { Divider, Nav } from '../layout';
-import { SocketContext } from '../spaces';
-import { selectCurrentUser } from '../store/authSlice';
 import { getActiveSpace, selectActiveSocket, selectActiveSpace } from '../store/spaceSlice';
 
 function Space() {
@@ -52,7 +50,6 @@ function Space() {
         {!isLoading && activeSpace && activeSpace?.status !== SpaceStatus.CREATED && (
           <>
             <Divider />
-            <Streams />
             <SpaceActions />
             <Divider />
             <Participants />

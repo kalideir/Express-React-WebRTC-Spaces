@@ -1,3 +1,4 @@
+import Peer from 'simple-peer';
 import { ParticipantTypes, SpaceStatus } from '../constants';
 
 export type NewTokenData = {
@@ -162,3 +163,7 @@ export type JoinSpace = {
   message: string;
   space: SpaceItem;
 };
+
+export type SocketUser = { userId: string; user?: ParticipantItem; socketId: string };
+
+export type PeerUser = { userId: string; peer: Peer.Instance; participant?: ParticipantItem };

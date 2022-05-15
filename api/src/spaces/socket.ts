@@ -5,7 +5,18 @@ import { findParticipant, joinSpace, setSpaceStatus, switchType } from '../servi
 import { ParticipantStatus } from '../types';
 import { getValue, setValue } from '../utils';
 
-import { ALL_PARTICIPANTS, JOIN_SPACE, RECEIVING_RETURNED_SIGNAL, RETURNING_SIGNAL, SENDING_SIGNAL, UPDATED_SPACE, USER_JOINED } from './types';
+import {
+  ALLOW_REMOTE_MIC,
+  ALL_PARTICIPANTS,
+  JOIN_SPACE,
+  MUTE_REMOTE_MIC,
+  RECEIVING_RETURNED_SIGNAL,
+  RETURNING_SIGNAL,
+  SENDING_SIGNAL,
+  UPDATED_SPACE,
+  USER_DISCONNECTED,
+  USER_JOINED,
+} from './types';
 
 const clientUrl = config.get<string>('clientUrl');
 
@@ -25,19 +36,7 @@ export function initSocketServer(server: Server) {
 
       const prevUsers = ((await getValue(spaceId)) as { userId: string; socketId: string }[]) || [];
 
-      let users = prevUsers.length ? [...prevUsers, { socketId: socket.id, userId }] : [{ socketId: socket.id, userId }];
-
-      if (users.length > 2) {
-        users = users.reduce((acc, curr) => {
-          const exists = !!acc.find(user => user.userId === userId);
-
-          if (!exists) {
-            acc.push(curr);
-            return acc;
-          }
-          return acc;
-        }, []);
-      }
+      const users = prevUsers.length ? [...prevUsers, { socketId: socket.id, userId }] : [{ socketId: socket.id, userId }];
 
       await setValue(spaceId, users);
 
@@ -45,33 +44,38 @@ export function initSocketServer(server: Server) {
 
       const usersInThisRoom = users.filter(user => user.socketId !== socket.id);
 
-      const space = await joinSpace(spaceId, userId, type);
+      const spaceResponse = await joinSpace(spaceId, userId, type);
 
       socket.emit(ALL_PARTICIPANTS, usersInThisRoom);
 
-      socket.emit(UPDATED_SPACE, space);
+      spaceResponse && socket.emit(UPDATED_SPACE, spaceResponse);
     });
 
     socket.on(SENDING_SIGNAL, payload => {
-      io.to(payload.userToSignal).emit(USER_JOINED, { signal: payload.signal, callerID: payload.callerID });
+      io.to(payload.userToSignal).emit(USER_JOINED, { signal: payload.signal, callerId: payload.callerId, userId: payload.userId });
     });
 
     socket.on(RETURNING_SIGNAL, payload => {
-      io.to(payload.callerID).emit(RECEIVING_RETURNED_SIGNAL, { signal: payload.signal, id: socket.id });
+      io.to(payload.callerId).emit(RECEIVING_RETURNED_SIGNAL, { signal: payload.signal, id: socket.id });
+    });
+
+    socket.on(MUTE_REMOTE_MIC, targetId => {
+      io.to(targetId).emit(MUTE_REMOTE_MIC);
+    });
+
+    socket.on(ALLOW_REMOTE_MIC, targetId => {
+      io.to(targetId).emit(ALLOW_REMOTE_MIC);
     });
 
     socket.on('disconnect', async () => {
       const spaceId = (await getValue(socket.id)) as string;
-      const users = ((await getValue(spaceId)) as { userId: string; socketId: string }[]) || [];
+      let users = ((await getValue(spaceId)) as { userId: string; socketId: string }[]) || [];
+      users = users.filter(user => user.socketId !== socket.id);
 
-      let room = users[spaceId];
-      if (room) {
-        room = room.filter(user => user.socketId !== socket.id);
-        users[spaceId] = room;
+      setValue(spaceId, users);
+      setValue(socket.id, null);
 
-        setValue(spaceId, []); // users
-        setValue(socket.id, null);
-      }
+      socket.to(spaceId).emit(USER_DISCONNECTED, socket.id);
     });
   });
 

@@ -231,6 +231,8 @@ export const selectSpaceBoard = (state: RootState) =>
     (participant: ParticipantItem) => !([ParticipantTypes.GUEST, ParticipantTypes.PENDING] as string[]).includes(participant.type as string),
   );
 
+export const selectSpaceParticipants = (state: RootState) => state.spaces.activeSpace?.participants || [];
+
 export const selectSpaceGuests = (state: RootState) =>
   (state.spaces.activeSpace?.participants || []).filter((participant: ParticipantItem) => participant.type === ParticipantTypes.GUEST);
 

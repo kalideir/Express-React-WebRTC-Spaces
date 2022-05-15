@@ -1,15 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { createContext, ReactNode, useEffect, useRef, useState } from 'react';
-import io, { Socket } from 'socket.io-client';
 import { useSnackbar } from 'notistack';
-import Peer from 'simple-peer';
-import { useCallback } from 'react';
+import { createContext, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch, useTypedSelector } from '../hooks';
-import { JoinSpace } from '../@types';
-import { selectCurrentUser } from '../store/authSlice';
-import { getOnlineSpaces, selectActiveSpace, setActiveSpace, setOwnSocketId } from '../store/spaceSlice';
+import Peer from 'simple-peer';
+import io, { Socket } from 'socket.io-client';
+import type { JoinSpace, PeerUser, SocketUser } from '../@types';
 import {
   ALL_PARTICIPANTS,
   JOIN_SPACE,
@@ -19,7 +15,9 @@ import {
   SENDING_SIGNAL,
   USER_JOINED,
 } from '../constants';
-import { nanoid } from '@reduxjs/toolkit';
+import { useAppDispatch, useTypedSelector } from '../hooks';
+import { selectCurrentUser } from '../store/authSlice';
+import { getOnlineSpaces, selectActiveSpace, setActiveSpace } from '../store/spaceSlice';
 
 export const SocketContext = createContext<
   | {
@@ -32,7 +30,8 @@ export const SocketContext = createContext<
       streams: { [key: string]: MediaStream };
 
       userVideo: MediaStream | null;
-      peers: Peer.Instance[];
+      peers: PeerUser[];
+      users: SocketUser[];
     }
   | any
 >({});
@@ -45,13 +44,16 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const [peers, setPeers] = useState<Peer.Instance[]>([]);
+  const [peers, setPeers] = useState<PeerUser[]>([]);
   const socketRef = useRef<Socket | null>();
   const userVideo = useRef<any | null>({});
-  const peersRef = useRef<{ peerID: string; peer: Peer.Instance }[]>([]);
+  const peersRef = useRef<{ peerId: string; peer: Peer.Instance }[]>([]);
   const spaceId = activeSpace?.key;
+  const [users, setUsers] = useState<SocketUser[]>([]);
 
-  console.log(peers, 'x');
+  const isAMember = users.find(user => user.userId === currentUser?.id);
+
+  console.log({ peers, users });
 
   useEffect(() => {
     if (!currentUser?.id) return;
@@ -69,39 +71,50 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
             ? ParticipantTypes.GUEST
             : ParticipantTypes.PENDING,
       });
-      socketRef.current?.on(ALL_PARTICIPANTS, users => {
-        const peers: Peer.Instance[] = [];
-        console.log({ users });
 
-        users.forEach(({ userId, socketId }: { userId: string; socketId: string }) => {
-          const peer = createPeer(socketId, socketRef.current?.id as string, stream);
+      // socketRef.current?.on(UPDATED_SPACE, (spaceResponse: { space: SpaceItem; [key: string]: any } | null) => {
+      //   spaceResponse?.space && dispatch(setActiveSpace(spaceResponse.space));
+      // });
+
+      socketRef.current?.on(ALL_PARTICIPANTS, (users: SocketUser[]) => {
+        users = users.reduce((acc, curr) => {
+          const exists = !!acc.find(user => user.userId === curr.userId);
+          if (exists) return acc;
+          acc.push(curr);
+          return acc;
+        }, [] as SocketUser[]);
+        setUsers(users);
+        const peers: PeerUser[] = [];
+
+        users.forEach(({ userId, socketId }: SocketUser) => {
+          const peer = createPeer(socketId, socketRef.current?.id as string, stream, userId);
           peersRef.current.push({
-            peerID: socketId,
+            peerId: socketId,
             peer,
           });
-          peers.push(peer);
+          peers.push({ userId, peer });
         });
         setPeers(peers);
       });
 
       socketRef.current?.on(USER_JOINED, payload => {
-        const peer = addPeer(payload.signal, payload.callerID, stream);
+        const peer = addPeer(payload.signal, payload.callerId, stream);
         peersRef.current.push({
-          peerID: payload.callerID,
+          peerId: payload.callerId,
           peer,
         });
 
-        setPeers(users => [...users, peer]);
+        setPeers(ps => [...ps, { userId: payload.userId, peer }]);
       });
 
       socketRef.current?.on(RECEIVING_RETURNED_SIGNAL, payload => {
-        const item = peersRef.current.find(p => p.peerID === payload.id);
+        const item = peersRef.current.find(p => p.peerId === payload.id);
         item?.peer.signal(payload.signal);
       });
     });
   }, [spaceId, currentUser?.id]);
 
-  function createPeer(userToSignal: string, callerID: string, stream: MediaStream) {
+  function createPeer(userToSignal: string, callerId: string, stream: MediaStream, userId: string) {
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -109,13 +122,13 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
     });
 
     peer.on('signal', signal => {
-      socketRef.current?.emit(SENDING_SIGNAL, { userToSignal, callerID, signal });
+      socketRef.current?.emit(SENDING_SIGNAL, { userToSignal, callerId, signal, userId });
     });
 
     return peer;
   }
 
-  function addPeer(incomingSignal: Peer.SignalData, callerID: string, stream: MediaStream) {
+  function addPeer(incomingSignal: Peer.SignalData, callerId: string, stream: MediaStream) {
     const peer = new Peer({
       initiator: false,
       trickle: false,
@@ -123,7 +136,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
     });
 
     peer.on('signal', signal => {
-      socketRef.current?.emit(RETURNING_SIGNAL, { signal, callerID });
+      socketRef.current?.emit(RETURNING_SIGNAL, { signal, callerId });
     });
 
     peer.signal(incomingSignal);
@@ -166,7 +179,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <SocketContext.Provider value={{ socket: socket.current, joinSpace, switchParticipantType, startSpace, userVideo, peers }}>
+    <SocketContext.Provider value={{ socket: socket.current, joinSpace, switchParticipantType, startSpace, userVideo, peers, users }}>
       {children}
     </SocketContext.Provider>
   );

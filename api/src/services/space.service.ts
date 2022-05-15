@@ -13,7 +13,7 @@ export async function joinSpace(key: string, userId: string, type: ParticipantSt
   let space = await findSpace({ key });
   const isParticipant = await findParticipant({ userId, spaceId: space.id });
   if (isParticipant) {
-    return { message: 'Already a member' };
+    return;
   }
   const input = { type, userId, spaceId: space.id };
   const participant = await ParticipantModel.create(input);
