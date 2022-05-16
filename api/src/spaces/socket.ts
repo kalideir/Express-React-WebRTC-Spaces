@@ -31,16 +31,24 @@ export function initSocketServer(server: Server) {
   });
 
   io.on('connection', socket => {
+    console.log({ id: socket.id });
+
     socket.on(JOIN_SPACE, async ({ spaceId, userId, type }: { spaceId: string; userId: string; type: ParticipantStatus }) => {
       if (!spaceId || !userId || !type) return;
 
       const prevUsers = ((await getValue(spaceId)) as { userId: string; socketId: string }[]) || [];
 
-      const users = prevUsers.length ? [...prevUsers, { socketId: socket.id, userId }] : [{ socketId: socket.id, userId }];
+      const exists = !!prevUsers.find(user => user.userId === userId);
+
+      const users = [...prevUsers];
+      if (!exists) users.push({ socketId: socket.id, userId });
+
+      console.log({ users, prevUsers });
 
       await setValue(spaceId, users);
 
-      await setValue(socket.id, spaceId);
+      await setValue(`get-space-${socket.id}`, spaceId);
+      await setValue(`get-user-${socket.id}`, userId);
 
       const usersInThisRoom = users.filter(user => user.socketId !== socket.id);
 
@@ -70,14 +78,16 @@ export function initSocketServer(server: Server) {
     });
 
     socket.on('disconnect', async () => {
-      const spaceId = (await getValue(socket.id)) as string;
+      const spaceId = (await getValue(`get-space-${socket.id}`)) || '';
+      const userId = (await getValue(`get-user-${socket.id}`)) || '';
+
       let users = ((await getValue(spaceId)) as { userId: string; socketId: string }[]) || [];
-      users = users.filter(user => user.socketId !== socket.id);
+      users = users.filter(user => user.socketId !== socket.id).filter(user => user.userId !== userId);
 
-      // setValue(spaceId, users);
-      // setValue(socket.id, null);
+      await setValue(spaceId, users);
+      await setValue(`get-space-${socket.id}`, null);
 
-      // io.to(spaceId).emit(USER_DISCONNECTED, socket.id);
+      io.to(socket.id).emit(USER_DISCONNECTED, socket.id);
     });
   });
 

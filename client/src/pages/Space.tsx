@@ -7,6 +7,7 @@ import { AddParticipant, Participants, SpaceActions, SpaceHeader } from '../comp
 import { SpaceStatus } from '../constants';
 import { useTypedSelector } from '../hooks';
 import { Divider, Nav } from '../layout';
+import { selectCurrentUser } from '../store/authSlice';
 import { getActiveSpace, selectActiveSpace } from '../store/spaceSlice';
 
 function Space() {
@@ -17,6 +18,8 @@ function Space() {
   useLayoutEffect(() => {
     window.history.replaceState(null, '');
   }, []);
+
+  const currentUser = useTypedSelector(selectCurrentUser);
 
   useEffect(() => {
     setIsLoading(true);
@@ -36,15 +39,16 @@ function Space() {
         />
       </div>
       <div className="mx-auto rounded-xl pb-10 w-full mt-3 pt-2">
-        <SpaceHeader />
+        <h1 className="text-3xl text-slate-200">You are {currentUser?.username}</h1>
+        {/* <SpaceHeader /> */}
         {!isLoading && activeSpace && activeSpace?.status !== SpaceStatus.CREATED && (
           <>
-            <Streams />
-            <Participants />
+            {/* <Streams /> */}
 
+            {/* <Divider /> */}
+            {/* <SpaceActions /> */}
             <Divider />
-            <SpaceActions />
-            <Divider />
+            <Participants />
           </>
         )}
 

@@ -19,6 +19,7 @@ import {
   RETURNING_SIGNAL,
   SENDING_SIGNAL,
   UPDATED_SPACE,
+  USER_DISCONNECTED,
   USER_JOINED,
 } from '../constants';
 import { nanoid } from '@reduxjs/toolkit';
@@ -59,26 +60,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
             : ParticipantTypes.PENDING,
       });
 
-      // socketRef.current?.on(UPDATED_SPACE, (spaceResponse: { space: SpaceItem; [key: string]: any } | null) => {
-      //   spaceResponse?.space && dispatch(setActiveSpace(spaceResponse.space));
-      // });
-      socketRef?.current?.on(MUTE_REMOTE_MIC, (e: any) => {
-        console.log({ e });
-
-        // const videoTrack = ref.current?.getTracks().find((track: { kind: string }) => track.kind === 'audio');
-        // console.log({ videoTrack });
-
-        // videoTrack.enabled = false;
-      });
-
       socketRef.current?.on(ALL_PARTICIPANTS, (_users: SocketUser[]) => {
-        // _users = _users.reduce((acc, curr) => {
-        //   const exists = !!acc.find(user => user.userId === curr.userId);
-        //   if (exists) return acc;
-        //   acc.push(curr);
-        //   return acc;
-        // }, [] as SocketUser[]);
-
         const ps: PeerUser[] = [];
 
         _users.forEach(({ userId, socketId }: SocketUser) => {
@@ -105,9 +87,18 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
       });
 
       socketRef.current?.on(RECEIVING_RETURNED_SIGNAL, payload => {
+        console.log({ payload });
+
         const item = peersRef.current.find(p => p.peerId === payload.id);
         // !item?.peer.destroyed &&
         item?.peer.signal(payload.signal);
+      });
+
+      socketRef.current?.on(USER_DISCONNECTED, diconnecting => {
+        console.log({ diconnecting });
+        // const item = peersRef.current.find(p => p.peerId === payload.id);
+        // !item?.peer.destroyed &&
+        // item?.peer.signal(payload.signal);
       });
     });
   }, [spaceId, currentUser?.id]);
