@@ -1,11 +1,12 @@
 import { useContext } from 'react';
 import Peer from 'simple-peer';
 import { StreamPlayer } from '.';
-import { PeerUser } from '../../@types';
+import { PeerUser, SpaceContext } from '../../@types';
 import { SocketContext } from '../../spaces';
 
 function Streams() {
-  const { stream, peers, userVideo } = useContext(SocketContext);
+  const { stream, peers, userVideo } = useContext<any | SpaceContext>(SocketContext);
+  console.log({ peers });
 
   return (
     <div

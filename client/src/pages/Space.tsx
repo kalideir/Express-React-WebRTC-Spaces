@@ -2,19 +2,18 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { Requests } from '../components';
+import { Requests, Streams } from '../components';
 import { AddParticipant, Participants, SpaceActions, SpaceHeader } from '../components/Space';
 import { SpaceStatus } from '../constants';
 import { useTypedSelector } from '../hooks';
 import { Divider, Nav } from '../layout';
-import { getActiveSpace, selectActiveSocket, selectActiveSpace } from '../store/spaceSlice';
+import { getActiveSpace, selectActiveSpace } from '../store/spaceSlice';
 
 function Space() {
   const dispatch = useDispatch();
   const { key, slug } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const activeSpace = useTypedSelector(selectActiveSpace);
-  const spaceSocketId = useTypedSelector(selectActiveSocket);
   useLayoutEffect(() => {
     window.history.replaceState(null, '');
   }, []);
@@ -24,15 +23,6 @@ function Space() {
     dispatch(getActiveSpace(key || ''));
     setIsLoading(false);
   }, [dispatch, key]);
-
-  // const { me, stream, socket } = useContext(SocketContext);
-  // const currentUser = useTypedSelector(selectCurrentUser);
-  // useEffect(() => {
-  //   // console.log({ spaceSocketId });
-
-  //   if (me && stream && activeSpace?.key && spaceSocketId)
-  //     socket.emit(JOIN_SPACE, { roomId: spaceSocketId, key: activeSpace?.key, peerId: me._id, userId: currentUser?.id });
-  // }, [activeSpace?.key, me, socket, stream, currentUser?.id, spaceSocketId]);
 
   return (
     <div className="max-w-5xl mx-auto mb-10" id="space">
@@ -49,10 +39,12 @@ function Space() {
         <SpaceHeader />
         {!isLoading && activeSpace && activeSpace?.status !== SpaceStatus.CREATED && (
           <>
+            <Streams />
+            <Participants />
+
             <Divider />
             <SpaceActions />
             <Divider />
-            <Participants />
           </>
         )}
 

@@ -7,7 +7,7 @@ export default function NoAuthRoute({ element: Component }: { element: () => JSX
   const location = useLocation();
 
   if (user && isAuthenticated) {
-    return <Navigate to="/" state={{ from: location }} replace />;
+    return <Navigate to="/space/XInVH91Lt2Qa5uQ5hsE8/New-Space" state={{ from: location }} replace />;
   }
   return <Component />;
 }

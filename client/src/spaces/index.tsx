@@ -1,40 +1,29 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { createContext, ReactNode, useEffect, useRef, useState } from 'react';
+import io, { Socket } from 'socket.io-client';
 import { useSnackbar } from 'notistack';
-import { createContext, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import Peer from 'simple-peer';
+import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Peer from 'simple-peer';
-import io, { Socket } from 'socket.io-client';
-import type { JoinSpace, PeerUser, SocketUser } from '../@types';
+import { useAppDispatch, useTypedSelector } from '../hooks';
+import { JoinSpace, PeerUser, SocketUser, SpaceContext, SpaceItem } from '../@types';
+import { selectCurrentUser } from '../store/authSlice';
+import { getOnlineSpaces, selectActiveSpace, setActiveSpace, setOwnSocketId } from '../store/spaceSlice';
 import {
   ALL_PARTICIPANTS,
   JOIN_SPACE,
+  MUTE_REMOTE_MIC,
   ParticipantTypes,
   RECEIVING_RETURNED_SIGNAL,
   RETURNING_SIGNAL,
   SENDING_SIGNAL,
+  UPDATED_SPACE,
   USER_JOINED,
 } from '../constants';
-import { useAppDispatch, useTypedSelector } from '../hooks';
-import { selectCurrentUser } from '../store/authSlice';
-import { getOnlineSpaces, selectActiveSpace, setActiveSpace } from '../store/spaceSlice';
+import { nanoid } from '@reduxjs/toolkit';
 
-export const SocketContext = createContext<
-  | {
-      socket: Socket | null;
-      joinSpace: unknown;
-      switchParticipantType: unknown;
-      startSpace: unknown;
-      stream: MediaStream | null;
-      me: Peer.Instance;
-      streams: { [key: string]: MediaStream };
-
-      userVideo: MediaStream | null;
-      peers: PeerUser[];
-      users: SocketUser[];
-    }
-  | any
->({});
+export const SocketContext = createContext<any | SpaceContext>({});
 
 export default function SocketProvider({ children }: { children: ReactNode }) {
   const socket = useRef<Socket | null>(null);
@@ -53,13 +42,11 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
 
   const isAMember = users.find(user => user.userId === currentUser?.id);
 
-  console.log({ peers, users });
-
   useEffect(() => {
     if (!currentUser?.id) return;
     socketRef.current = io('http://localhost:8000');
 
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+    navigator.mediaDevices.getUserMedia({ video: !false, audio: true }).then(stream => {
       userVideo.current.srcObject = stream;
       socketRef.current?.emit(JOIN_SPACE, {
         spaceId,
@@ -75,40 +62,51 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
       // socketRef.current?.on(UPDATED_SPACE, (spaceResponse: { space: SpaceItem; [key: string]: any } | null) => {
       //   spaceResponse?.space && dispatch(setActiveSpace(spaceResponse.space));
       // });
+      socketRef?.current?.on(MUTE_REMOTE_MIC, (e: any) => {
+        console.log({ e });
 
-      socketRef.current?.on(ALL_PARTICIPANTS, (users: SocketUser[]) => {
-        users = users.reduce((acc, curr) => {
-          const exists = !!acc.find(user => user.userId === curr.userId);
-          if (exists) return acc;
-          acc.push(curr);
-          return acc;
-        }, [] as SocketUser[]);
-        setUsers(users);
-        const peers: PeerUser[] = [];
+        // const videoTrack = ref.current?.getTracks().find((track: { kind: string }) => track.kind === 'audio');
+        // console.log({ videoTrack });
 
-        users.forEach(({ userId, socketId }: SocketUser) => {
+        // videoTrack.enabled = false;
+      });
+
+      socketRef.current?.on(ALL_PARTICIPANTS, (_users: SocketUser[]) => {
+        // _users = _users.reduce((acc, curr) => {
+        //   const exists = !!acc.find(user => user.userId === curr.userId);
+        //   if (exists) return acc;
+        //   acc.push(curr);
+        //   return acc;
+        // }, [] as SocketUser[]);
+
+        const ps: PeerUser[] = [];
+
+        _users.forEach(({ userId, socketId }: SocketUser) => {
           const peer = createPeer(socketId, socketRef.current?.id as string, stream, userId);
+
           peersRef.current.push({
             peerId: socketId,
             peer,
           });
-          peers.push({ userId, peer });
+          ps.push({ peer, userId, socketId });
         });
-        setPeers(peers);
+        setPeers(ps);
       });
 
       socketRef.current?.on(USER_JOINED, payload => {
         const peer = addPeer(payload.signal, payload.callerId, stream);
+
         peersRef.current.push({
           peerId: payload.callerId,
           peer,
         });
 
-        setPeers(ps => [...ps, { userId: payload.userId, peer }]);
+        setPeers(ps => [...ps, { peer, userId: payload.userId, socketId: payload.callerId }]);
       });
 
       socketRef.current?.on(RECEIVING_RETURNED_SIGNAL, payload => {
         const item = peersRef.current.find(p => p.peerId === payload.id);
+        // !item?.peer.destroyed &&
         item?.peer.signal(payload.signal);
       });
     });
@@ -139,6 +137,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
       socketRef.current?.emit(RETURNING_SIGNAL, { signal, callerId });
     });
 
+    // !peer.destroyed &&
     peer.signal(incomingSignal);
 
     return peer;
@@ -179,7 +178,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <SocketContext.Provider value={{ socket: socket.current, joinSpace, switchParticipantType, startSpace, userVideo, peers, users }}>
+    <SocketContext.Provider value={{ socket: socket.current, socketRef, joinSpace, switchParticipantType, startSpace, userVideo, peers, users }}>
       {children}
     </SocketContext.Provider>
   );

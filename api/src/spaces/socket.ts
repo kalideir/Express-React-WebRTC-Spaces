@@ -48,7 +48,7 @@ export function initSocketServer(server: Server) {
 
       socket.emit(ALL_PARTICIPANTS, usersInThisRoom);
 
-      spaceResponse && socket.emit(UPDATED_SPACE, spaceResponse);
+      // spaceResponse && socket.emit(UPDATED_SPACE, spaceResponse);
     });
 
     socket.on(SENDING_SIGNAL, payload => {
@@ -60,7 +60,9 @@ export function initSocketServer(server: Server) {
     });
 
     socket.on(MUTE_REMOTE_MIC, targetId => {
-      io.to(targetId).emit(MUTE_REMOTE_MIC);
+      console.log({ targetId });
+
+      io.to(targetId).emit(MUTE_REMOTE_MIC, targetId);
     });
 
     socket.on(ALLOW_REMOTE_MIC, targetId => {
@@ -72,10 +74,10 @@ export function initSocketServer(server: Server) {
       let users = ((await getValue(spaceId)) as { userId: string; socketId: string }[]) || [];
       users = users.filter(user => user.socketId !== socket.id);
 
-      setValue(spaceId, users);
-      setValue(socket.id, null);
+      // setValue(spaceId, users);
+      // setValue(socket.id, null);
 
-      socket.to(spaceId).emit(USER_DISCONNECTED, socket.id);
+      // io.to(spaceId).emit(USER_DISCONNECTED, socket.id);
     });
   });
 

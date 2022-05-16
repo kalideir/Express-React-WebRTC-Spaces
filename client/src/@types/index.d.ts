@@ -166,4 +166,18 @@ export type JoinSpace = {
 
 export type SocketUser = { userId: string; user?: ParticipantItem; socketId: string };
 
-export type PeerUser = { userId: string; peer: Peer.Instance; participant?: ParticipantItem };
+export type PeerUser = { userId: string; peer: Peer.Instance; participant?: ParticipantItem; socketId: string };
+
+export type SpaceContext = {
+  socket: Socket | null;
+  joinSpace: unknown;
+  switchParticipantType: unknown;
+  startSpace: unknown;
+  stream: MediaStream | null;
+  me: Peer.Instance;
+  streams: { [key: string]: MediaStream };
+
+  userVideo: MediaStream | null;
+  peers: PeerUser[];
+  users: SocketUser[];
+};

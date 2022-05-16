@@ -1,25 +1,25 @@
 import React from 'react';
+import Peer from 'simple-peer';
 import { StreamPlayer } from '.';
 import { ParticipantItem } from '../../@types';
 import { getAvatar } from '../../utils';
-import Peer from 'simple-peer';
 interface IProps {
   participant?: ParticipantItem;
   peer: Peer.Instance;
+  socketId: string;
 }
 
 function Participant(props: IProps) {
   const { participant } = props;
   const user = participant?.user;
 
-  if (!props.peer) return null;
-  console.log({ peer: props.peer.connected });
+  // if (!props.peer) return null;
 
   // if (!props.peer.connected) return null;
 
   return (
-    <div className="flex-col items-center justify-center mx-auto w-full bg-slate-200 dark:bg-slate-800 rounded-md py-4">
-      <StreamPlayer peer={props.peer} />
+    <div className="flex-col items-center justify-center mx-auto w-full h-40 bg-slate-200 dark:bg-slate-800 rounded-md py-4">
+      <StreamPlayer socketId={props.socketId} peer={props.peer} />
 
       <img src={user?.profilePicture?.smallUrl || getAvatar(user?.username)} className="bg-slate-500 rounded-full h-12 w-12 mx-auto" />
       <div className="flex items-center justify-center my-1">
