@@ -177,7 +177,7 @@ export type SpaceContext = {
   me: Peer.Instance;
   streams: { [key: string]: MediaStream };
 
-  userVideo: MediaStream | null;
+  userStream: MediaStream | null;
   peers: PeerUser[];
   users: SocketUser[];
 };

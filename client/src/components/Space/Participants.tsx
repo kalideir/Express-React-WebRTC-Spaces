@@ -1,6 +1,6 @@
 import { nanoid } from '@reduxjs/toolkit';
 import { useContext, useMemo } from 'react';
-import { Participant, StreamPlayer } from '.';
+import { OwnStream, Participant, StreamPlayer } from '.';
 import { ParticipantItem, PeerUser } from '../../@types';
 import { useTypedSelector } from '../../hooks';
 import { SocketContext } from '../../spaces';
@@ -17,7 +17,7 @@ function Participants() {
       peers
         // .filter(({ userId }) => userId !== currentUser?.id)
         .map((peer: PeerUser) => {
-          console.log('x', peer.userId, currentUser?.id);
+          // console.log('x', peer.userId, currentUser?.id);
 
           const participant = participants.find(participant => participant.userId === peer.userId);
           return { ...peer, participant };
@@ -34,10 +34,10 @@ function Participants() {
 
   return (
     <div className="mt-5 bg-slate-50 dark:bg-slate-900 py-2 shadow-md rounded-md grid grid-cols-5 auto-rows-fr text-center self-center gap-1">
-      {/* <Participant key={nanoid()} socketId={peerUser.socketId} participant={peerUser.participant} peer={peerUser.peer} /> */}
+      <OwnStream />
       {items.map((peerUser: PeerUser) => (
         <div key={peerUser.socketId}>
-          <StreamPlayer peer={peerUser.peer} />
+          {/* <StreamPlayer peer={peerUser.peer} /> */}
           <Participant key={nanoid()} socketId={peerUser.socketId} participant={peerUser.participant} peer={peerUser.peer} />
         </div>
       ))}

@@ -1,12 +1,11 @@
 import { useContext } from 'react';
-import Peer from 'simple-peer';
 import { StreamPlayer } from '.';
 import { PeerUser, SpaceContext } from '../../@types';
 import { SocketContext } from '../../spaces';
 
 function Streams() {
-  const { stream, peers, userVideo, streams } = useContext<any | SpaceContext>(SocketContext);
-  console.log({ peers }, 'x');
+  const { stream, peers, streams } = useContext<any | SpaceContext>(SocketContext);
+  // console.log({ peers }, 'x');
 
   return (
     <div
@@ -15,9 +14,12 @@ function Streams() {
     >
       <span>{peers.length}</span>
       <div className=" grid grid-cols-5 auto-rows-fr text-center self-center gap-1">
-        <video style={{ background: '#f8f8f8' }} autoPlay playsInline ref={userVideo} />
+        {/* <video style={{ background: '#f8f8f8' }} autoPlay playsInline ref={userVideo} /> */}
         {peers.map((peer: PeerUser, index: number) => (
-          <StreamPlayer peer={peer.peer} key={index.toString()} />
+          <div key={index.toString()}>
+            <h1>{peer.userId}</h1>
+            <StreamPlayer peer={peer.peer} />
+          </div>
         ))}
       </div>
     </div>

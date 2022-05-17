@@ -39,7 +39,9 @@ function Space() {
         />
       </div>
       <div className="mx-auto rounded-xl pb-10 w-full mt-3 pt-2">
-        <h1 className="text-3xl text-slate-200">You are {currentUser?.username}</h1>
+        <h1 className="text-3xl text-slate-200">
+          You are {currentUser?.username} {currentUser?.id}
+        </h1>
         {/* <SpaceHeader /> */}
         {!isLoading && activeSpace && activeSpace?.status !== SpaceStatus.CREATED && (
           <>

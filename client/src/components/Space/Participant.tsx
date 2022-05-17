@@ -19,9 +19,8 @@ function Participant(props: IProps) {
 
   return (
     <>
-      <div className="flex-col items-center justify-center mx-auto w-full h-40 bg-slate-200 dark:bg-slate-800 rounded-md py-4">
-        {/* <StreamPlayer socketId={props.socketId} peer={props.peer} /> */}
-
+      <div className="flex-col items-center justify-center mx-auto w-full bg-slate-200 dark:bg-slate-800 rounded-md py-4">
+        <StreamPlayer socketId={props.socketId} peer={props.peer} />
         <img src={user?.profilePicture?.smallUrl || getAvatar(user?.username)} className="bg-slate-500 rounded-full h-12 w-12 mx-auto" />
         <div className="flex items-center justify-center my-1">
           <span className="bg-slate-100 text-slate-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-slate-700 mt-1 dark:text-slate-300">

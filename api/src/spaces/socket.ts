@@ -1,10 +1,9 @@
 import config from 'config';
 import { Server } from 'http';
 import { Server as SocketServer } from 'socket.io';
-import { findParticipant, joinSpace, setSpaceStatus, switchType } from '../services';
+import { joinSpace } from '../services';
 import { ParticipantStatus } from '../types';
 import { getValue, setValue } from '../utils';
-
 import {
   ALLOW_REMOTE_MIC,
   ALL_PARTICIPANTS,
@@ -13,7 +12,6 @@ import {
   RECEIVING_RETURNED_SIGNAL,
   RETURNING_SIGNAL,
   SENDING_SIGNAL,
-  UPDATED_SPACE,
   USER_DISCONNECTED,
   USER_JOINED,
 } from './types';
@@ -43,14 +41,14 @@ export function initSocketServer(server: Server) {
       const users = [...prevUsers];
       if (!exists) users.push({ socketId: socket.id, userId });
 
-      console.log({ users, prevUsers });
+      console.log({ users, prevUsers, exists });
 
       await setValue(spaceId, users);
 
       await setValue(`get-space-${socket.id}`, spaceId);
       await setValue(`get-user-${socket.id}`, userId);
 
-      const usersInThisRoom = users.filter(user => user.socketId !== socket.id);
+      const usersInThisRoom = users.filter(user => user.userId !== userId);
 
       const spaceResponse = await joinSpace(spaceId, userId, type);
 
@@ -60,6 +58,8 @@ export function initSocketServer(server: Server) {
     });
 
     socket.on(SENDING_SIGNAL, payload => {
+      console.log(payload.callerId, payload.userId, payload.userToSignal, 'sending_signal');
+
       io.to(payload.userToSignal).emit(USER_JOINED, { signal: payload.signal, callerId: payload.callerId, userId: payload.userId });
     });
 
