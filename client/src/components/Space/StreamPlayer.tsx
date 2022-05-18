@@ -25,7 +25,7 @@ const Video = (props: { peer: Peer.Instance; socketId?: string }) => {
 
   // useEffect(() => {
   //   socketRef?.current?.on(MUTE_REMOTE_MIC, (res: any) => {
-  //     console.log('xxxx', res);
+  //     // console.log('xxxx', res);
 
   //     // videoTrack.enabled = false;
   //     // currStream.enabled = false;
@@ -35,18 +35,18 @@ const Video = (props: { peer: Peer.Instance; socketId?: string }) => {
   function toggleMute() {
     // if (currStream.enabled) socketRef.current?.emit(MUTE_REMOTE_MIC, props.socketId);
     // else if (!currStream.enabled) socketRef.current?.emit(ALLOW_REMOTE_MIC, props.socketId);
-    console.log({ props });
+    // console.log({ props });
   }
 
   return (
-    <div className="flex-col items-center justify-center p-1">
+    <div className="flex-col items-center justify-center p-1 bg-slate-500 m-1 mb-2 h-auto">
       <video style={{ width: '100%', height: '100%' }} playsInline autoPlay ref={ref} />
       {/* {isOwner && ( */}
       <button
         onClick={toggleMute}
         className="bg-indigo-500 text-slate-100 mt-2 rounded py-2 h-6 text-xs px-4 flex items-center justify-center mx-auto"
       >
-        {!currStream.enabled ? (
+        {!currStream.enabled && currentUser?.id === currentSpace?.ownerId ? (
           <BsFillMicFill size={20} className="text-slate-800 dark:text-slate-200 mx-auto" />
         ) : (
           <BsFillMicMuteFill size={20} className="text-slate-800 dark:text-slate-200 mx-auto" />

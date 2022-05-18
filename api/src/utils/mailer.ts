@@ -53,7 +53,7 @@ async function sendEmail(options: SendMailOptions, context: SendMailContext, tem
   };
   transporter.sendMail(payload, (err, info) => {
     if (err) {
-      // console.log({ err });
+      // // console.log({ err });
       logger.error(err);
       return;
     }

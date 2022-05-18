@@ -19,7 +19,7 @@ redisClient.on('error', function (error) {
 export const setValue = (key: string, value: unknown) => key && redisClient.set(key, JSON.stringify(value));
 
 export const getValue = async (key: string) => {
-  console.log({ key });
+  // console.log({ key });
 
   const value = (await redisClient.get(key || '')) || 'null';
   return JSON.parse(value);
