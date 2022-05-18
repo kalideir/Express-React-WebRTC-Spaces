@@ -48,7 +48,7 @@ export function initSocketServer(server: Server) {
       await setValue(`get-space-${socket.id}`, spaceId);
       await setValue(`get-user-${socket.id}`, userId);
 
-      const usersInThisRoom = users.filter(user => user.userId !== userId);
+      const usersInThisRoom = users.filter(user => user.socketId !== socket.id);
 
       const spaceResponse = await joinSpace(spaceId, userId, type);
 
@@ -59,11 +59,16 @@ export function initSocketServer(server: Server) {
 
     socket.on(SENDING_SIGNAL, payload => {
       console.log(payload.callerId, payload.userId, payload.userToSignal, 'sending_signal');
-
-      io.to(payload.userToSignal).emit(USER_JOINED, { signal: payload.signal, callerId: payload.callerId, userId: payload.userId });
+      io.to(payload.userToSignal).emit(USER_JOINED, {
+        signal: payload.signal,
+        callerId: payload.callerId,
+        userId: payload.userId,
+        userToSignal: payload.userToSignal,
+      });
     });
 
     socket.on(RETURNING_SIGNAL, payload => {
+      console.log(payload, 'returning_signal');
       io.to(payload.callerId).emit(RECEIVING_RETURNED_SIGNAL, { signal: payload.signal, id: socket.id });
     });
 

@@ -1,3 +1,4 @@
+/* eslint-disable prefer-rest-params */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useSnackbar } from 'notistack';
 import { createContext, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
@@ -56,30 +57,33 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
       });
 
       socketRef.current?.on(ALL_PARTICIPANTS, (_users: SocketUser[]) => {
-        console.log({ _users });
-
         const peers: PeerUser[] = [];
-        _users.forEach(socketUser => {
-          const peer = createPeer(socketUser.socketId, socketRef.current?.id as string, stream, socketUser.userId);
-          peersRef.current.push({
-            peerId: socketUser.socketId,
-            peer,
+        _users
+          .filter(user => user.userId !== currentUser?.id)
+          .forEach(socketUser => {
+            const peer = createPeer(socketUser.socketId, socketRef.current?.id as string, stream, socketUser.userId);
+            peersRef.current.push({
+              peerId: socketUser.socketId,
+              peer,
+            });
+            peers.push({ peer, socketId: socketUser.socketId, userId: socketUser.userId });
           });
-          peers.push({ peer, socketId: socketUser.socketId, userId: socketUser.userId });
-        });
+
         setPeers(peers);
       });
 
       socketRef.current?.on(USER_JOINED, payload => {
-        console.log(payload.callerId, payload.userId, 'xxxx');
+        const item = peersRef.current.find(p => p.peerId === payload.callerId);
+        if (!item) {
+          const peer = addPeer(payload.signal, payload.callerId, stream);
 
-        const peer = addPeer(payload.signal, payload.callerId, stream);
-        peersRef.current.push({
-          peerId: payload.callerId,
-          peer,
-        });
+          peersRef.current.push({
+            peerId: payload.callerId,
+            peer,
+          });
 
-        setPeers(peers => [...peers, { peer, userId: payload.userId, socketId: payload.callerId }]);
+          setPeers(ps => [...ps, { peer, userId: payload.userId, socketId: payload.callerId }]);
+        }
       });
 
       socketRef.current?.on(RECEIVING_RETURNED_SIGNAL, payload => {
@@ -97,7 +101,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
     });
 
     peer.on('signal', signal => {
-      socketRef.current?.emit(SENDING_SIGNAL, { userToSignal, callerId, signal, userId });
+      socketRef.current?.emit(SENDING_SIGNAL, { userToSignal, callerId, signal, userId: currentUser?.id });
     });
 
     return peer;

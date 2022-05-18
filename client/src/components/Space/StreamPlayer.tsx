@@ -46,7 +46,7 @@ const Video = (props: { peer: Peer.Instance; socketId?: string }) => {
         onClick={toggleMute}
         className="bg-indigo-500 text-slate-100 mt-2 rounded py-2 h-6 text-xs px-4 flex items-center justify-center mx-auto"
       >
-        {!currStream.enabled ? (
+        {!currStream.enabled && currentUser?.id === currentSpace?.ownerId ? (
           <BsFillMicFill size={20} className="text-slate-800 dark:text-slate-200 mx-auto" />
         ) : (
           <BsFillMicMuteFill size={20} className="text-slate-800 dark:text-slate-200 mx-auto" />
