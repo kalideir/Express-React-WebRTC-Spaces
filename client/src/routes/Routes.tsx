@@ -14,6 +14,7 @@ import {
 } from '../pages';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { NoAuthRoute, RequireAuthRoute } from './wrappers';
+import SocketProvider from '../spaces';
 
 export default function AppRoutes() {
   const location = useLocation();
@@ -31,7 +32,18 @@ export default function AppRoutes() {
         <Route path="/verify-account/:token" element={<NoAuthRoute element={VerifyAccount} />} />
 
         <Route path="/profile" element={<RequireAuthRoute element={Profile} />} />
-        <Route path="/space/:key/:slug" element={<RequireAuthRoute element={Space} />} />
+        <Route
+          path="/space/:key/:slug"
+          element={
+            <RequireAuthRoute
+              element={() => (
+                <SocketProvider>
+                  <Space />
+                </SocketProvider>
+              )}
+            />
+          }
+        />
         <Route path="/my-spaces" element={<RequireAuthRoute element={MySpaces} />} />
         <Route path="/spaces" element={<RequireAuthRoute element={Spaces} />} />
 

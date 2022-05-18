@@ -32,13 +32,17 @@ function NewSpace() {
     reset,
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      IsPublic: true,
+      title: '',
+    },
   });
   const navigate = useNavigate();
 
   async function onSubmitHandler(data: FieldValues) {
     setIsLoading(true);
     try {
-      const res = await dispatch(createSpace(data as SpaceData)).unwrap();
+      const res = await dispatch(createSpace({ ...data, isPublic: true } as SpaceData)).unwrap();
       const { message, space } = res;
       enqueueSnackbar(message, {
         variant: 'success',
@@ -108,13 +112,13 @@ function NewSpace() {
                   {errors.title && <div className="text-red-500 font-semibold">{errors.title.message}</div>}
                 </div>
               </div>
-              <div className="w-full">
+              {/* <div className="w-full">
                 <label htmlFor="default-toggle" className="relative inline-flex items-center cursor-pointer">
-                  <input {...register('isPublic')} type="checkbox" value="" id="default-toggle" className="sr-only peer" />
+                  <input {...register('isPublic')} type="checkbox" value="" id="default-toggle" className="sr-only" />
                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-slate-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600"></div>
-                  <span className="ml-3 text-sm font-medium text-slate-900 dark:text-slate-300">Public</span>
+                  <span className="ml-3 text-sm font-medium text-slate-900 dark:text-slate-300">Public only</span>
                 </label>
-              </div>
+              </div> */}
             </div>
             <div className="flex items-center p-6 space-x-2 rounded-b border-t border-slate-200 dark:border-slate-600">
               <button

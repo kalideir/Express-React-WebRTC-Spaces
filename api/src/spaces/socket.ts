@@ -5,13 +5,14 @@ import { joinSpace } from '../services';
 import { ParticipantStatus } from '../types';
 import { getValue, setValue } from '../utils';
 import {
-  ALLOW_REMOTE_MIC,
   ALL_PARTICIPANTS,
+  CLOSE,
   JOIN_SPACE,
-  MUTE_REMOTE_MIC,
   RECEIVING_RETURNED_SIGNAL,
   RETURNING_SIGNAL,
   SENDING_SIGNAL,
+  TOGGLE_REMOTE_MIC,
+  UPDATED_SPACE,
   USER_DISCONNECTED,
   USER_JOINED,
 } from './types';
@@ -29,8 +30,6 @@ export function initSocketServer(server: Server) {
   });
 
   io.on('connection', socket => {
-    console.log({ id: socket.id });
-
     socket.on(JOIN_SPACE, async ({ spaceId, userId, type }: { spaceId: string; userId: string; type: ParticipantStatus }) => {
       if (!spaceId || !userId || !type) return;
 
@@ -40,8 +39,6 @@ export function initSocketServer(server: Server) {
 
       const users = [...prevUsers];
       if (!exists) users.push({ socketId: socket.id, userId });
-
-      console.log({ users, prevUsers, exists });
 
       await setValue(spaceId, users);
 
@@ -54,11 +51,10 @@ export function initSocketServer(server: Server) {
 
       socket.emit(ALL_PARTICIPANTS, usersInThisRoom);
 
-      // spaceResponse && socket.emit(UPDATED_SPACE, spaceResponse);
+      socket.emit(UPDATED_SPACE, spaceResponse);
     });
 
     socket.on(SENDING_SIGNAL, payload => {
-      console.log(payload.callerId, payload.userId, payload.userToSignal, 'sending_signal');
       io.to(payload.userToSignal).emit(USER_JOINED, {
         signal: payload.signal,
         callerId: payload.callerId,
@@ -68,18 +64,13 @@ export function initSocketServer(server: Server) {
     });
 
     socket.on(RETURNING_SIGNAL, payload => {
-      console.log(payload, 'returning_signal');
       io.to(payload.callerId).emit(RECEIVING_RETURNED_SIGNAL, { signal: payload.signal, id: socket.id });
     });
 
-    socket.on(MUTE_REMOTE_MIC, targetId => {
-      console.log({ targetId });
+    socket.on(TOGGLE_REMOTE_MIC, targetId => {
+      console.log('muting');
 
-      io.to(targetId).emit(MUTE_REMOTE_MIC, targetId);
-    });
-
-    socket.on(ALLOW_REMOTE_MIC, targetId => {
-      io.to(targetId).emit(ALLOW_REMOTE_MIC);
+      io.to(targetId).emit(TOGGLE_REMOTE_MIC, targetId);
     });
 
     socket.on('disconnect', async () => {
@@ -92,7 +83,7 @@ export function initSocketServer(server: Server) {
       await setValue(spaceId, users);
       await setValue(`get-space-${socket.id}`, null);
 
-      io.to(socket.id).emit(USER_DISCONNECTED, socket.id);
+      socket.broadcast.emit(CLOSE, socket.id);
     });
   });
 
