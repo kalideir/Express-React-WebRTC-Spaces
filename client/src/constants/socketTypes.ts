@@ -8,6 +8,5 @@ export const UPDATED_SPACE = 'UPDATED_SPACE';
 export const MUTE_REMOTE_MIC = 'MUTE_REMOTE_MIC';
 export const UNMUTE_REMOTE_MIC = 'UNMUTE_REMOTE_MIC';
 export const USER_DISCONNECTED = 'USER_DISCONNECTED';
-export const MUTE = 'MUTE';
-export const UNMUTE = 'UNMUTE';
+export const END_SPACE = 'END_SPACE';
 export const CLOSE = 'CLOSE';

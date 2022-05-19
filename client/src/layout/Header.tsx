@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { BsPlusSquareFill } from 'react-icons/bs';
 import { selectIsAuthenticated } from '../store/authSlice';
 import { useAppDispatch, useTypedSelector } from '../hooks';
+import { BiNetworkChart } from 'react-icons/bi';
 
 function Header() {
   const [top, setTop] = useState(true);
@@ -24,8 +25,9 @@ function Header() {
       <div className="w-9/12 mx-auto">
         <div className="flex justify-between items-center h-10">
           <div>
-            <Link className="block text-slate-900 font-extrabold tracking-wider text-3xl dark:text-slate-200" to="/">
-              <span>xSpace</span>
+            <Link className="text-indigo-800 dark:text-indigo-200 font-extrabold tracking-wider text-3xl flex items-center justify-start" to="/">
+              <BiNetworkChart size={50} />
+              <span>Ether</span>
             </Link>
           </div>
 

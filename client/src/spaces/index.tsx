@@ -10,6 +10,7 @@ import { JoinSpace, PeerUser, SocketUser, SpaceContext } from '../@types';
 import {
   ALL_PARTICIPANTS,
   CLOSE,
+  END_SPACE,
   JOIN_SPACE,
   ParticipantTypes,
   RECEIVING_RETURNED_SIGNAL,
@@ -45,17 +46,13 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
       socketRef.current?.emit(JOIN_SPACE, {
         spaceId,
         userId: currentUser?.id,
-        type:
-          activeSpace?.ownerId === currentUser?.id
-            ? ParticipantTypes.HOST
-            : activeSpace?.isPublic
-            ? ParticipantTypes.GUEST
-            : ParticipantTypes.PENDING,
+        type: activeSpace?.ownerId === currentUser?.id ? ParticipantTypes.HOST : ParticipantTypes.GUEST,
+        // : activeSpace?.isPublic
+        // /?
+        // : ParticipantTypes.PENDING,
       });
 
       socketRef.current?.on(ALL_PARTICIPANTS, (_users: SocketUser[]) => {
-        console.log('users: ', _users);
-
         const peers: PeerUser[] = [];
         _users
           // .filter(user => user.userId !== currentUser?.id)
@@ -100,6 +97,15 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
         });
         setPeers(_peers); // we used socketId as a peerId above
         peersRef.current = peersRef.current.filter(peer => peer.peerId !== peerId);
+      });
+
+      socketRef.current?.on(END_SPACE, () => {
+        peers.forEach(peer => {
+          peer.peer.destroy();
+        });
+        setPeers([]);
+        peersRef.current = [];
+        navigate('/');
       });
     });
   }, [spaceId, currentUser?.id]);

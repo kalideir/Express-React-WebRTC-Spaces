@@ -24,3 +24,5 @@ export const getValue = async (key: string) => {
   const value = (await redisClient.get(key || '')) || 'null';
   return JSON.parse(value);
 };
+
+export const deleteKey = (key: string) => key && redisClient.del(key);

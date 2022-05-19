@@ -44,6 +44,13 @@ export function findSpaceById(id: string) {
 
 export async function updateSpace({ query }: FilterQuery<SpaceInput>, input: UpdateSpaceInput['body']) {
   const space = await SpaceModel.findOneAndUpdate(query, { ...input }, { new: true });
+
+  return await space.save();
+}
+
+export async function updateSpaceById(id, input: UpdateSpaceInput['body']) {
+  const space = await SpaceModel.findByIdAndUpdate(id, { ...input }, { new: true });
+
   return await space.save();
 }
 

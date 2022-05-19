@@ -1,12 +1,13 @@
 import config from 'config';
 import { Server } from 'http';
 import { Server as SocketServer } from 'socket.io';
-import { joinSpace } from '../services';
+import { joinSpace, setSpaceStatus, updateSpace, updateSpaceById } from '../services';
 import { ParticipantStatus } from '../types';
-import { getValue, setValue } from '../utils';
+import { deleteKey, getValue, setValue } from '../utils';
 import {
   ALL_PARTICIPANTS,
   CLOSE,
+  END_SPACE,
   JOIN_SPACE,
   MUTE_REMOTE_MIC,
   RECEIVING_RETURNED_SIGNAL,
@@ -33,6 +34,7 @@ export function initSocketServer(server: Server) {
   io.on('connection', socket => {
     socket.on(JOIN_SPACE, async ({ spaceId, userId, type }: { spaceId: string; userId: string; type: ParticipantStatus }) => {
       if (!spaceId || !userId || !type) return;
+      await updateSpace({ query: { key: spaceId } }, { startedAt: new Date() });
 
       const prevUsers = ((await getValue(spaceId)) as { userId: string; socketId: string }[]) || [];
 
@@ -76,6 +78,16 @@ export function initSocketServer(server: Server) {
       io.to(targetId).emit(UNMUTE_REMOTE_MIC, targetId);
     });
 
+    socket.on(END_SPACE, async (spaceId: string) => {
+      await deleteKey(spaceId);
+      await deleteKey(`get-space-${socket.id}`);
+      await deleteKey(`get-user-${socket.id}`);
+
+      await updateSpaceById(spaceId, { startedAt: null });
+
+      socket.broadcast.emit(END_SPACE);
+    });
+
     socket.on('disconnect', async () => {
       const spaceId = (await getValue(`get-space-${socket.id}`)) || '';
       const userId = (await getValue(`get-user-${socket.id}`)) || '';
@@ -84,7 +96,7 @@ export function initSocketServer(server: Server) {
       users = users.filter(user => user.socketId !== socket.id).filter(user => user.userId !== userId);
 
       await setValue(spaceId, users);
-      await setValue(`get-space-${socket.id}`, null);
+      await deleteKey(`get-space-${socket.id}`);
 
       socket.broadcast.emit(CLOSE, socket.id);
     });
