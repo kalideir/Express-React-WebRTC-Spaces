@@ -12,6 +12,7 @@ function Participants() {
   const query = useTypedSelector(spaceGuestQuery);
   const { peers } = useContext<{ peers: PeerUser[] }>(SocketContext);
   const currentUser = useTypedSelector(selectCurrentUser);
+
   const items = useMemo(() => {
     return (
       peers
@@ -24,16 +25,15 @@ function Participants() {
   }, [participants, peers]);
 
   const filtered = useMemo(
-    () => participants.filter((guest: ParticipantItem) => guest.user?.fullName.includes(query) || guest.user?.username.includes(query)),
-    [participants, query],
+    () => items.filter((user: PeerUser) => user.participant?.user?.fullName.includes(query) || user.participant?.user?.username?.includes(query)),
+    [items, query],
   );
 
   return (
     <div className="mt-5 bg-slate-50 dark:bg-slate-900 py-2 shadow-md rounded-md grid grid-cols-5 auto-rows-fr text-center self-center gap-1">
       <OwnStream />
-      {items.map((peerUser: PeerUser) => (
+      {filtered.map((peerUser: PeerUser) => (
         <div key={peerUser.socketId}>
-          {/* <StreamPlayer peer={peerUser.peer} /> */}
           <Participant key={nanoid()} socketId={peerUser.socketId} participant={peerUser.participant} peer={peerUser.peer} />
         </div>
       ))}

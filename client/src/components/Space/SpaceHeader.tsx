@@ -29,8 +29,7 @@ function SpaceHeader() {
           )}
         </button>
       </div>
-      <Divider />
-      <Board />
+      {/* <Board /> */}
     </div>
   );
 }

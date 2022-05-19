@@ -18,22 +18,30 @@ function Participant() {
   useEffect(() => {}, [socketRef, userStream]);
 
   socketRef.current?.on(MUTE_REMOTE_MIC, () => {
-    userStream.current?.srcObject?.getTracks()?.forEach((track: MediaStreamTrack) => {
-      track.enabled = false;
-    });
-    setMutedByHost(() => true);
+    if (streamEnabled) {
+      userStream.current?.srcObject?.getTracks()?.forEach((track: MediaStreamTrack) => {
+        track.enabled = false;
+      });
+      setMutedByHost(() => true);
+    }
   });
 
   socketRef.current?.on(UNMUTE_REMOTE_MIC, () => {
-    userStream.current?.srcObject?.getTracks()?.forEach((track: MediaStreamTrack) => {
-      track.enabled = true;
-    });
-    setMutedByHost(() => false);
+    if (streamEnabled) {
+      userStream.current?.srcObject?.getTracks()?.forEach((track: MediaStreamTrack) => {
+        track.enabled = true;
+      });
+      setMutedByHost(() => false);
+    }
   });
 
   function toggleMute() {
-    socketRef.current?.emit(streamEnabled ? MUTE_REMOTE_MIC : UNMUTE_REMOTE_MIC, socketRef.current.id);
-    setStreamEnabled(isEnabled => !isEnabled);
+    if (!mutedByHost) {
+      setStreamEnabled(isEnabled => !isEnabled);
+      userStream.current?.srcObject?.getTracks()?.forEach((track: MediaStreamTrack) => {
+        track.enabled = !track.enabled;
+      });
+    }
   }
 
   return (

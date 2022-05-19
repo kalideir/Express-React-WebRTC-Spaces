@@ -1,12 +1,13 @@
 import config from 'config';
 import { Server } from 'http';
 import { Server as SocketServer } from 'socket.io';
-import { joinSpace } from '../services';
+import { joinSpace, setSpaceStatus, updateSpace } from '../services';
 import { ParticipantStatus } from '../types';
-import { getValue, setValue } from '../utils';
+import { deleteKey, getValue, setValue } from '../utils';
 import {
   ALL_PARTICIPANTS,
   CLOSE,
+  END_SPACE,
   JOIN_SPACE,
   MUTE_REMOTE_MIC,
   RECEIVING_RETURNED_SIGNAL,
@@ -76,6 +77,14 @@ export function initSocketServer(server: Server) {
       io.to(targetId).emit(UNMUTE_REMOTE_MIC, targetId);
     });
 
+    socket.on(END_SPACE, async (spaceId: string) => {
+      await deleteKey(spaceId);
+      await deleteKey(`get-space-${socket.id}`);
+      await deleteKey(`get-user-${socket.id}`);
+
+      socket.broadcast.emit(END_SPACE);
+    });
+
     socket.on('disconnect', async () => {
       const spaceId = (await getValue(`get-space-${socket.id}`)) || '';
       const userId = (await getValue(`get-user-${socket.id}`)) || '';
@@ -85,6 +94,8 @@ export function initSocketServer(server: Server) {
 
       await setValue(spaceId, users);
       await setValue(`get-space-${socket.id}`, null);
+
+      await updateSpace({ _id: spaceId }, { startedAt: null });
 
       socket.broadcast.emit(CLOSE, socket.id);
     });

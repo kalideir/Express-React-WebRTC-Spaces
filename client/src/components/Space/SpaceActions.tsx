@@ -1,8 +1,10 @@
 import { MdGroups } from 'react-icons/md';
 import { IoMdPersonAdd } from 'react-icons/io';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useContext } from 'react';
 import { BsPlusSquareFill } from 'react-icons/bs';
 import { Dot } from '../../layout';
+import { SocketContext } from '../../spaces';
+
 import { useAppDispatch, useNow, useTypedSelector } from '../../hooks';
 import { selectActiveSpace, selectParticipants, selectPendingRequests, setSpaceGuestQuery } from '../../store/spaceSlice';
 import { showAddParticipantModal, showRequestsModal } from '../../store/uiSlice';
@@ -15,6 +17,7 @@ function SpaceActions() {
   const pending = useTypedSelector(selectPendingRequests);
   const activeSpace = useTypedSelector(selectActiveSpace);
   const { now } = useNow();
+  const { peers } = useContext(SocketContext);
 
   return (
     <div className="my-4">
@@ -40,7 +43,7 @@ function SpaceActions() {
           </div>
         </div>
         <div className="flex items-center justify-start">
-          <button
+          {/* <button
             onClick={() => dispatch(showAddParticipantModal())}
             className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 px-4 cursor-pointer"
           >
@@ -53,10 +56,10 @@ function SpaceActions() {
           >
             <IoMdPersonAdd className="mr-1" />
             <span>{pending.length}</span>
-          </div>
+          </div> */}
           <div className="mx-1 w-auto h-8 flex items-center justify-center text-slate-700 dark:text-slate-200 bg-slate-700 px-4 rounded-full cursor-pointer">
             <MdGroups size={20} className="mr-1" />
-            <span>{participants.length}</span>
+            <span>{peers.length + 1}</span>
           </div>
           <div className="ml-1 w-45 max-w-45 min-w-45 text-xs h-8 flex items-center justify-center bg-red-500 dark:bg-red-500 text-slate-50 px-4 rounded-full cursor-pointer">
             <Dot size={3} color="bg-green-100" />
