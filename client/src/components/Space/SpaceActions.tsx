@@ -61,10 +61,12 @@ function SpaceActions() {
             <MdGroups size={20} className="mr-1" />
             <span>{peers.length + 1}</span>
           </div>
-          <div className="ml-1 w-45 max-w-45 min-w-45 text-xs h-8 flex items-center justify-center bg-red-500 dark:bg-red-500 text-slate-50 px-4 rounded-full cursor-pointer">
-            <Dot size={3} color="bg-green-100" />
-            <span>{duration(now, activeSpace?.startedAt as string)}</span>
-          </div>
+          {activeSpace?.startedAt && (
+            <div className="ml-1 w-45 max-w-45 min-w-45 text-xs h-8 flex items-center justify-center bg-red-500 dark:bg-red-500 text-slate-50 px-4 rounded-full cursor-pointer">
+              <Dot size={3} color="bg-green-100" />
+              <span>{duration(now, activeSpace?.startedAt as string)}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

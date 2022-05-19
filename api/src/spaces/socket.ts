@@ -34,7 +34,7 @@ export function initSocketServer(server: Server) {
   io.on('connection', socket => {
     socket.on(JOIN_SPACE, async ({ spaceId, userId, type }: { spaceId: string; userId: string; type: ParticipantStatus }) => {
       if (!spaceId || !userId || !type) return;
-      await updateSpaceById(spaceId, { startedAt: new Date() });
+      await updateSpace({ query: { key: spaceId } }, { startedAt: new Date() });
 
       const prevUsers = ((await getValue(spaceId)) as { userId: string; socketId: string }[]) || [];
 
