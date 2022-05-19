@@ -1,13 +1,41 @@
-import React, { useContext } from 'react';
-import { ParticipantTypes } from '../../constants';
+import React, { useContext, useEffect, useState } from 'react';
+import { MUTE_REMOTE_MIC, ParticipantTypes, UNMUTE_REMOTE_MIC } from '../../constants';
 import { useTypedSelector } from '../../hooks';
 import { SocketContext } from '../../spaces';
 import { selectCurrentUser } from '../../store/authSlice';
+import { selectActiveSpace } from '../../store/spaceSlice';
 import { getAvatar } from '../../utils';
 
 function Participant() {
   const currentUser = useTypedSelector(selectCurrentUser);
-  const { userStream } = useContext(SocketContext);
+  const currentSpace = useTypedSelector(selectActiveSpace);
+  const { userStream, socketRef } = useContext(SocketContext);
+  const [mutedByHost, setMutedByHost] = useState(false);
+  const isSpaceHost = currentSpace?.ownerId === currentUser?.id;
+
+  const [streamEnabled, setStreamEnabled] = useState(true);
+
+  useEffect(() => {}, [socketRef, userStream]);
+
+  socketRef.current?.on(MUTE_REMOTE_MIC, () => {
+    userStream.current?.srcObject?.getTracks()?.forEach((track: MediaStreamTrack) => {
+      track.enabled = false;
+    });
+    setMutedByHost(() => true);
+  });
+
+  socketRef.current?.on(UNMUTE_REMOTE_MIC, () => {
+    userStream.current?.srcObject?.getTracks()?.forEach((track: MediaStreamTrack) => {
+      track.enabled = true;
+    });
+    setMutedByHost(() => false);
+  });
+
+  function toggleMute() {
+    socketRef.current?.emit(streamEnabled ? MUTE_REMOTE_MIC : UNMUTE_REMOTE_MIC, socketRef.current.id);
+    setStreamEnabled(isEnabled => !isEnabled);
+  }
+
   return (
     <>
       <div className="flex-col items-center justify-center mx-auto w-full bg-slate-200 dark:bg-slate-800 rounded-md py-4">
@@ -24,6 +52,22 @@ function Participant() {
         <span className="text-xs self-center block mt-2 text-slate-700 dark:text-slate-200 text-center">
           {currentUser?.fullName?.trim() || `@${currentUser?.username}`}
         </span>
+        {isSpaceHost && (
+          <button
+            onClick={toggleMute}
+            className="bg-indigo-500 text-slate-100 mt-2 rounded py-2 h-6 text-xs px-4 flex items-center justify-center mx-auto"
+          >
+            {!streamEnabled ? 'Unmute' : 'Mute'}
+          </button>
+        )}
+        {!isSpaceHost && !mutedByHost && (
+          <button
+            onClick={toggleMute}
+            className="bg-indigo-500 text-slate-100 mt-2 rounded py-2 h-6 text-xs px-4 flex items-center justify-center mx-auto"
+          >
+            {!streamEnabled ? 'Unmute' : 'Mute'}
+          </button>
+        )}
       </div>
     </>
   );

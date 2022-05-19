@@ -13,15 +13,12 @@ function Participant(props: IProps) {
   const { participant } = props;
   const user = participant?.user;
 
-  // if (!props.peer) return null;
-
   // if (!props.peer.connected) return null;
 
   return (
     <>
       <div className="flex-col items-center justify-center mx-auto w-full bg-slate-200 dark:bg-slate-800 rounded-md py-4">
         <StreamPlayer socketId={props.socketId} peer={props.peer} />
-        {props.peer.connected && 'truedfdfg'}
 
         <img src={user?.profilePicture?.smallUrl || getAvatar(user?.username)} className="bg-slate-500 rounded-full h-12 w-12 mx-auto" />
         <div className="flex items-center justify-center my-1">

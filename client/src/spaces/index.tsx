@@ -9,6 +9,7 @@ import io, { Socket } from 'socket.io-client';
 import { JoinSpace, PeerUser, SocketUser, SpaceContext } from '../@types';
 import {
   ALL_PARTICIPANTS,
+  CLOSE,
   JOIN_SPACE,
   ParticipantTypes,
   RECEIVING_RETURNED_SIGNAL,
@@ -23,7 +24,6 @@ import { getOnlineSpaces, selectActiveSpace, setActiveSpace } from '../store/spa
 export const SocketContext = createContext<any | SpaceContext>({});
 
 export default function SocketProvider({ children }: { children: ReactNode }) {
-  const socket = useRef<Socket | null>(null);
   const activeSpace = useTypedSelector(selectActiveSpace);
   const { enqueueSnackbar } = useSnackbar();
   const currentUser = useSelector(selectCurrentUser);
@@ -35,9 +35,6 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
   const userStream = useRef<any | null>({});
   const peersRef = useRef<{ peerId: string; peer: Peer.Instance }[]>([]);
   const spaceId = activeSpace?.key;
-  const [users, setUsers] = useState<SocketUser[]>([]);
-
-  const isAMember = users.find(user => user.userId === currentUser?.id);
 
   useEffect(() => {
     if (!currentUser?.id) return;
@@ -57,11 +54,13 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
       });
 
       socketRef.current?.on(ALL_PARTICIPANTS, (_users: SocketUser[]) => {
+        console.log('users: ', _users);
+
         const peers: PeerUser[] = [];
         _users
-          .filter(user => user.userId !== currentUser?.id)
+          // .filter(user => user.userId !== currentUser?.id)
           .forEach(socketUser => {
-            const peer = createPeer(socketUser.socketId, socketRef.current?.id as string, stream, socketUser.userId);
+            const peer = createPeer(socketUser.socketId, socketRef.current?.id as string, stream);
             peersRef.current.push({
               peerId: socketUser.socketId,
               peer,
@@ -90,14 +89,27 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
         const item = peersRef.current.find(p => p.peerId === payload.id);
         item?.peer.signal(payload.signal);
       });
+
+      socketRef.current?.on(CLOSE, (peerId: string) => {
+        const _peers = [...peers];
+        _peers.forEach((peer, index) => {
+          if (peer.socketId === peerId) {
+            peer.peer.destroy();
+            _peers.splice(index, 1);
+          }
+        });
+        setPeers(_peers); // we used socketId as a peerId above
+        peersRef.current = peersRef.current.filter(peer => peer.peerId !== peerId);
+      });
     });
   }, [spaceId, currentUser?.id]);
 
-  function createPeer(userToSignal: string /* socket id*/, callerId: string /* socket id */, stream: MediaStream, userId: string) {
+  function createPeer(userToSignal: string /* socket id*/, callerId: string /* socket id */, stream: MediaStream) {
     const peer = new Peer({
       initiator: true,
       trickle: false,
       stream,
+      config: { iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }, { urls: ['stun:stun1.l.google.com:19302'] }] },
     });
 
     peer.on('signal', signal => {
@@ -112,6 +124,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
       initiator: false,
       trickle: false,
       stream,
+      config: { iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }, { urls: ['stun:stun1.l.google.com:19302'] }] },
     });
 
     peer.on('signal', signal => {
@@ -158,8 +171,6 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <SocketContext.Provider value={{ socket: socket.current, socketRef, joinSpace, switchParticipantType, startSpace, userStream, peers, users }}>
-      {children}
-    </SocketContext.Provider>
+    <SocketContext.Provider value={{ socketRef, joinSpace, switchParticipantType, startSpace, userStream, peers }}>{children}</SocketContext.Provider>
   );
 }
