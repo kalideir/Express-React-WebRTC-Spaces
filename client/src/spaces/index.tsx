@@ -58,7 +58,7 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
 
         const peers: PeerUser[] = [];
         _users
-          .filter(user => user.userId !== currentUser?.id)
+          // .filter(user => user.userId !== currentUser?.id)
           .forEach(socketUser => {
             const peer = createPeer(socketUser.socketId, socketRef.current?.id as string, stream);
             peersRef.current.push({
@@ -91,8 +91,6 @@ export default function SocketProvider({ children }: { children: ReactNode }) {
       });
 
       socketRef.current?.on(CLOSE, (peerId: string) => {
-        console.log({ peerId });
-
         const _peers = [...peers];
         _peers.forEach((peer, index) => {
           if (peer.socketId === peerId) {

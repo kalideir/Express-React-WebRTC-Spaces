@@ -17,15 +17,11 @@ function Participants() {
       peers
         // .filter(({ userId }) => userId !== currentUser?.id)
         .map((peer: PeerUser) => {
-          // console.log('x', peer.userId, currentUser?.id);
-
           const participant = participants.find(participant => participant.userId === peer.userId);
           return { ...peer, participant };
         }, [])
     );
-  }, [participants, peers, currentUser?.id]);
-
-  console.log({ peers, items });
+  }, [participants, peers]);
 
   const filtered = useMemo(
     () => participants.filter((guest: ParticipantItem) => guest.user?.fullName.includes(query) || guest.user?.username.includes(query)),

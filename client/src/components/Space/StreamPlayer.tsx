@@ -1,11 +1,11 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import Peer from 'simple-peer';
 import { BsFillMicFill, BsFillMicMuteFill } from 'react-icons/bs';
-import { TOGGLE_REMOTE_MIC, MUTE } from '../../constants';
 import { useTypedSelector } from '../../hooks';
 import { SocketContext } from '../../spaces';
 import { selectCurrentUser } from '../../store/authSlice';
 import { selectActiveSpace } from '../../store/spaceSlice';
+import { MUTE_REMOTE_MIC, UNMUTE_REMOTE_MIC } from '../../constants';
 
 const Video = (props: { peer: Peer.Instance; socketId?: string }) => {
   const ref = useRef<any>({});
@@ -23,17 +23,9 @@ const Video = (props: { peer: Peer.Instance; socketId?: string }) => {
     });
   }, [props.peer]);
 
-  useEffect(() => {
-    socketRef.current?.on(TOGGLE_REMOTE_MIC, () => {
-      ref.current?.srcObject?.getTracks()?.forEach((track: MediaStreamTrack) => {
-        track.enabled = !track.enabled;
-      });
-      setStreamEnabled(!streamEnabled);
-    });
-  }, []);
-
   function toggleMute() {
-    socketRef.current?.emit(TOGGLE_REMOTE_MIC, props.socketId);
+    socketRef.current?.emit(streamEnabled ? MUTE_REMOTE_MIC : UNMUTE_REMOTE_MIC, props.socketId);
+    setStreamEnabled(isEnabled => !isEnabled);
   }
 
   return (

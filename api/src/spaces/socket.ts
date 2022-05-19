@@ -8,10 +8,11 @@ import {
   ALL_PARTICIPANTS,
   CLOSE,
   JOIN_SPACE,
+  MUTE_REMOTE_MIC,
   RECEIVING_RETURNED_SIGNAL,
   RETURNING_SIGNAL,
   SENDING_SIGNAL,
-  TOGGLE_REMOTE_MIC,
+  UNMUTE_REMOTE_MIC,
   UPDATED_SPACE,
   USER_DISCONNECTED,
   USER_JOINED,
@@ -67,10 +68,12 @@ export function initSocketServer(server: Server) {
       io.to(payload.callerId).emit(RECEIVING_RETURNED_SIGNAL, { signal: payload.signal, id: socket.id });
     });
 
-    socket.on(TOGGLE_REMOTE_MIC, targetId => {
-      console.log('muting');
+    socket.on(MUTE_REMOTE_MIC, targetId => {
+      io.to(targetId).emit(MUTE_REMOTE_MIC, targetId);
+    });
 
-      io.to(targetId).emit(TOGGLE_REMOTE_MIC, targetId);
+    socket.on(UNMUTE_REMOTE_MIC, targetId => {
+      io.to(targetId).emit(UNMUTE_REMOTE_MIC, targetId);
     });
 
     socket.on('disconnect', async () => {
